@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+<title>AskAnnuityAI — Ask anything about retirement & annuities</title>
+<meta name="description" content="The premium AI for retirement & annuity questions. Ask anything and get clear, unbiased, educational answers — instantly. Talk to a licensed professional when you're ready." />
+<meta property="og:title" content="AskAnnuityAI" />
+<meta property="og:description" content="Ask anything about retirement & annuities. Clear, unbiased, AI-powered education." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800;900&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"What is an annuity?","acceptedAnswer":{"@type":"Answer","text":"An annuity is a contract with an insurance company. You give the insurer money and receive guaranteed payments back, used mainly to create retirement income you cannot outlive, grow savings tax-deferred, or protect savings from market losses."}},
+{"@type":"Question","name":"Are annuities safe?","acceptedAnswer":{"@type":"Answer","text":"Fixed and fixed indexed annuities are designed to protect principal from market losses. Guarantees are backed by the claims-paying ability of the issuing insurer, plus state guaranty associations up to certain limits."}}
+]}
+</script>
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-warm:#FBFAF8;
+    --surface:#ffffff;
+    --elevated:#ffffff;
+    --ink:#0e1a2b;
+    --ink-2:#3b485c;
+    --muted:#838d9c;
+    --faint:#aab2bf;
+    --line:#ededf1;
+    --line-2:#f3f3f6;
+    --navy:#082B63;
+    --navy-soft:#0d3a82;
+    --gold:#D4A12B;
+    --gold-ink:#b8881d;
+    --accent:#082B63;
+    --on-accent:#ffffff;
+    --good:#1f9d57;
+    --r-lg:26px;
+    --r:18px;
+    --r-sm:13px;
+    --shadow-xs:0 1px 2px rgba(14,26,43,.04);
+    --shadow-sm:0 2px 8px rgba(14,26,43,.05),0 1px 2px rgba(14,26,43,.04);
+    --shadow:0 12px 36px rgba(14,26,43,.09);
+    --shadow-lg:0 30px 80px rgba(14,26,43,.16);
+    --hd:64px;
+    --ease:cubic-bezier(.22,.8,.26,1);
+    --maxw:1080px;
+    --read:720px;
+  }
+  html[data-theme="dark"]{
+    --bg:#0a0f17;
+    --bg-warm:#0c121b;
+    --surface:#111824;
+    --elevated:#141c2a;
+    --ink:#eef2f8;
+    --ink-2:#c2cbd9;
+    --muted:#8794a6;
+    --faint:#5e6b80;
+    --line:#1e2735;
+    --line-2:#18202c;
+    --navy:#3f6fb5;
+    --navy-soft:#5683c6;
+    --accent:#D4A12B;
+    --on-accent:#0a0f17;
+    --shadow-xs:0 1px 2px rgba(0,0,0,.4);
+    --shadow-sm:0 2px 10px rgba(0,0,0,.45);
+    --shadow:0 16px 50px rgba(0,0,0,.55);
+    --shadow-lg:0 30px 80px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;
+    background-color:var(--bg);
+    background-image:linear-gradient(to bottom, var(--bg) 0%, color-mix(in srgb,var(--bg) 90%,transparent) 22%, color-mix(in srgb,var(--bg) 52%,transparent) 52%, color-mix(in srgb,var(--bg) 14%,transparent) 80%, transparent 100%), url("https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=2400&q=80");
+    background-repeat:no-repeat,no-repeat;background-position:center,bottom center;background-size:cover,cover;background-attachment:fixed,fixed;
+    color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;letter-spacing:-.011em;transition:background-color .35s var(--ease),color .35s var(--ease)
+  }
+  ::selection{background:rgba(212,161,43,.24)}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+
+  /* ============ NAV ============ */
+  header{position:fixed;top:0;left:0;right:0;height:var(--hd);z-index:60;
+    background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
+  header.scrolled{border-color:var(--line);background:color-mix(in srgb,var(--bg) 86%,transparent)}
+  .nav{display:flex;align-items:center;height:var(--hd);gap:18px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16.5px;letter-spacing:-.03em;cursor:pointer}
+  .logo{width:30px;height:30px;border-radius:9px;background:var(--navy);display:grid;place-items:center;box-shadow:inset 0 0 0 1px rgba(212,161,43,.32)}
+  .logo svg{width:18px;height:18px}
+  .brand i{color:var(--gold);font-style:normal}
+  .nav-links{display:flex;gap:4px;margin-left:14px}
+  .nav-links a,.nav-ghost{padding:8px 13px;border-radius:10px;font-size:14px;font-weight:550;color:var(--ink-2);
+    background:none;border:0;cursor:pointer;transition:.15s}
+  .nav-links a:hover,.nav-ghost:hover{background:var(--bg-warm);color:var(--ink)}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+    color:var(--ink-2);cursor:pointer;display:grid;place-items:center;font-size:15px;transition:.15s}
+  .icon-btn:hover{background:var(--bg-warm);transform:translateY(-1px)}
+  .btn{border:0;cursor:pointer;font-weight:600;font-size:14px;padding:9px 17px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:8px;transition:transform .18s var(--ease),background .18s,box-shadow .18s,filter .18s;white-space:nowrap}
+  .btn:active{transform:scale(.96)}
+  .btn-accent{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-xs)}
+  .btn-accent:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+  .btn-gold{background:var(--gold);color:#0a1730}
+  .btn-gold:hover{background:var(--gold-ink);transform:translateY(-1px)}
+  .btn-soft{background:var(--bg-warm);color:var(--ink);border:1px solid var(--line)}
+  .btn-soft:hover{border-color:var(--faint);transform:translateY(-1px)}
+  .btn-lg{padding:14px 26px;font-size:15.5px}
+  .nav-ghost.sm-hide,.nav-links{}
+  #newChatBtn{display:none}
+  body.chatting #newChatBtn{display:inline-flex}
+  body.chatting .nav-links{display:none}
+
+  /* ============ APP SHELL ============ */
+  main{padding-top:var(--hd)}
+
+  /* ============ HERO / EMPTY STATE ============ */
+  .hero{min-height:calc(100vh - var(--hd));display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:40px 24px 60px;position:relative}
+  body.chatting .landing{display:none}
+  .orb{width:78px;height:78px;position:relative;margin-bottom:30px;animation:floaty 6s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .orb .core{position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #1a4a96 0%, var(--navy) 52%, #06224f 100%);
+    box-shadow:0 10px 30px rgba(8,43,99,.34), inset 0 2px 8px rgba(255,255,255,.18)}
+  .orb .sheen{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 70% 78%, rgba(212,161,43,.55), transparent 42%);mix-blend-mode:screen}
+  .orb .ring{position:absolute;inset:-9px;border-radius:50%;border:1.5px solid rgba(8,43,99,.16);animation:pulse 2.8s ease-out infinite}
+  html[data-theme="dark"] .orb .ring{border-color:rgba(212,161,43,.28)}
+  .orb .ring:nth-child(4){animation-delay:1.4s}
+  @keyframes pulse{0%{transform:scale(.82);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+  .orb .spark{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;background:var(--gold);
+    transform:translate(-50%,-50%);box-shadow:0 0 14px 3px rgba(212,161,43,.7);animation:twinkle 3s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:.85;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}}
+  .eyebrow{font-size:13.5px;font-weight:600;color:var(--muted);margin-bottom:18px;opacity:0;animation:fadeUp .7s var(--ease) .05s forwards}
+  .eyebrow b{color:var(--gold-ink)}
+  html[data-theme="dark"] .eyebrow b{color:var(--gold)}
+  .hero h1{font-size:clamp(38px,6.4vw,68px);font-weight:850;max-width:880px;letter-spacing:-.04em;line-height:1.02;
+    opacity:0;animation:fadeUp .8s var(--ease) .12s forwards}
+  .hero h1 em{font-style:normal;color:var(--gold)}
+  .hero .lede{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:540px;margin:20px auto 0;font-weight:450;
+    opacity:0;animation:fadeUp .8s var(--ease) .2s forwards}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  .askbox{width:100%;max-width:680px;margin:34px auto 0;opacity:0;animation:fadeUp .8s var(--ease) .3s forwards}
+  .askwrap{display:flex;align-items:flex-end;gap:8px;background:var(--surface);border:1px solid var(--line);
+    border-radius:24px;padding:10px 10px 10px 22px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s,transform .2s}
+  .askwrap:focus-within{border-color:color-mix(in srgb,var(--navy) 45%,transparent);
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--navy) 12%,transparent),var(--shadow)}
+  .askwrap textarea{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-size:17px;font-family:inherit;
+    resize:none;padding:12px 0;max-height:160px;line-height:1.5}
+  .askwrap textarea::placeholder{color:var(--faint)}
+  .sendbtn{width:44px;height:44px;border-radius:15px;border:0;background:var(--accent);color:var(--on-accent);cursor:pointer;
+    display:grid;place-items:center;transition:.18s var(--ease);flex:0 0 44px}
+  .sendbtn:hover{filter:brightness(1.08);transform:scale(1.05)}
+  .sendbtn:disabled{opacity:.35;cursor:default;transform:none;filter:none}
+  .sendbtn svg{width:19px;height:19px}
+  .kbd-hint{font-size:12px;color:var(--faint);margin-top:12px}
+  .kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:11px;font-weight:600;color:var(--muted)}
+
+  .prompts{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;max-width:660px;margin:24px auto 0;
+    opacity:0;animation:fadeUp .8s var(--ease) .4s forwards}
+  .prompt{background:var(--surface);border:1px solid var(--line);color:var(--ink-2);font-size:13.5px;font-weight:500;
+    padding:10px 16px;border-radius:999px;cursor:pointer;transition:.18s var(--ease);box-shadow:var(--shadow-xs)}
+  .prompt:hover{border-color:color-mix(in srgb,var(--navy) 35%,transparent);color:var(--ink);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+
+  .scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--faint);
+    display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;animation:fadeUp 1s var(--ease) .7s forwards}
+  .scrollcue span{animation:bobble 1.8s ease-in-out infinite}
+  @keyframes bobble{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+  /* ============ CHAT MODE ============ */
+  .chatpane{display:none;position:fixed;inset:var(--hd) 0 0 0;flex-direction:column;z-index:30;background:var(--bg)}
+  body.chatting .chatpane{display:flex;animation:fadeIn .4s var(--ease)}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .chatscroll{flex:1;overflow-y:auto;scroll-behavior:smooth}
+  .chatscroll-inner{max-width:var(--read);margin:0 auto;padding:30px 22px 150px}
+  .msg{display:flex;gap:14px;margin-bottom:30px;animation:msgIn .45s var(--ease)}
+  @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .msg .avatar{width:30px;height:30px;border-radius:9px;flex:0 0 30px;display:grid;place-items:center;margin-top:2px}
+  .msg.ai .avatar{background:var(--navy);box-shadow:inset 0 0 0 1px rgba(212,161,43,.3)}
+  .msg.ai .avatar svg{width:17px;height:17px}
+  .msg.user{justify-content:flex-end}
+  .msg.user .content{max-width:84%}
+  .msg.user .bubble{background:var(--accent);color:var(--on-accent);padding:13px 18px;border-radius:20px;border-bottom-right-radius:7px;font-size:15.5px}
+  .msg.ai .content{flex:1;min-width:0}
+  .msg.ai .text{font-size:16px;color:var(--ink);line-height:1.68}
+  .msg.ai .text p{margin:0 0 13px}.msg.ai .text p:last-child{margin:0}
+  .msg.ai .text strong{font-weight:700}
+  .msg.ai .text .cursor{display:inline-block;width:8px;height:18px;background:var(--gold);vertical-align:text-bottom;border-radius:2px;animation:blink 1s steps(2) infinite;margin-left:2px}
+  @keyframes blink{50%{opacity:0}}
+  /* skeleton */
+  .skel{display:flex;flex-direction:column;gap:10px;padding-top:4px}
+  .skel i{height:13px;border-radius:7px;background:linear-gradient(90deg,var(--line-2) 25%,var(--line) 37%,var(--line-2) 63%);
+    background-size:400% 100%;animation:shimmer 1.4s ease infinite;display:block}
+  .skel i:nth-child(1){width:92%}.skel i:nth-child(2){width:99%}.skel i:nth-child(3){width:74%}
+  @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+  .sources{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg-warm)}
+  .sources summary{cursor:pointer;list-style:none;padding:11px 15px;font-size:13px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+  .sources summary::-webkit-details-marker{display:none}
+  .sources summary .chev{margin-left:auto;transition:.2s;color:var(--faint)}
+  .sources[open] summary .chev{transform:rotate(180deg)}
+  .sources .src-body{padding:2px 15px 14px;font-size:13px;color:var(--muted)}
+  .sources .src-body b{color:var(--ink-2);font-weight:600}
+  .ctrls{display:flex;gap:4px;margin-top:12px}
+  .ctrl{background:none;border:0;color:var(--faint);cursor:pointer;font-size:12.5px;font-weight:550;padding:6px 9px;border-radius:9px;
+    display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  .ctrl:hover{background:var(--bg-warm);color:var(--ink-2)}
+  .ctrl.done{color:var(--good)}
+  .followups{margin-top:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .fu{background:var(--surface);border:1px solid var(--line);color:var(--ink-2);font-size:14px;font-weight:500;
+    padding:11px 16px;border-radius:14px;cursor:pointer;text-align:left;transition:.18s var(--ease);max-width:100%}
+  .fu:hover{border-color:color-mix(in srgb,var(--navy) 35%,transparent);color:var(--ink);transform:translateX(3px)}
+  .fu::before{content:'↳';color:var(--gold);margin-right:8px;font-weight:700}
+
+  .procard{margin-top:18px;border:1px solid var(--line);background:var(--bg-warm);border-radius:18px;padding:18px 20px}
+  .procard h4{font-size:16px;font-weight:700;margin:0 0 5px}
+  .procard p{margin:0 0 13px;font-size:14px;color:var(--muted)}
+  .procard .row{display:flex;gap:9px;flex-wrap:wrap}
+
+  /* composer (chat mode) */
+  .composerbar{position:absolute;left:0;right:0;bottom:0;padding:14px 22px 22px;
+    background:linear-gradient(180deg,transparent,var(--bg) 32%)}
+  .composer{max-width:var(--read);margin:0 auto;display:flex;align-items:flex-end;gap:8px;
+    background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:9px 9px 9px 20px;box-shadow:var(--shadow)}
+  .composer:focus-within{border-color:color-mix(in srgb,var(--navy) 45%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--navy) 12%,transparent),var(--shadow)}
+  .composer textarea{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-size:16px;font-family:inherit;resize:none;padding:11px 0;max-height:150px;line-height:1.5}
+  .composer textarea::placeholder{color:var(--faint)}
+  .disc{max-width:var(--read);margin:9px auto 0;text-align:center;font-size:11px;color:var(--faint)}
+
+  /* ============ SECTIONS (landing) ============ */
+  section.blk{padding:84px 0}
+  .center{text-align:center;max-width:640px;margin:0 auto 46px}
+  .kicker{font-size:13px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-ink)}
+  html[data-theme="dark"] .kicker{color:var(--gold)}
+  .center h2{font-size:clamp(28px,4vw,42px);margin-top:12px}
+  .center p{color:var(--muted);font-size:18px;margin-top:14px}
+  .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:30px;
+    box-shadow:var(--shadow-xs);transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
+  .card:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:var(--line)}
+  .card .ic{width:46px;height:46px;border-radius:13px;background:var(--bg-warm);display:grid;place-items:center;margin-bottom:17px;color:var(--navy)}
+  .card .ic svg{width:23px;height:23px}
+  .card h3{font-size:19px;font-weight:700}
+  .card p{color:var(--muted);font-size:14.5px;margin:9px 0 0}
+
+  /* talk */
+  .talk{background:var(--bg-warm);border:1px solid var(--line);border-radius:var(--r-lg);padding:46px;
+    display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+  .talk h2{font-size:clamp(26px,3.4vw,36px)}
+  .talk .s{color:var(--muted);font-size:17px;margin:14px 0 24px}
+  .contact a{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);
+    padding:15px 18px;border-radius:15px;margin-bottom:11px;transition:.2s var(--ease)}
+  .contact a:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);border-color:color-mix(in srgb,var(--navy) 30%,transparent)}
+  .contact .ic{width:42px;height:42px;border-radius:12px;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:18px;flex:0 0 42px}
+  html[data-theme="dark"] .contact .ic{color:#0a0f17}
+  .contact b{display:block;font-size:15px}.contact small{color:var(--muted)}
+  .leadcard{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:var(--shadow-sm)}
+  .leadcard h3{font-size:21px}
+  .leadcard .s{color:var(--muted);font-size:14px;margin:5px 0 20px}
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+  .fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);
+    border-radius:13px;padding:13px 15px;font-size:15px;font-family:inherit;outline:0;transition:.18s}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{border-color:color-mix(in srgb,var(--navy) 45%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--navy) 11%,transparent)}
+  .fld.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .leadok{display:none;text-align:center;padding:26px 6px}
+  .leadok .big{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good);display:grid;place-items:center;font-size:30px;margin:0 auto 14px}
+
+  /* footer resource cards */
+  .res{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .rcard{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    padding:28px;box-shadow:var(--shadow-xs);transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
+  .rcard:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--navy) 25%,transparent)}
+  .rcard:hover .arrow{transform:translateX(5px);color:var(--gold-ink)}
+  .rcard .emoji{font-size:30px}
+  .rcard h3{font-size:18px;font-weight:700;margin:16px 0 7px}
+  .rcard p{color:var(--muted);font-size:14px;margin:0;flex:1}
+  .rcard .arrow{margin-top:18px;font-weight:700;font-size:14px;color:var(--ink-2);transition:.25s var(--ease);align-self:flex-start}
+
+  footer{border-top:1px solid var(--line);padding:34px 0;margin-top:30px}
+  .foot{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start;color:var(--muted);font-size:12.5px;line-height:1.55}
+  .foot .legal{max-width:680px}.foot .legal b{color:var(--ink-2)}
+  .foot a.adm{color:var(--muted)}.foot a.adm:hover{color:var(--ink)}
+
+  /* ============ SIDEBAR (saved area) ============ */
+  .sb-backdrop{position:fixed;inset:0;background:rgba(8,14,24,.42);backdrop-filter:blur(2px);z-index:65;opacity:0;pointer-events:none;transition:opacity .25s}
+  body.sidebar-open .sb-backdrop{opacity:1;pointer-events:auto}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;z-index:70;display:flex;flex-direction:column;
+    background:var(--bg-warm);border-right:1px solid var(--line);transform:translateX(-100%);transition:transform .3s var(--ease)}
+  body.sidebar-open .sidebar{transform:none}
+  .sb-top{display:flex;align-items:center;gap:10px;padding:15px 14px 8px}
+  .sb-brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:15px}
+  .sb-brand .logo{width:26px;height:26px;border-radius:7px}
+  .sb-brand i{color:var(--gold);font-style:normal}
+  .sb-x{margin-left:auto;width:32px;height:32px;border-radius:9px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;transition:.15s}
+  .sb-x:hover{background:var(--line);color:var(--ink)}
+  .sb-new{margin:8px 12px;display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:13px;
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;font-size:14px;cursor:pointer;transition:.15s var(--ease);box-shadow:var(--shadow-xs)}
+  .sb-new:hover{border-color:var(--faint);transform:translateY(-1px)}
+  .sb-search{margin:0 12px 6px}
+  .sb-search input{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:11px;padding:9px 12px;font-size:13.5px;outline:0;font-family:inherit;transition:.15s}
+  .sb-search input:focus{border-color:color-mix(in srgb,var(--navy) 40%,transparent)}
+  .sb-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);padding:10px 18px 4px}
+  .sb-list{flex:1;overflow-y:auto;padding:0 8px 8px}
+  .sb-item{width:100%;display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:11px;border:0;background:transparent;
+    color:var(--ink-2);cursor:pointer;font-size:13.5px;font-family:inherit;text-align:left;transition:.13s;margin-bottom:2px}
+  .sb-item:hover{background:var(--surface);color:var(--ink)}
+  .sb-item.active{background:var(--surface);color:var(--ink);box-shadow:inset 2.5px 0 0 var(--gold)}
+  .sb-item .sb-ic{flex:0 0 auto;opacity:.55;font-size:13px}
+  .sb-item .sb-tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sb-empty{color:var(--faint);font-size:13px;padding:14px 18px;line-height:1.5}
+  .sb-foot{border-top:1px solid var(--line);padding:10px 12px}
+  .sb-fav{width:100%;display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;border:0;background:transparent;color:var(--ink-2);cursor:pointer;font-size:13.5px;font-family:inherit;transition:.13s;margin-bottom:4px}
+  .sb-fav:hover{background:var(--surface);color:var(--ink)}
+  .sb-user{display:flex;align-items:center;gap:10px;padding:7px 6px 4px}
+  .sb-av{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:0 0 32px}
+  html[data-theme="dark"] .sb-av{color:#0a0f17}
+  .sb-user .nm{font-size:13.5px;font-weight:600;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sb-user .em{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sb-out{margin-left:auto;background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;font-weight:600;padding:6px 8px;border-radius:8px;transition:.15s}
+  .sb-out:hover{background:var(--line);color:var(--ink)}
+  #sbToggle{display:none}
+  body.authed #sbToggle{display:grid}
+  .gbtn{font-weight:600}
+  /* welcome / how-it-works popup */
+  .welcome-head{text-align:center;margin-bottom:20px}
+  .welcome-head h3{font-size:21px;font-weight:800}
+  .welcome-head p{color:var(--muted);font-size:14px;margin-top:7px}
+  .w-orb{width:54px;height:54px;border-radius:50%;margin:0 auto 14px;position:relative;
+    background:radial-gradient(circle at 32% 28%,#1a4a96,var(--navy) 55%,#06224f);box-shadow:0 8px 22px rgba(8,43,99,.35)}
+  .w-orb::after{content:'';position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:var(--gold);transform:translate(-50%,-50%);box-shadow:0 0 12px 3px rgba(212,161,43,.7)}
+  .steps{display:flex;flex-direction:column;gap:15px;margin:4px 0 22px}
+  .step{display:flex;gap:13px;align-items:flex-start}
+  .step .num{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:0 0 30px;margin-top:1px}
+  html[data-theme="dark"] .step .num{background:var(--gold);color:#0a0f17}
+  .step h4{font-size:15.5px;font-weight:700;margin:0 0 3px}
+  .step p{font-size:13.5px;color:var(--muted);margin:0;line-height:1.5}
+  .skip{display:block;width:100%;text-align:center;margin-top:14px;color:var(--muted);font-size:13.5px;font-weight:550;background:none;border:0;cursor:pointer;padding:6px}
+  .skip:hover{color:var(--ink)}
+  @media(min-width:1024px){
+    body.sidebar-open header{left:280px}
+    body.sidebar-open main{margin-left:280px}
+    body.sidebar-open .chatpane{left:280px}
+  }
+  @media(max-width:1023px){ .sidebar{width:86vw;max-width:320px} }
+
+  /* ============ MODALS ============ */
+  .ov{position:fixed;inset:0;background:rgba(10,16,26,.5);backdrop-filter:blur(5px);z-index:90;display:none;align-items:center;justify-content:center;padding:20px}
+  .ov.open{display:flex;animation:fadeIn .2s}
+  .sheet{background:var(--surface);border:1px solid var(--line);border-radius:24px;width:100%;max-width:740px;max-height:90vh;overflow:auto;box-shadow:var(--shadow-lg);animation:sheetIn .3s var(--ease)}
+  @keyframes sheetIn{from{transform:translateY(16px) scale(.985);opacity:0}to{transform:none;opacity:1}}
+  .sheet.sm{max-width:420px}
+  .sh-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line-2);position:sticky;top:0;background:var(--surface);z-index:2;border-radius:24px 24px 0 0}
+  .sh-head h3{font-size:18px;font-weight:700}
+  .x{width:34px;height:34px;border-radius:10px;border:0;background:var(--bg-warm);color:var(--ink-2);cursor:pointer;font-size:15px;transition:.15s}
+  .x:hover{background:var(--line)}
+  .sh-body{padding:24px}
+  .auth-btns{display:grid;gap:10px;margin-bottom:16px}
+  .auth-btns button{display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;cursor:pointer;transition:.15s}
+  .auth-btns button:hover{background:var(--bg-warm);transform:translateY(-1px)}
+  .divider{text-align:center;color:var(--faint);font-size:12px;margin:16px 0;position:relative}
+  .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--line)}
+  .divider::before{left:0}.divider::after{right:0}
+  .err{color:#d4503f;font-size:13px;min-height:18px;margin-top:6px}
+  .tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:0;padding:11px 14px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+  .tab.active{color:var(--ink);border-bottom-color:var(--gold)}
+  .drop{border:2px dashed var(--line);border-radius:16px;padding:32px;text-align:center;color:var(--muted);cursor:pointer;background:var(--bg-warm);transition:.18s}
+  .drop.drag{border-color:var(--navy);color:var(--navy);background:color-mix(in srgb,var(--navy) 6%,transparent)}
+  .drop .big{font-size:28px;margin-bottom:6px}
+  .hint{font-size:12.5px;color:var(--ink-2);background:var(--bg-warm);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin:12px 0}
+  .kbi{border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin-bottom:9px;background:var(--surface)}
+  .kbi .t{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .kbi b{font-size:14px}.kbi .src{font-size:11px;color:var(--muted);background:var(--bg-warm);padding:2px 8px;border-radius:7px;border:1px solid var(--line)}
+  .kbi p{margin:6px 0 0;font-size:12.5px;color:var(--muted);max-height:46px;overflow:hidden}
+  .del{background:none;border:0;color:#d4503f;cursor:pointer;font-size:12px;font-weight:600}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:var(--bg-warm);border:1px solid var(--line);border-radius:15px;padding:18px}
+  .stat b{display:block;font-size:28px;font-weight:850;letter-spacing:-.02em}
+  .stat span{font-size:12.5px;color:var(--muted)}
+  .row{border:1px solid var(--line);border-radius:13px;padding:12px 15px;margin-bottom:8px;font-size:13.5px}
+  .row .meta{color:var(--muted);font-size:12px}
+  .save-row{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .flash{color:var(--good);font-weight:600;font-size:13px;opacity:0;transition:.2s}.flash.show{opacity:1}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hist{border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin-bottom:8px;cursor:pointer;transition:.15s}
+  .hist:hover{border-color:color-mix(in srgb,var(--navy) 30%,transparent);transform:translateY(-1px)}
+  .hist b{font-size:14px}.hist .meta{font-size:12px;color:var(--muted)}
+  .empty{text-align:center;color:var(--muted);padding:30px 10px}
+  .empty .e{font-size:30px;opacity:.5;margin-bottom:8px}
+
+  /* toast */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);z-index:120;
+    background:var(--navy);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:550;
+    box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.3s var(--ease)}
+  html[data-theme="dark"] .toast{background:var(--gold);color:#0a0f17}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media(max-width:880px){
+    .feats,.res{grid-template-columns:1fr}
+    .talk{grid-template-columns:1fr;padding:30px}
+    .fld.two,.grid2,.stat-grid{grid-template-columns:1fr}
+    .nav-links{display:none}
+    .nav-ghost.sm-hide{display:none}
+    .hero{min-height:calc(100svh - var(--hd));padding-top:20px}
+    .chatscroll-inner{padding:22px 16px 140px}
+    .composerbar{padding:12px 14px 16px}
+  }
+  @media print{
+    header,.composerbar,.prompts,.scrollcue,.ctrls,.followups,.procard,.icon-btn,.ov{display:none !important}
+    body.chatting .chatpane{position:static}
+    .chatscroll{overflow:visible}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<svg style="display:none">
+  <symbol id="mtn" viewBox="0 0 24 24" fill="none">
+    <path d="M1 20 L7.5 8.5 L11 14 L14.5 6.5 L23 20 Z" fill="#fff"/>
+    <path d="M6 12.2 L8.4 10 L9.6 11.9 Z" fill="#082B63"/>
+    <path d="M13.4 9.6 L15.6 11.8 L17.4 9.6 Z" fill="#082B63"/>
+  </symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+</svg>
+
+<div class="sb-backdrop" id="sbBackdrop"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-brand"><span class="logo"><svg><use href="#mtn"/></svg></span>AskAnnuity<i>AI</i></div>
+    <button class="sb-x" id="sbClose" title="Collapse">‹</button>
+  </div>
+  <button class="sb-new" id="sbNew"><span style="font-size:16px;line-height:1">＋</span> New chat</button>
+  <div class="sb-search"><input id="sbSearch" placeholder="Search chats…"></div>
+  <div class="sb-label">Saved conversations</div>
+  <div class="sb-list" id="sbHistory"></div>
+  <div class="sb-foot">
+    <button class="sb-fav" id="sbFavBtn"><span>⭐</span> Favorites <span id="sbFavCount" style="margin-left:auto;color:var(--faint);font-weight:700">0</span></button>
+    <div class="sb-user">
+      <div class="sb-av" id="sbAvatar">A</div>
+      <div style="min-width:0;flex:1"><div class="nm" id="sbName">Member</div><div class="em" id="sbEmail"></div></div>
+      <button class="sb-out" id="sbSignout">Sign out</button>
+    </div>
+  </div>
+</aside>
+
+<header id="hdr">
+  <div class="wrap nav">
+    <button class="icon-btn" id="sbToggle" title="Conversations" style="margin-right:2px">☰</button>
+    <div class="brand" id="brandHome">
+      <span class="logo"><svg><use href="#mtn"/></svg></span>
+      AskAnnuity<i>AI</i>
+    </div>
+    <nav class="nav-links">
+      <a id="askNav">Ask AI</a>
+      <a href="#resources">Resources</a>
+      <a href="#talk">Book a Call</a>
+    </nav>
+    <button class="nav-ghost" id="newChatBtn">＋ New chat</button>
+    <div class="nav-right">
+      <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
+      <button class="nav-ghost sm-hide" id="loginBtn">Sign in</button>
+      <button class="btn btn-soft sm-hide" id="adminBtn">Admin</button>
+      <button class="btn btn-accent" id="bookNav">Book a Professional</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="landing">
+    <!-- HERO / EMPTY STATE -->
+    <section class="hero">
+      <div class="orb">
+        <span class="ring"></span><span class="ring"></span>
+        <span class="core"></span><span class="sheen"></span><span class="spark"></span>
+      </div>
+      <div class="eyebrow">Unbiased · AI-powered · <b>Always free</b></div>
+      <h1>Ask anything about<br>retirement &amp; <em>annuities</em>.</h1>
+      <p class="lede">Clear, calm, jargon-free answers — instantly. The smartest way to understand your retirement income, with a licensed professional whenever you want one.</p>
+
+      <div class="askbox">
+        <div class="askwrap">
+          <textarea id="heroInput" rows="1" placeholder="Ask me anything about retirement…"></textarea>
+          <button class="sendbtn" id="heroSend" title="Ask" disabled><svg><use href="#send"/></svg></button>
+        </div>
+        <div class="kbd-hint">Press <span class="kbd">/</span> to focus · <span class="kbd">⌘K</span> for history</div>
+      </div>
+
+      <div class="prompts" id="prompts"></div>
+
+      <div class="scrollcue"><span>↓</span>Learn how it works</div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="blk wrap" id="how">
+      <div class="center">
+        <div class="kicker">Why AskAnnuityAI</div>
+        <h2>Designed to feel effortless.</h2>
+        <p>No forms, no jargon, no pressure. Just the clearest path from a question to real confidence.</p>
+      </div>
+      <div class="feats">
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l2.2 5.5L20 9.5l-4 4 1 6-5-2.8L7 19.5l1-6-4-4 5.8-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+          <h3>Ask in plain English</h3>
+          <p>Type like you'd text a sharp friend. The AI explains annuities, income, taxes, and market risk — simply.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <h3>Cited &amp; honest</h3>
+          <p>Every answer shows its source. If it isn't sure, it says so — accuracy beats sounding confident.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <h3>A human when ready</h3>
+          <p>Want real numbers? Reach a licensed professional in one tap — no obligation, no hard sell.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TALK -->
+    <section class="blk wrap" id="talk">
+      <div class="talk">
+        <div>
+          <div class="kicker">Talk to a professional</div>
+          <h2 style="margin-top:12px">Real numbers, from a real person.</h2>
+          <p class="s">Get a free, no-obligation retirement income review with current rates from a licensed professional who works for you.</p>
+          <div class="contact">
+            <a id="callLink" href="tel:+15555550123"><span class="ic">📞</span><span><b>Call directly</b><small id="phoneLabel">(555) 555-0123</small></span></a>
+            <a id="bookLink" href="#" target="_blank" rel="noopener"><span class="ic">📅</span><span><b>Book a retirement review</b><small>Pick a time that works for you</small></span></a>
+          </div>
+        </div>
+        <div class="leadcard">
+          <form id="leadForm">
+            <h3>Request your free review</h3>
+            <p class="s">A licensed professional will reach out. No obligation.</p>
+            <div class="fld"><label>Full name</label><input name="name" required placeholder="Jane Saver"></div>
+            <div class="fld two">
+              <div><label>Email</label><input name="email" type="email" required placeholder="jane@email.com"></div>
+              <div><label>Phone</label><input name="phone" type="tel" required placeholder="(555) 555-0123"></div>
+            </div>
+            <div class="fld"><label>Amount you're considering (optional)</label>
+              <select name="amount"><option value="">Prefer not to say</option><option>Under $50k</option><option>$50k–$150k</option><option>$150k–$500k</option><option>$500k+</option></select></div>
+            <div class="fld"><label>What can we help with? (optional)</label><textarea name="message" rows="2" placeholder="e.g. I'm 60 and want guaranteed income at 67…"></textarea></div>
+            <button type="submit" class="btn btn-accent btn-lg" style="width:100%;justify-content:center">Request my free review →</button>
+          </form>
+          <div class="leadok" id="leadOk"><div class="big">✓</div><h3>Thank you.</h3><p class="s">Your request is in. A licensed professional will reach out shortly. Prefer to talk now? Call <b id="okPhone">(555) 555-0123</b>.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section class="blk wrap" id="resources">
+      <div class="center"><div class="kicker">Keep learning</div><h2>Go deeper.</h2></div>
+      <div class="res">
+        <a class="rcard" id="cardBook" href="#" target="_blank" rel="noopener">
+          <div class="emoji">📘</div><h3>Indexed Annuity Secrets</h3><p>The plain-English guide to protected, predictable retirement income.</p><span class="arrow">Read the book →</span></a>
+        <a class="rcard" id="cardUni" href="#" target="_blank" rel="noopener">
+          <div class="emoji">🎓</div><h3>University</h3><p>Free, on-demand courses on retirement income, taxes, and market risk.</p><span class="arrow">Start learning →</span></a>
+        <a class="rcard" id="cardSite" href="https://pacificridgeway.com" target="_blank" rel="noopener">
+          <div class="emoji">🌐</div><h3>Pacific Ridgeway</h3><p>Meet the licensed team behind the answers and how they help.</p><span class="arrow">Visit site →</span></a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap foot">
+        <div class="legal">
+          <b>AskAnnuityAI</b> — AI-powered retirement &amp; annuity education.<br><br>
+          Answers are generated by AI for general educational purposes only and may contain errors. They are <b>not</b> financial, investment, tax, or legal advice and are not a recommendation to buy any product. Annuities are insurance products; guarantees rely on the claims-paying ability of the issuing insurer and availability varies by state. Consult a licensed professional before deciding. © <span id="yr"></span> AskAnnuityAI.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;text-align:right">
+          <a href="#how">How it works</a><a href="#resources">Resources</a>
+          <a class="adm" id="adminBtn2">Admin</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- CHAT MODE -->
+  <div class="chatpane">
+    <div class="chatscroll" id="chatscroll">
+      <div class="chatscroll-inner" id="msgs"></div>
+    </div>
+    <div class="composerbar">
+      <div class="composer">
+        <textarea id="chatInput" rows="1" placeholder="Ask a follow-up…"></textarea>
+        <button class="sendbtn" id="chatSend" title="Send"><svg><use href="#send"/></svg></button>
+      </div>
+      <div class="disc">AI-generated education — not financial, tax, or legal advice. Verify with a licensed professional.</div>
+    </div>
+  </div>
+</main>
+
+<!-- AUTH MODAL -->
+<div class="ov" id="authModal">
+  <div class="sheet sm">
+    <div class="sh-head"><h3 id="authTitle">Create your free account</h3><button class="x" data-close>✕</button></div>
+    <div class="sh-body">
+      <div class="auth-btns">
+        <button id="googleBtn" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:0 0 18px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Sign in with Google</button>
+      </div>
+      <div class="divider">or use email</div>
+      <div class="fld"><label>Name</label><input id="auName" placeholder="Your name"></div>
+      <div class="fld"><label>Email</label><input id="auEmail" type="email" placeholder="you@email.com"></div>
+      <button class="btn btn-soft btn-lg" id="emailAuthBtn" style="width:100%;justify-content:center">Continue with email</button>
+      <div class="err" id="authErr"></div>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin:14px 0 0">A free account saves your conversations across visits. We never store sensitive financial data without your consent.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT MODAL -->
+<div class="ov" id="acctModal">
+  <div class="sheet">
+    <div class="sh-head"><h3 id="acctHi">Your account</h3><button class="x" data-close>✕</button></div>
+    <div class="sh-body">
+      <div class="tabs">
+        <button class="tab active" data-atab="history">History</button>
+        <button class="tab" data-atab="favs">Favorites</button>
+      </div>
+      <div class="apane" data-apane="history">
+        <div class="fld"><input id="histSearch" placeholder="Search past conversations…"></div>
+        <div id="histList"></div>
+      </div>
+      <div class="apane" data-apane="favs" style="display:none"><div id="favList"></div></div>
+      <div class="save-row"><button class="btn btn-soft" id="logoutBtn">Sign out</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="ov" id="adminModal">
+  <div class="sheet">
+    <div class="sh-head"><h3 id="adminTitle">🔒 Admin</h3><button class="x" data-close>✕</button></div>
+    <div class="sh-body">
+      <div id="adLogin" style="max-width:340px;margin:6px auto;text-align:center">
+        <div style="font-size:32px;margin-bottom:8px">🔐</div>
+        <p style="color:var(--muted);font-size:14px;margin:0 0 18px">Enter the admin password to manage the knowledge base.</p>
+        <div class="fld"><input id="adPass" type="password" placeholder="Password" style="text-align:center;letter-spacing:2px"></div>
+        <button class="btn btn-accent btn-lg" id="adLoginBtn" style="width:100%;justify-content:center">Unlock</button>
+        <div class="err" id="adErr"></div>
+      </div>
+      <div id="adPanel" style="display:none">
+        <div class="tabs">
+          <button class="tab active" data-dtab="kb">Knowledge</button>
+          <button class="tab" data-dtab="analytics">Analytics</button>
+          <button class="tab" data-dtab="leads">Leads</button>
+          <button class="tab" data-dtab="settings">Settings</button>
+        </div>
+        <div class="dpane" data-dpane="kb">
+          <div class="hint">Upload PDFs, books, carrier guides, IRS docs, FAQs, training material. Text files (.txt, .md, .csv, .json) are indexed automatically; PDFs/Word are logged by name — automatic vector extraction runs in the live hosted version.</div>
+          <div class="drop" id="drop"><div class="big">＋</div><div><b>Drop files here</b> or click to browse</div><div style="font-size:12px;margin-top:4px;color:var(--faint)">PDF · DOCX · TXT · MD · CSV · JSON</div><input type="file" id="fileInput" multiple style="display:none"></div>
+          <div style="margin-top:16px">
+            <div class="fld"><input id="kbTitle" placeholder="Title (e.g. 'Our top fixed annuity rates')"></div>
+            <div class="fld"><textarea id="kbText" rows="3" placeholder="Or paste knowledge directly — FAQs, product details, talking points…"></textarea></div>
+            <div class="save-row"><button class="btn btn-accent" id="addKbBtn">Add to knowledge</button><button class="btn btn-soft" id="exportKbBtn">Export JSON</button><span class="flash" id="kbFlash">Saved ✓</span></div>
+          </div>
+          <h4 style="margin:24px 0 12px;font-weight:700">Knowledge base (<span id="kbCount">0</span>)</h4>
+          <div id="kbList"></div>
+        </div>
+        <div class="dpane" data-dpane="analytics" style="display:none">
+          <div class="stat-grid">
+            <div class="stat"><b id="stQ">0</b><span>Questions asked</span></div>
+            <div class="stat"><b id="stLeads">0</b><span>Leads captured</span></div>
+            <div class="stat"><b id="stKb">0</b><span>Knowledge items</span></div>
+          </div>
+          <h4 style="margin:6px 0 12px;font-weight:700">Top questions</h4>
+          <div id="topQ"></div>
+        </div>
+        <div class="dpane" data-dpane="leads" style="display:none">
+          <div class="hint">Leads from the contact form. In the live version these also email instantly to <b id="leadEmailLabel"></b> and sync to your CRM.</div>
+          <div id="leadsList"></div>
+          <button class="btn btn-soft" id="exportLeadsBtn" style="margin-top:8px">Export CSV</button>
+        </div>
+        <div class="dpane" data-dpane="settings" style="display:none">
+          <div class="hint">These power the “Book a Professional” buttons and resource links.</div>
+          <div class="grid2"><div class="fld"><label>Phone</label><input id="setPhone"></div><div class="fld"><label>Lead email</label><input id="setEmail"></div></div>
+          <div class="fld"><label>Booking link</label><input id="setBooking" placeholder="https://calendly.com/…"></div>
+          <div class="grid2"><div class="fld"><label>Book link</label><input id="setBook"></div><div class="fld"><label>University link</label><input id="setUni"></div></div>
+          <div class="fld"><label>Admin password</label><input id="setPass"></div>
+          <div class="save-row"><button class="btn btn-accent" id="saveSetBtn">Save settings</button><span class="flash" id="setFlash">Saved ✓</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WELCOME / HOW IT WORKS POPUP -->
+<div class="ov" id="welcomeModal">
+  <div class="sheet sm">
+    <div class="sh-body" style="padding:30px 28px 26px">
+      <div class="welcome-head">
+        <div class="w-orb"></div>
+        <h3>Get the most out of <span style="color:var(--gold)">AskAnnuityAI</span></h3>
+        <p>Three quick steps to smarter retirement answers.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><div><h4>Ask anything</h4><p>Type any retirement or annuity question and get a clear, instant answer — share as much or as little as you like.</p></div></div>
+        <div class="step"><div class="num">2</div><div><h4>Create a free account</h4><p>Sign in with Google so your conversations, answers, and favorites are saved across every visit.</p></div></div>
+        <div class="step"><div class="num">3</div><div><h4>Keep learning</h4><p>Unlock curated resources and pick up right where you left off, anytime.</p></div></div>
+      </div>
+      <div class="auth-btns">
+        <button id="welcomeGoogle" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:0 0 18px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continue with Google</button>
+      </div>
+      <button class="skip" id="welcomeSkip">Maybe later</button>
+      <p style="text-align:center;font-size:11.5px;color:var(--faint);margin-top:12px">Free forever · No spam · Unsubscribe anytime</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== STORAGE ===================== */
+const LS={kb:'aai2_kb',leads:'aai2_leads',cfg:'aai2_cfg',user:'aai2_user',convos:'aai2_convos',favs:'aai2_favs',stats:'aai2_stats',theme:'aai2_theme',welcomed:'aai2_welcomed'};
+const DEFAULT_CFG={phone:'(555) 555-0123',phoneRaw:'+15555550123',leadEmail:'stevenson@pacificridgewayinsurance.com',
+  booking:'https://calendly.com/pacific-ridgeway/retirement-review',bookLink:'https://pacificridgeway.com/book',
+  uniLink:'https://pacificridgeway.com/university',adminPassword:'ridgeway2026'};
+const getCfg=()=>{try{return{...DEFAULT_CFG,...JSON.parse(localStorage.getItem(LS.cfg)||'{}')}}catch(e){return{...DEFAULT_CFG}}};
+const saveCfg=c=>localStorage.setItem(LS.cfg,JSON.stringify(c));
+const J=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch(e){return d}};
+const S=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const $=id=>document.getElementById(id);
+
+/* ===================== KNOWLEDGE BASE ===================== */
+const DEFAULT_KB=[
+ {id:'d1',title:'What is an annuity?',source:'Annuity Basics',text:`An annuity is a contract with an insurance company. You give the insurer money — a lump sum or a series of payments — and in return the insurer provides guaranteed payments back to you, starting now or later. People use annuities mainly to create income they can't outlive in retirement, to grow savings tax-deferred, and to protect part of their nest egg from market losses. Because they're insurance products, guarantees depend on the financial strength of the issuing insurer.`},
+ {id:'d2',title:'Types of annuities',source:'Annuity Basics',text:`The main types are FIXED annuities, which pay a guaranteed interest rate similar in spirit to a CD but tax-deferred; FIXED INDEXED annuities, where growth is linked to a market index with a floor that protects against losses but a cap that limits upside; VARIABLE annuities, invested in sub-accounts that rise and fall with the market; IMMEDIATE annuities, which turn a lump sum into income starting right away; and DEFERRED annuities, which grow now and pay income later. People who prioritize safety and guaranteed income often choose fixed or fixed indexed annuities.`},
+ {id:'d3',title:'How does guaranteed lifetime income work?',source:'Retirement Income Guide',text:`Many annuities offer guaranteed lifetime income, often through an income rider. Your money grows during the accumulation phase, and when you turn on income the insurer pays you a set amount every month for life — even if the underlying account eventually reaches zero. The payment depends on your age, how long you wait, current rates, and whether you cover one life or two. This is the feature people mean when they call an annuity a personal pension.`},
+ {id:'d4',title:'What does an annuity cost — fees and surrender charges?',source:'Annuity Costs',text:`Costs vary by type. Fixed and fixed indexed annuities often have no explicit annual fee unless you add optional riders, where an income rider might cost roughly 0.5% to 1.25% per year. Variable annuities tend to carry higher ongoing fees. Most deferred annuities also have a SURRENDER CHARGE period, commonly 5 to 10 years, during which withdrawing more than a set amount (often 10% per year) triggers a penalty that declines over time. Always get the specific fees and surrender schedule in writing.`},
+ {id:'d5',title:'How are annuities taxed?',source:'Annuity Tax Overview',text:`Annuities grow tax-deferred, so you don't pay tax on growth until you withdraw. With a non-qualified annuity bought with after-tax money, only the earnings portion of each withdrawal is taxable as ordinary income. With a qualified annuity inside an IRA or 401k, withdrawals are generally fully taxable. Withdrawals before age 59½ may face a 10% IRS penalty on the taxable portion. Annuity gains are taxed as ordinary income, not at lower capital-gains rates. Tax rules are complex — confirm specifics with a tax professional.`},
+ {id:'d6',title:'Are annuities safe? What backs the guarantee?',source:'Annuity Safety',text:`Fixed and fixed indexed annuities are designed to protect principal from market losses, so a down market year doesn't reduce your value. Guarantees are backed by the financial strength and claims-paying ability of the insurer, so its credit rating matters — look for strong ratings from A.M. Best, Moody's, or S&P. Every state also has a guaranty association providing a layer of protection up to certain limits if an insurer fails. Annuities are not FDIC insured the way bank deposits are.`},
+ {id:'d7',title:'Pros and cons of annuities',source:'Annuity Basics',text:`Potential benefits include guaranteed income you can't outlive, protection from market downturns with fixed and indexed types, tax-deferred growth, and a possible death benefit for heirs. Potential drawbacks include money being locked up during the surrender period, fees on some products, capped upside, and that annuitizing can be hard to reverse. Annuities tend to fit people who value guaranteed income and downside protection over maximum growth and full liquidity.`},
+ {id:'d8',title:'Who is a good fit for an annuity?',source:'Retirement Planning',text:`Annuities often make sense for people at or near retirement who worry about running out of money, who want a predictable paycheck for essential expenses, or who want to protect part of their savings from a market crash near retirement. They're usually used for a PORTION of a plan, not all of someone's money. People who need full short-term access to cash, or who are decades from retirement with a high risk tolerance, may be better served by other tools first.`},
+ {id:'d9',title:'Should I roll over my 401(k) into an annuity?',source:'Rollover Guide',text:`You can often roll over funds from a 401k, 403b, or IRA into an annuity without triggering immediate taxes when done as a proper direct rollover or transfer. This keeps tax deferral while adding guaranteed-income features. Because money inside an IRA is already tax-deferred, people generally do this for the income guarantees and downside protection rather than extra tax deferral. Whether it's right for you depends on your full picture — a licensed professional can confirm and handle the rollover correctly.`},
+ {id:'d10',title:'Annuities and required minimum distributions (RMDs)',source:'Annuity Tax Overview',text:`If your annuity is held inside a qualified account like an IRA, it's generally subject to required minimum distributions once you reach the RMD age. Income payments from an annuitized contract can count toward satisfying that contract's RMD. The rules get technical, especially with certain riders, so review your specific contract with a professional.`},
+ {id:'d11',title:'What happens to the annuity when I die?',source:'Annuity Basics',text:`It depends on the contract and options chosen. Many annuities include a death benefit paying remaining value to your named beneficiary, often bypassing probate. Some income options guarantee payments for a minimum number of years or return unused premium to heirs, while a life-only option stops at death in exchange for the highest payment. Choosing the payout option and beneficiary structure is an important planning decision worth discussing with an advisor.`},
+ {id:'d12',title:'How do I get a quote or personalized illustration?',source:'Getting Started',text:`To get real numbers, a licensed professional prepares an illustration based on your age, the amount considered, when you want income to start, and current rates. It's free with no obligation. The fastest way is to request a free retirement review on this page — a licensed professional will follow up. You can also book a call directly or call the number listed on this page.`},
+ {id:'d13',title:'Annuities, Social Security, and market risk',source:'Retirement Income Guide',text:`Annuities are often used alongside Social Security to cover essential expenses with guaranteed income, reducing how much you must withdraw from market-exposed investments during downturns — which helps manage sequence-of-returns risk early in retirement. A common approach pairs Social Security and an income annuity to cover the basics, leaving other investments for growth and flexibility. The right mix is personal and depends on your expenses, other income, and risk tolerance.`},
+ {id:'d14',title:'Annuities vs. CDs',source:'Annuity Basics',text:`A fixed annuity and a bank CD both offer a guaranteed rate, but they differ in important ways. Annuity growth is tax-deferred until withdrawal, while CD interest is taxed each year. CDs are FDIC insured; annuities are backed by the insurer and state guaranty associations instead. Annuities can also offer lifetime-income options a CD cannot, but they typically have longer surrender periods and less short-term liquidity. The right choice depends on your time horizon and whether you want lifetime income.`},
+ {id:'d15',title:'The "invest the assets, buy the income" holistic approach',source:'Holistic Retirement Planning',text:`A holistic retirement plan often gives your savings two distinct jobs: INCOME and GROWTH. First you "buy the income" — you use a portion of your assets to secure guaranteed lifetime income, typically through an annuity working alongside Social Security, so that your essential expenses like housing, food, healthcare, and utilities are covered for life no matter what the markets do. Then you "invest the assets" — you keep the remainder in a diversified portfolio aimed at growth, liquidity, inflation protection, and leaving a legacy. The core idea is that once your basic needs are guaranteed, you can invest the rest with more confidence and less temptation to sell in a downturn, which helps manage sequence-of-returns risk early in retirement. It's a balanced, both-and strategy rather than an all-or-nothing choice between safety and growth. The right split between guaranteed income and invested assets depends on your essential expenses, other income sources, risk tolerance, time horizon, and goals — a licensed professional can help you model what fits your situation.`}
+];
+const loadKB=()=>[...DEFAULT_KB,...J(LS.kb,[])];
+const loadAdminKB=()=>J(LS.kb,[]);
+const saveAdminKB=a=>S(LS.kb,a);
+
+/* ===================== RETRIEVAL ===================== */
+const STOP=new Set('a an the is are was were do does did how what when who whom which why where will would can could should i my me you your we our of to in on for with about and or as at by from it its this that these those if then than so be been being have has had not no yes get got into out over under more most less'.split(' '));
+const tok=s=>(s.toLowerCase().match(/[a-z0-9$%]+/g)||[]).filter(w=>!STOP.has(w)&&w.length>1);
+function findAnswer(q){
+  const kb=loadKB(),qt=tok(q);if(!qt.length)return null;let best=null,bs=0;
+  kb.forEach(e=>{const hay=(e.title+' '+e.text).toLowerCase();const tt=tok(e.title);let s=0;
+    qt.forEach(t=>{if(tt.includes(t))s+=3;else if(hay.includes(t))s+=1;});
+    if(hay.includes(q.toLowerCase().trim()))s+=4;if(s>bs){bs=s;best=e;}});
+  return(best&&bs>=2)?{entry:best,score:bs}:null;
+}
+const ADVICE=/\b(should i|should we|is .* right for me|what should|tell me what to do|recommend|which (one|annuity) should|is it a good idea for me|my specific|in my situation|how much should i (put|invest|buy))\b/i;
+
+/* ===================== CHAT ===================== */
+const msgsEl=$('msgs'),chatscroll=$('chatscroll');
+let exchanges=0,convoId=null,currentConvo=[],asked=new Set(),streaming=false,proCount=0,lastProAt=-99;
+const PROMPTS=['What is an annuity, simply?','How do fixed indexed annuities work?','What is the "invest the assets, buy the income" approach?','How are annuities taxed?','Should I roll over my 401(k)?'];
+const FOLLOWPOOL=['What are the fees and surrender charges?','Are annuities safe if the market crashes?','What happens to my annuity when I die?','Annuities vs. CDs — what’s the difference?','How does an income rider work?','How much retirement income can I create?','Annuities and Social Security together?','How do I cover my essential expenses in retirement?','Will I run out of money in retirement?'];
+
+function botAvatar(){return '<div class="avatar"><svg><use href="#mtn"/></svg></div>';}
+function scrollBottom(){chatscroll.scrollTop=chatscroll.scrollHeight;}
+
+function fmtFull(text){let t=text.replace(/&/g,'&amp;').replace(/</g,'&lt;');t=t.replace(/\b([A-Z]{3,})\b/g,'<strong>$1</strong>');
+  const p=t.split(/(?<=\.) (?=[A-Z])/);let out='',buf=[];p.forEach(s=>{buf.push(s);if(buf.length>=2){out+='<p>'+buf.join(' ')+'</p>';buf=[];}});if(buf.length)out+='<p>'+buf.join(' ')+'</p>';return out;}
+
+function enterChat(){if(!document.body.classList.contains('chatting')){document.body.classList.add('chatting');}}
+function addUser(text){enterChat();const m=el('div','msg user');m.innerHTML=`<div class="content"><div class="bubble">${text.replace(/</g,'&lt;')}</div></div>`;msgsEl.appendChild(m);currentConvo.push({role:'user',html:m.querySelector('.bubble').innerHTML});scrollBottom();}
+
+function addAI(){const m=el('div','msg ai');m.innerHTML=`${botAvatar()}<div class="content"><div class="text"><div class="skel"><i></i><i></i><i></i></div></div></div>`;msgsEl.appendChild(m);scrollBottom();return m;}
+
+function streamText(textEl,full,cb){
+  streaming=true;const words=full.split(' ');let i=0;
+  const tick=()=>{
+    const partial=words.slice(0,i+1).join(' ');
+    textEl.innerHTML=fmtFull(partial)+'<span class="cursor"></span>';
+    scrollBottom();i++;
+    if(i<words.length){setTimeout(tick,14+Math.random()*22);}
+    else{textEl.innerHTML=fmtFull(full);streaming=false;cb&&cb();}
+  };tick();
+}
+
+function finalizeAI(contentEl,answerText,source,opts){
+  // sources (collapsible)
+  if(source){
+    const d=el('details','sources');
+    d.innerHTML=`<summary>📎 Sources <span class="chev">▾</span></summary><div class="src-body"><b>${source}</b> — educational reference used for this answer.</div>`;
+    contentEl.appendChild(d);
+  }
+  // controls
+  const ctrls=el('div','ctrls');
+  const copyBtn=el('button','ctrl','⧉ Copy');copyBtn.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(answerText);copyBtn.textContent='✓ Copied';copyBtn.classList.add('done');setTimeout(()=>{copyBtn.textContent='⧉ Copy';copyBtn.classList.remove('done');},1600);};
+  const shareBtn=el('button','ctrl','↗ Share');shareBtn.onclick=()=>{const txt=answerText+'\n\n— via AskAnnuityAI';if(navigator.share){navigator.share({title:'AskAnnuityAI',text:txt}).catch(()=>{});}else{navigator.clipboard&&navigator.clipboard.writeText(txt);toast('Copied to share');}};
+  const favBtn=el('button','ctrl','☆ Save');favBtn.onclick=()=>{saveFav(answerText,source);favBtn.textContent='★ Saved';favBtn.classList.add('done');};
+  const pdfBtn=el('button','ctrl','⤓ PDF');pdfBtn.onclick=()=>window.print();
+  ctrls.append(copyBtn,shareBtn,favBtn,pdfBtn);
+  contentEl.appendChild(ctrls);
+  // pro card
+  if(opts&&opts.pro){contentEl.appendChild(proCard());}
+  // follow-ups
+  const fus=pickFollowups();
+  if(fus.length){const wrap=el('div','followups');fus.forEach(q=>{const b=el('button','fu',q);b.onclick=()=>send(q);wrap.appendChild(b);});contentEl.appendChild(wrap);}
+  currentConvo.push({role:'ai',html:contentEl.querySelector('.text').innerHTML,source:source||null});
+  saveConvo();scrollBottom();
+}
+function proCard(){const cfg=getCfg();const c=el('div','procard');
+  c.innerHTML=`<h4>Want real numbers for your situation?</h4><p>A licensed professional can build a free, no-obligation retirement income review with current rates.</p>
+  <div class="row"><a class="btn btn-gold" id="pcReview">Request free review</a><a class="btn btn-soft" href="${cfg.booking}" target="_blank" rel="noopener">Book a call</a><a class="btn btn-soft" href="tel:${cfg.phoneRaw}">📞 ${cfg.phone}</a></div>`;
+  setTimeout(()=>{const r=c.querySelector('#pcReview');if(r)r.onclick=()=>{document.body.classList.remove('chatting');location.hash='#talk';};},0);
+  return c;}
+function pickFollowups(){const pool=[...PROMPTS,...FOLLOWPOOL].filter(q=>!asked.has(q.toLowerCase()));const out=[];while(out.length<3&&pool.length){out.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);}return out;}
+
+const HUMAN=/\b(buy|purchase|talk|speak|agent|advisor|professional|human|call|quote|illustration|rate|price|sign up|get started|apply|contact|appointment|schedule|book)\b/i;
+
+/* Review-prompt cadence: 1st after the 2nd message, then every 10, and after 3 showings every 20. */
+function dueForPro(){
+  if(proCount===0)return exchanges>=2;
+  if(proCount<3)return exchanges>=lastProAt+10;
+  return exchanges>=lastProAt+20;
+}
+
+function send(q){
+  q=(q||'').trim();if(!q||streaming)return;
+  asked.add(q.toLowerCase());logStat(q);exchanges++;
+  addUser(q);
+  const m=addAI();const textEl=m.querySelector('.text');const contentEl=m.querySelector('.content');
+  (async()=>{
+    let answerText,source;const advice=ADVICE.test(q);
+    if(advice){
+      answerText=`That's a personalized question — and giving individualized financial, tax, or investment advice is something only a licensed professional should do for your exact situation. I'd rather get you to the right answer than offer a generic guess. I'm glad to explain the general concepts behind it, and the best next step is a quick, no-obligation conversation with a licensed professional who can look at your real numbers.`;
+      source='Educational guardrail';
+    } else {
+      try{ const r=await AAI.askAI(q); answerText=r.answer; source=(r.sources||[]).join(', ')||'AskAnnuityAI knowledge base'; }
+      catch(e){ answerText="Sorry — I had trouble reaching the assistant just now. Please try again in a moment."; source=''; }
+    }
+    let showPro=false;
+    if(advice||HUMAN.test(q)||dueForPro()){showPro=true;proCount++;lastProAt=exchanges;}
+    textEl.innerHTML='';
+    streamText(textEl,answerText,()=>finalizeAI(contentEl,answerText,source,{pro:showPro}));
+  })();
+}
+
+/* hero + chat inputs (auto-grow) */
+function wireInput(input,btn){
+  const grow=()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,160)+'px';if(btn)btn.disabled=!input.value.trim();};
+  input.addEventListener('input',grow);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();const v=input.value.trim();if(v){send(v);input.value='';grow();}}});
+  if(btn)btn.onclick=()=>{const v=input.value.trim();if(v){send(v);input.value='';grow();}};
+}
+wireInput($('heroInput'),$('heroSend'));
+wireInput($('chatInput'),$('chatSend'));
+const promptsWrap=$('prompts');PROMPTS.forEach(p=>{const b=el('button','prompt',p);b.onclick=()=>{send(p);};promptsWrap.appendChild(b);});
+
+function newChat(){document.body.classList.remove('chatting');msgsEl.innerHTML='';currentConvo=[];convoId=null;exchanges=0;asked=new Set();proCount=0;lastProAt=-99;if(getUser())renderSidebar();window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('heroInput').focus(),300);}
+$('newChatBtn').onclick=newChat;
+$('brandHome').onclick=newChat;
+$('askNav').onclick=()=>{newChat();};
+
+/* stats */
+function logStat(q){const s=J(LS.stats,{total:0,questions:{}});s.total++;const k=q.trim().toLowerCase().slice(0,80);s.questions[k]=(s.questions[k]||0)+1;S(LS.stats,s);}
+
+/* ===================== ACCOUNTS ===================== */
+const getUser=()=>J(LS.user,null);
+function setUser(u){S(LS.user,u);refreshAuthUI();}
+function refreshAuthUI(){const u=getUser();
+  document.body.classList.toggle('authed',!!u);
+  $('loginBtn').textContent=u?'My chats':'Sign in';
+  if(u){$('sbName').textContent=u.name||'Member';$('sbEmail').textContent=u.email||'';$('sbAvatar').textContent=(u.name||'A').trim().slice(0,1).toUpperCase();renderSidebar();}
+  else{document.body.classList.remove('sidebar-open');}
+}
+function openAuth(t){$('authTitle').textContent=t||'Create your free account';$('authModal').classList.add('open');}
+function loginAs(u){setUser(u);$('authModal').classList.remove('open');openSidebar();toast('Signed in');}
+$('loginBtn').onclick=()=>{getUser()?toggleSidebar():openAuth('Sign in to AskAnnuityAI');};
+$('googleBtn').onclick=()=>AAI.signInWithGoogle();
+$('emailAuthBtn').onclick=()=>{const n=$('auName').value.trim(),e=$('auEmail').value.trim();if(!e||!/.+@.+\..+/.test(e)){$('authErr').textContent='Enter a valid email.';return;}loginAs({name:n||e.split('@')[0],email:e,provider:'email'});};
+
+/* ---- saved-area sidebar ---- */
+function openSidebar(){if(getUser())document.body.classList.add('sidebar-open');}
+function closeSidebar(){document.body.classList.remove('sidebar-open');}
+function toggleSidebar(){document.body.classList.contains('sidebar-open')?closeSidebar():openSidebar();}
+$('sbToggle').onclick=toggleSidebar;$('sbClose').onclick=closeSidebar;$('sbBackdrop').onclick=closeSidebar;
+$('sbNew').onclick=()=>{newChat();if(innerWidth<1024)closeSidebar();};
+$('sbSearch').addEventListener('input',e=>renderSidebar(e.target.value));
+$('sbSignout').onclick=()=>{localStorage.removeItem(LS.user);refreshAuthUI();toast('Signed out');};
+$('sbFavBtn').onclick=()=>{openAcct();const t=document.querySelector('[data-atab="favs"]');if(t)t.click();};
+function renderSidebar(f){const u=getUser();if(!u)return;
+  const list=(J(LS.convos,{})[u.email]||[]);const ff=(f||'').toLowerCase();const box=$('sbHistory');box.innerHTML='';
+  const shown=list.filter(c=>!ff||c.title.toLowerCase().includes(ff)||JSON.stringify(c.messages).toLowerCase().includes(ff));
+  if(!shown.length){box.innerHTML='<div class="sb-empty">'+(ff?'No matches.':'No conversations yet. Ask a question to start one.')+'</div>';}
+  else shown.forEach(c=>{const d=el('button','sb-item'+(convoId===c.id?' active':''));d.innerHTML=`<span class="sb-ic">💬</span><span class="sb-tx">${c.title.replace(/</g,'&lt;')}</span>`;d.onclick=()=>{loadConvo(c);if(innerWidth<1024)closeSidebar();};box.appendChild(d);});
+  $('sbFavCount').textContent=(J(LS.favs,{})[u.email]||[]).length;
+}
+
+function saveConvo(){const u=getUser();if(!u||!currentConvo.length)return;const all=J(LS.convos,{});const list=all[u.email]||[];
+  if(!convoId)convoId='c'+Date.now();const first=currentConvo.find(m=>m.role==='user');const title=first?first.html.replace(/<[^>]+>/g,'').slice(0,64):'Conversation';
+  const rec={id:convoId,title,ts:new Date().toISOString(),messages:currentConvo.slice()};const i=list.findIndex(c=>c.id===convoId);
+  if(i>=0)list[i]=rec;else list.unshift(rec);all[u.email]=list;S(LS.convos,all);renderSidebar();}
+function openAcct(){const u=getUser();if(!u)return openAuth('Welcome back');$('acctHi').textContent='Hi, '+(u.name||'there');renderHistory();renderFavs();$('acctModal').classList.add('open');}
+function renderHistory(f){const u=getUser();const list=(J(LS.convos,{})[u.email]||[]);const ff=(f||'').toLowerCase();const box=$('histList');box.innerHTML='';
+  const shown=list.filter(c=>!ff||JSON.stringify(c.messages).toLowerCase().includes(ff)||c.title.toLowerCase().includes(ff));
+  if(!shown.length){box.innerHTML='<div class="empty"><div class="e">💬</div>No saved conversations yet. Start chatting and they’ll appear here.</div>';return;}
+  shown.forEach(c=>{const d=el('div','hist');d.innerHTML=`<b>${c.title.replace(/</g,'&lt;')}</b><div class="meta">${new Date(c.ts).toLocaleString()} · ${c.messages.length} messages</div>`;d.onclick=()=>loadConvo(c);box.appendChild(d);});}
+$('histSearch').addEventListener('input',e=>renderHistory(e.target.value));
+function loadConvo(c){msgsEl.innerHTML='';currentConvo=[];convoId=c.id;document.body.classList.add('chatting');
+  c.messages.forEach(m=>{if(m.role==='user'){const x=el('div','msg user');x.innerHTML=`<div class="content"><div class="bubble">${m.html}</div></div>`;msgsEl.appendChild(x);currentConvo.push(m);}
+    else{const x=el('div','msg ai');x.innerHTML=`${botAvatar()}<div class="content"><div class="text">${m.html}</div></div>`;if(m.source){const d=el('details','sources');d.innerHTML=`<summary>📎 Sources <span class="chev">▾</span></summary><div class="src-body"><b>${m.source}</b> — educational reference.</div>`;x.querySelector('.content').appendChild(d);}msgsEl.appendChild(x);currentConvo.push(m);}});
+  $('acctModal').classList.remove('open');if(getUser())renderSidebar();scrollBottom();}
+function saveFav(text,source){const u=getUser();if(!u){openAuth('Sign in to save');return;}const favs=J(LS.favs,{});const list=favs[u.email]||[];list.unshift({text,source,ts:new Date().toISOString()});favs[u.email]=list;S(LS.favs,favs);toast('Saved to favorites');}
+function renderFavs(){const u=getUser();const favs=(J(LS.favs,{})[u.email]||[]);const box=$('favList');box.innerHTML='';if(!favs.length){box.innerHTML='<div class="empty"><div class="e">⭐</div>Tap “Save” on any answer to keep it here.</div>';return;}favs.forEach(f=>{const d=el('div','row');d.innerHTML=`${f.text.slice(0,260).replace(/</g,'&lt;')}${f.text.length>260?'…':''}${f.source?`<div class="meta">📎 ${f.source}</div>`:''}`;box.appendChild(d);});}
+document.querySelectorAll('[data-atab]').forEach(t=>t.onclick=()=>{document.querySelectorAll('[data-atab]').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelectorAll('.apane').forEach(p=>p.style.display='none');document.querySelector(`[data-apane="${t.dataset.atab}"]`).style.display='block';});
+$('logoutBtn').onclick=()=>{localStorage.removeItem(LS.user);refreshAuthUI();$('acctModal').classList.remove('open');toast('Signed out');};
+
+/* ===================== LEAD FORM ===================== */
+$('leadForm').addEventListener('submit',e=>{e.preventDefault();const cfg=getCfg();const f=e.target;const d=Object.fromEntries(new FormData(f).entries());d.ts=new Date().toISOString();
+  try{AAI.saveLead({name:d.name,email:d.email,phone:d.phone,amount:d.amount,message:d.message,source:'Contact form'});}catch(_){}
+  f.style.display='none';$('leadOk').style.display='block';});
+
+/* ===================== CONFIG -> UI ===================== */
+function applyCfg(){const c=getCfg();$('phoneLabel').textContent=c.phone;$('okPhone').textContent=c.phone;$('callLink').href='tel:'+c.phoneRaw;
+  $('bookLink').href=c.booking;$('cardBook').href=c.bookLink;$('cardUni').href=c.uniLink;$('yr').textContent=new Date().getFullYear();
+  $('bookNav').onclick=()=>{document.body.classList.remove('chatting');location.hash='#talk';};}
+applyCfg();refreshAuthUI();if(getUser()&&innerWidth>=1024)openSidebar();
+window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}}});});
+
+/* ---- welcome / how-it-works popup ---- */
+function registerLearnerLead(u){const leads=J(LS.leads,[]);
+  if(!leads.some(l=>l.email===u.email&&l.source==='Welcome popup')){
+    leads.unshift({name:u.name||'',email:u.email||'',phone:'',amount:'',message:'Wants to continuously learn (signed up via welcome pop-up)',source:'Welcome popup',ts:new Date().toISOString()});
+    S(LS.leads,leads);}
+}
+$('welcomeGoogle').onclick=()=>{localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
+$('welcomeSkip').onclick=()=>{$('welcomeModal').classList.remove('open');S(LS.welcomed,1);};
+$('welcomeModal').addEventListener('click',e=>{if(e.target===$('welcomeModal'))S(LS.welcomed,1);});
+if(!getUser()&&!J(LS.welcomed,0)){setTimeout(()=>{if(!getUser()&&!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);}
+
+/* ===================== THEME ===================== */
+const themeBtn=$('themeBtn');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'☀️':'🌙';S(LS.theme,t);}
+applyTheme(J(LS.theme,(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light'));
+themeBtn.onclick=()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+
+/* ===================== HEADER SCROLL ===================== */
+const hdr=$('hdr');addEventListener('scroll',()=>{hdr.classList.toggle('scrolled',scrollY>10);},{passive:true});
+
+/* ===================== MODALS ===================== */
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.ov').classList.remove('open'));
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+/* ===================== ADMIN ===================== */
+$('adminBtn').onclick=()=>$('adminModal').classList.add('open');
+$('adminBtn2').onclick=()=>$('adminModal').classList.add('open');
+$('adLoginBtn').onclick=adLogin;$('adPass').addEventListener('keydown',e=>{if(e.key==='Enter')adLogin();});
+function adLogin(){if($('adPass').value===getCfg().adminPassword){$('adLogin').style.display='none';$('adPanel').style.display='block';$('adminTitle').textContent='⚙️ Admin Console';renderKB();renderAnalytics();renderLeads();fillSettings();}else $('adErr').textContent='Incorrect password.';}
+document.querySelectorAll('[data-dtab]').forEach(t=>t.onclick=()=>{document.querySelectorAll('[data-dtab]').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelectorAll('.dpane').forEach(p=>p.style.display='none');document.querySelector(`[data-dpane="${t.dataset.dtab}"]`).style.display='block';});
+function renderKB(){const admin=loadAdminKB();$('kbCount').textContent=DEFAULT_KB.length+admin.length;const list=$('kbList');list.innerHTML='';
+  [...admin.map(x=>({...x,_a:true})),...DEFAULT_KB.map(x=>({...x,_a:false}))].forEach(it=>{const d=el('div','kbi');
+    d.innerHTML=`<div class="t"><b>${(it.title||'Untitled').replace(/</g,'&lt;')}</b><span class="src">${it._a?'added':'built-in'}</span></div><p>${(it.text||'').slice(0,150).replace(/</g,'&lt;')}…</p>`;
+    if(it._a){const del=el('button','del','Remove');del.onclick=()=>{saveAdminKB(loadAdminKB().filter(x=>x.id!==it.id));renderKB();renderAnalytics();};d.querySelector('.t').appendChild(del);}list.appendChild(d);});}
+function addKB(title,text){if(!text||!text.trim())return;const a=loadAdminKB();a.unshift({id:'a'+Date.now()+Math.random().toString(36).slice(2,5),title:title||'(untitled note)',text:text.trim(),source:(title||'Uploaded note')});saveAdminKB(a);renderKB();flash('kbFlash');}
+$('addKbBtn').onclick=async()=>{const t=$('kbTitle').value.trim()||'Pasted note';const x=$('kbText').value;if(!x.trim())return;try{const r=await AAI.ingestText(t,x);toast('Added ('+r.chunks+' chunks)');}catch(e){toast('Failed: '+(e.message||e));}$('kbTitle').value='';$('kbText').value='';};
+function flash(id){const f=$(id);f.classList.add('show');setTimeout(()=>f.classList.remove('show'),1400);}
+const drop=$('drop'),fileInput=$('fileInput');drop.onclick=()=>fileInput.click();
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+drop.addEventListener('drop',e=>handleFiles(e.dataTransfer.files));fileInput.addEventListener('change',e=>handleFiles(e.target.files));
+function handleFiles(files){[...files].forEach(async file=>{try{toast('Uploading "'+file.name+'"…');const r=await AAI.uploadDoc(file);toast('Added "'+r.title+'" ('+r.chunks+' chunks)');}catch(e){toast('Upload failed: '+(e.message||e));}});}
+$('exportKbBtn').onclick=()=>{const b=new Blob([JSON.stringify(loadAdminKB(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='askannuityai-knowledge.json';a.click();};
+function renderAnalytics(){const s=J(LS.stats,{total:0,questions:{}});const leads=J(LS.leads,[]);$('stQ').textContent=s.total;$('stLeads').textContent=leads.length;$('stKb').textContent=DEFAULT_KB.length+loadAdminKB().length;
+  const top=Object.entries(s.questions).sort((a,b)=>b[1]-a[1]).slice(0,8);const box=$('topQ');box.innerHTML='';if(!top.length){box.innerHTML='<div class="empty"><div class="e">📊</div>No questions yet.</div>';return;}top.forEach(([q,n])=>{const d=el('div','row');d.innerHTML=`<b>${n}×</b> &nbsp;${q.replace(/</g,'&lt;')}`;box.appendChild(d);});}
+function renderLeads(){$('leadEmailLabel').textContent=getCfg().leadEmail;const leads=J(LS.leads,[]);const box=$('leadsList');if(!leads.length){box.innerHTML='<div class="empty"><div class="e">📥</div>No leads captured yet.</div>';return;}box.innerHTML='';leads.forEach(l=>{const d=el('div','row');d.innerHTML=`<b>${(l.name||'').replace(/</g,'&lt;')}</b> — ${l.email||''} · ${l.phone||''}<div class="meta">${l.amount||'amount n/a'} • ${new Date(l.ts).toLocaleString()}</div>${l.message?(l.message.replace(/</g,'&lt;')):''}`;box.appendChild(d);});}
+$('exportLeadsBtn').onclick=()=>{const leads=J(LS.leads,[]);const rows=[['name','email','phone','amount','message','submitted'],...leads.map(l=>[l.name,l.email,l.phone,l.amount,(l.message||'').replace(/\n/g,' '),l.ts])];const csv=rows.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='askannuityai-leads.csv';a.click();};
+function fillSettings(){const c=getCfg();$('setPhone').value=c.phone;$('setEmail').value=c.leadEmail;$('setBooking').value=c.booking;$('setBook').value=c.bookLink;$('setUni').value=c.uniLink;$('setPass').value=c.adminPassword;}
+$('saveSetBtn').onclick=()=>{const c=getCfg();c.phone=$('setPhone').value.trim()||c.phone;c.phoneRaw='+'+c.phone.replace(/[^0-9]/g,'');c.leadEmail=$('setEmail').value.trim()||c.leadEmail;c.booking=$('setBooking').value.trim()||c.booking;c.bookLink=$('setBook').value.trim()||c.bookLink;c.uniLink=$('setUni').value.trim()||c.uniLink;c.adminPassword=$('setPass').value.trim()||c.adminPassword;saveCfg(c);applyCfg();flash('setFlash');};
+
+/* ===================== TOAST + SHORTCUTS ===================== */
+let toastT;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800);}
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){document.querySelectorAll('.ov.open').forEach(o=>o.classList.remove('open'));}
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();getUser()?openAcct():openAuth('Sign in to view history');}
+  if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();(document.body.classList.contains('chatting')?$('chatInput'):$('heroInput')).focus();}
+});
+
+/* ===================== UI SOUND (Apple-style clicks) ===================== */
+(function(){
+  let ctx,master;
+  function ac(){
+    if(!ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C();master=ctx.createGain();master.gain.value=0.5;master.connect(ctx.destination);}
+    if(ctx.state==='suspended')ctx.resume();
+    return ctx;
+  }
+  function tone(freq,dur,{type='sine',g=0.06,to=null,attack=0.004,delay=0}={}){
+    const c=ac();if(!c)return;const t=c.currentTime+delay;
+    const o=c.createOscillator(),gain=c.createGain();
+    o.type=type;o.frequency.setValueAtTime(freq,t);
+    if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);
+    gain.gain.setValueAtTime(0.0001,t);
+    gain.gain.linearRampToValueAtTime(g,t+attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(gain).connect(master);o.start(t);o.stop(t+dur+0.03);
+  }
+  // soft, premium presets
+  const tap   =()=>{tone(660,0.055,{type:'sine',g:0.05});tone(1320,0.045,{type:'sine',g:0.018});};
+  const primary=()=>{tone(523.25,0.07,{type:'sine',g:0.05});tone(784,0.06,{type:'sine',g:0.03,delay:0.015});};
+  const send  =()=>{tone(620,0.13,{type:'sine',g:0.05,to:1180});};
+  const soft  =()=>{tone(880,0.04,{type:'triangle',g:0.03});};
+
+  // unlock audio on first gesture
+  ['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,()=>ac(),{once:true}));
+
+  const SEL='button, a, summary, .prompt, .fu, .tab, .rcard, .hist, [data-close], .icon-btn, .kbi .del, .contact a';
+  document.addEventListener('click',e=>{
+    const t=e.target.closest(SEL);if(!t)return;
+    if(t.classList.contains('sendbtn'))return send();          // sending a message
+    if(t.tagName==='SUMMARY'||t.classList.contains('tab')||t.classList.contains('icon-btn'))return soft();
+    if(t.classList.contains('btn-accent')||t.classList.contains('btn-gold'))return primary();
+    tap();
+  },true);
+})();
+</script>
+<script src="/aai-config.js"></script>
+<script type="module" src="/aai-backend.js"></script>
+</body>
+</html>
