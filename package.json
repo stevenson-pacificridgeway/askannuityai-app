@@ -1,0 +1,14 @@
+{
+  "name": "askannuityai",
+  "private": true,
+  "type": "module",
+  "description": "AskAnnuityAI — production app: Supabase auth + storage + pgvector, Claude RAG, Vercel serverless.",
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "openai": "^4.67.3",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.8.0"
+  }
+}
