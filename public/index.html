@@ -170,6 +170,12 @@
   .sendbtn:hover{filter:brightness(1.08);transform:scale(1.05)}
   .sendbtn:disabled{opacity:.35;cursor:default;transform:none;filter:none}
   .sendbtn svg{width:19px;height:19px}
+  .micbtn{width:44px;height:44px;border-radius:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    display:grid;place-items:center;transition:.18s var(--ease);flex:0 0 44px}
+  .micbtn:hover{background:var(--bg-warm);color:var(--ink);transform:scale(1.04)}
+  .micbtn svg{width:20px;height:20px}
+  .micbtn.listening{background:#e5484d;border-color:#e5484d;color:#fff;animation:micpulse 1.3s infinite}
+  @keyframes micpulse{0%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}70%{box-shadow:0 0 0 11px rgba(229,72,77,0)}100%{box-shadow:0 0 0 0 rgba(229,72,77,0)}}
   .kbd-hint{font-size:12px;color:var(--faint);margin-top:12px}
   .kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:11px;font-weight:600;color:var(--muted)}
 
@@ -440,6 +446,7 @@
     <path d="M13.4 9.6 L15.6 11.8 L17.4 9.6 Z" fill="#082B63"/>
   </symbol>
   <symbol id="send" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><path d="M12 15a3.5 3.5 0 003.5-3.5V6a3.5 3.5 0 00-7 0v5.5A3.5 3.5 0 0012 15z M6 11.5a6 6 0 0012 0 M12 18.5V22 M8.5 22h7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
 <div class="sb-backdrop" id="sbBackdrop"></div>
@@ -499,6 +506,7 @@
       <div class="askbox">
         <div class="askwrap">
           <textarea id="heroInput" rows="1" placeholder="Ask me anything about retirement…"></textarea>
+          <button class="micbtn" id="heroMic" title="Speak your question" type="button"><svg><use href="#mic"/></svg></button>
           <button class="sendbtn" id="heroSend" title="Ask" disabled><svg><use href="#send"/></svg></button>
         </div>
         <div class="kbd-hint">Press <span class="kbd">/</span> to focus · <span class="kbd">⌘K</span> for history</div>
@@ -601,6 +609,7 @@
     <div class="composerbar">
       <div class="composer">
         <textarea id="chatInput" rows="1" placeholder="Ask a follow-up…"></textarea>
+        <button class="micbtn" id="chatMic" title="Speak your question" type="button"><svg><use href="#mic"/></svg></button>
         <button class="sendbtn" id="chatSend" title="Send"><svg><use href="#send"/></svg></button>
       </div>
       <div class="disc">AI-generated education — not financial, tax, or legal advice. Verify with a licensed professional.</div>
@@ -871,6 +880,25 @@ function wireInput(input,btn){
 }
 wireInput($('heroInput'),$('heroSend'));
 wireInput($('chatInput'),$('chatSend'));
+
+/* speak-to-text (voice input) */
+function wireMic(input,btn){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){btn.style.display='none';return;}
+  let rec=null,on=false;
+  btn.onclick=()=>{
+    if(on){try{rec.stop();}catch(e){}return;}
+    rec=new SR();rec.lang='en-US';rec.interimResults=true;rec.continuous=false;
+    const base=input.value.trim()?input.value.trim()+' ':'';
+    rec.onstart=()=>{on=true;btn.classList.add('listening');btn.title='Listening… tap to stop';window.__aaiSnd&&window.__aaiSnd.listenOn();};
+    rec.onend=()=>{on=false;btn.classList.remove('listening');btn.title='Speak your question';window.__aaiSnd&&window.__aaiSnd.listenOff();};
+    rec.onerror=()=>{on=false;btn.classList.remove('listening');};
+    rec.onresult=(e)=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;input.value=base+t;input.dispatchEvent(new Event('input'));};
+    try{rec.start();}catch(e){}
+  };
+}
+wireMic($('heroInput'),$('heroMic'));
+wireMic($('chatInput'),$('chatMic'));
 const promptsWrap=$('prompts');PROMPTS.forEach(p=>{const b=el('button','prompt',p);b.onclick=()=>{send(p);};promptsWrap.appendChild(b);});
 
 function newChat(){document.body.classList.remove('chatting');msgsEl.innerHTML='';currentConvo=[];convoId=null;exchanges=0;asked=new Set();proCount=0;lastProAt=-99;if(getUser())renderSidebar();window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('heroInput').focus(),300);}
@@ -1025,6 +1053,9 @@ addEventListener('keydown',e=>{
   const primary=()=>{tone(523.25,0.07,{type:'sine',g:0.05});tone(784,0.06,{type:'sine',g:0.03,delay:0.015});};
   const send  =()=>{tone(620,0.13,{type:'sine',g:0.05,to:1180});};
   const soft  =()=>{tone(880,0.04,{type:'triangle',g:0.03});};
+  const listenOn =()=>{tone(523.25,0.08,{type:'sine',g:0.05});tone(880,0.1,{type:'sine',g:0.04,delay:0.06});};
+  const listenOff=()=>{tone(740,0.08,{type:'sine',g:0.045});tone(440,0.12,{type:'sine',g:0.04,delay:0.05});};
+  window.__aaiSnd={tap,primary,send,soft,listenOn,listenOff};
 
   // unlock audio on first gesture
   ['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,()=>ac(),{once:true}));
