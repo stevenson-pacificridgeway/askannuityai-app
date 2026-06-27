@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const sources = [...new Set((chunks || []).map(c => c.source).filter(Boolean))];
 
     const msg = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-latest', // swap to a newer Claude model anytime
+      model: 'claude-sonnet-4-6', // Claude Sonnet 4.6 — swap to claude-opus-4-8 or claude-haiku-4-5-20251001 anytime
       max_tokens: 800,
       system: SYSTEM,
       messages: [{
