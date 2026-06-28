@@ -222,8 +222,13 @@
   .sources summary::-webkit-details-marker{display:none}
   .sources summary .chev{margin-left:auto;transition:.2s;color:var(--faint)}
   .sources[open] summary .chev{transform:rotate(180deg)}
-  .sources .src-body{padding:2px 15px 14px;font-size:13px;color:var(--muted)}
+  .sources .src-body{padding:2px 12px 12px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
   .sources .src-body b{color:var(--ink-2);font-weight:600}
+  .sources .src-link{display:flex;align-items:center;gap:8px;flex-wrap:wrap;text-decoration:none;color:var(--ink-2);font-weight:600;
+    padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);transition:.15s}
+  .sources .src-link:hover{border-color:var(--gold);box-shadow:0 4px 14px rgba(8,43,99,.07)}
+  .sources .src-go{font-weight:600;color:var(--gold-ink,#9c7414);font-size:12px;margin-left:auto;white-space:nowrap}
+  .sources .src-plain{padding:7px 12px;color:var(--muted)}
   .ctrls{display:flex;gap:4px;margin-top:12px}
   .ctrl{background:none;border:0;color:var(--faint);cursor:pointer;font-size:12.5px;font-weight:550;padding:6px 9px;border-radius:9px;
     display:inline-flex;align-items:center;gap:6px;transition:.15s}
@@ -396,6 +401,19 @@
   .kbi .t{display:flex;justify-content:space-between;align-items:center;gap:10px}
   .kbi b{font-size:14px}.kbi .src{font-size:11px;color:var(--muted);background:var(--bg-warm);padding:2px 8px;border-radius:7px;border:1px solid var(--line)}
   .kbi p{margin:6px 0 0;font-size:12.5px;color:var(--muted);max-height:46px;overflow:hidden}
+  .libstat{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .libstat span{background:var(--bg-warm);border:1px solid var(--line);border-radius:10px;padding:8px 13px;font-size:12.5px;color:var(--muted)}
+  .libstat b{color:var(--ink-2);font-size:15px;font-weight:700}
+  .librow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--surface);transition:.15s}
+  .librow:hover{border-color:var(--gold);box-shadow:0 4px 14px rgba(8,43,99,.06)}
+  .librow .libnum{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--gold-ink,#9c7414);background:var(--bg-warm);border:1px solid var(--line);border-radius:7px;padding:4px 8px;flex:none}
+  .librow .libttl{flex:1;font-size:14px;font-weight:600;color:var(--ink-2);line-height:1.35}
+  .librow .libacts{display:flex;gap:6px;flex:none}
+  .librow .libbtn{font-size:12px;font-weight:600;text-decoration:none;padding:6px 11px;border-radius:9px;border:1px solid var(--line);white-space:nowrap}
+  .librow .libbtn.open{color:var(--ink-2);background:var(--bg-warm)}
+  .librow .libbtn.pdf{color:#fff;background:var(--navy,#082B63);border-color:var(--navy,#082B63)}
+  .librow .libbtn:hover{opacity:.88}
+  @media(max-width:620px){.librow{flex-wrap:wrap}.librow .libttl{flex:1 1 100%;order:2}.librow .libacts{order:3}}
   .del{background:none;border:0;color:#d4503f;cursor:pointer;font-size:12px;font-weight:600}
   .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
   .stat{background:var(--bg-warm);border:1px solid var(--line);border-radius:15px;padding:18px}
@@ -694,6 +712,7 @@
       <div id="adPanel" style="display:none">
         <div class="tabs">
           <button class="tab active" data-dtab="kb">Knowledge</button>
+          <button class="tab" data-dtab="library">📚 Library</button>
           <button class="tab" data-dtab="analytics">Analytics</button>
           <button class="tab" data-dtab="leads">Leads</button>
           <button class="tab" data-dtab="settings">Settings</button>
@@ -708,6 +727,13 @@
           </div>
           <h4 style="margin:24px 0 12px;font-weight:700">Knowledge base (<span id="kbCount">0</span>)</h4>
           <div id="kbList"></div>
+        </div>
+        <div class="dpane" data-dpane="library" style="display:none">
+          <div class="hint">Your full case-study library. Every story is an original, branded Pacific Ridgeway page authored by Gregory Stevenson. Click any story to open it, or download a branded PDF with your contact info.</div>
+          <div class="libstat"><span><b id="libCaseCount">0</b> case studies</span><span><b id="libDocCount">0</b> documents in the AI brain</span><span>Goal: <b>100</b></span></div>
+          <div class="fld" style="margin-top:14px"><input id="libSearch" placeholder="🔎 Search the library — try &quot;widow&quot;, &quot;rollover&quot;, &quot;long-term care&quot;, &quot;pension&quot;…"></div>
+          <div id="libCount" style="font-size:12.5px;color:var(--faint);margin:2px 2px 10px"></div>
+          <div id="libList"></div>
         </div>
         <div class="dpane" data-dpane="analytics" style="display:none">
           <div class="stat-grid">
@@ -815,6 +841,10 @@ let exchanges=0,convoId=null,currentConvo=[],asked=new Set(),streaming=false,pro
 const PROMPTS=['What is an annuity, simply?','How do fixed indexed annuities work?','What is the "invest the assets, buy the income" approach?','How are annuities taxed?','Should I roll over my 401(k)?'];
 const FOLLOWPOOL=['What are the fees and surrender charges?','Are annuities safe if the market crashes?','What happens to my annuity when I die?','Annuities vs. CDs — what’s the difference?','How does an income rider work?','How much retirement income can I create?','Annuities and Social Security together?','How do I cover my essential expenses in retirement?','Will I run out of money in retirement?'];
 
+/* Case-study index — lets source citations link to the branded Pacific Ridgeway story pages. */
+const CASE_INDEX=[{"num":"001","slug":"betty-bad-advice-guaranteed-income","title":"Betty's Story: Recovering From Bad Advice With Guaranteed Income","key":"betty's story"},{"num":"002","slug":"classy-rob-protection-and-growth","title":"Classy Rob: The Saver Whose Advisor Wouldn't Show Him the Option","key":"classy rob"},{"num":"003","slug":"sue-the-teacher-tax-free-income","title":"Sue the Teacher: Building Tax-Free Retirement Income Early","key":"sue the teacher"},{"num":"004","slug":"john-and-the-40-40-40-trap","title":"John and the 40-40-40 Trap: Designing a $5,000-a-Month Paycheck","key":"john and the 40-40-40 trap"},{"num":"005","slug":"the-72t-strategy-early-access","title":"The 72(t) Strategy: Reaching Retirement Money Early Without the 10% Penalty","key":"the 72(t) strategy"},{"num":"006","slug":"the-401k-fee-trap","title":"The 401(k) Fee Trap: How Hidden Costs Quietly Drain a Nest Egg","key":"the 401(k) fee trap"},{"num":"007","slug":"the-pension-decision-lump-sum-vs-income","title":"The Pension Decision: Lump Sum or Lifetime Income?","key":"the pension decision"},{"num":"008","slug":"the-widows-income-gap","title":"The Widow's Income Gap: Protecting the Surviving Spouse","key":"the widow's income gap"},{"num":"009","slug":"the-business-owner-self-funded-retirement","title":"The Business Owner: Building Retirement Without a Safety Net","key":"the business owner"},{"num":"010","slug":"social-security-timing","title":"Social Security Timing: Claim at 62, Full Retirement Age, or 70?","key":"social security timing"},{"num":"011","slug":"the-doctor-late-start-high-income","title":"The Doctor: A Late Start, A High Income, and a Chance to Catch Up Fast","key":"the doctor"},{"num":"012","slug":"the-dentist-practice-sale-to-income","title":"The Dentist: Turning a Practice Into a Paycheck for Life","key":"the dentist"},{"num":"013","slug":"the-federal-employee-fers-tsp-pension","title":"The Federal Employee: Making the Most of FERS, TSP, and a Pension","key":"the federal employee"},{"num":"014","slug":"divorce-in-retirement-rebuilding-income","title":"Divorce in Retirement: Splitting a Nest Egg and Rebuilding Income","key":"divorce in retirement"},{"num":"015","slug":"the-large-inheritance-windfall-to-security","title":"The Large Inheritance: Turning a Windfall Into Lasting Security","key":"the large inheritance"},{"num":"016","slug":"the-cd-investor-safe-money-alternative","title":"The CD Investor: A Safer-Money Option Most Savers Never Hear About","key":"the cd investor"},{"num":"017","slug":"the-bond-investor-after-2022","title":"The Bond Investor: When the 'Safe' Part of the Portfolio Falls","key":"the bond investor"},{"num":"018","slug":"the-inflation-worried-retiree","title":"The Inflation-Worried Retiree: Protecting Purchasing Power","key":"the inflation-worried retiree"},{"num":"019","slug":"afraid-to-lose-money-loss-aversion","title":"The Saver Who's Afraid to Lose Money: When Fear Is Its Own Risk","key":"afraid to lose money"},{"num":"020","slug":"when-a-fixed-indexed-annuity-is-not-right","title":"When a Fixed Indexed Annuity Is NOT the Right Choice","key":"when a fixed indexed annuity is not"},{"num":"021","slug":"the-conservative-pre-retiree-fragile-decade","title":"The Conservative Pre-Retiree: Surviving the Fragile Decade","key":"the conservative pre-retiree"},{"num":"022","slug":"the-already-retired-now-what-review","title":"Already Retired, No Real Plan: The 'Now What?' Review","key":"already retired"},{"num":"023","slug":"the-rmd-age-retiree-managing-distributions","title":"The RMD-Age Retiree: Managing Required Distributions at 73","key":"the rmd-age retiree"},{"num":"024","slug":"the-high-net-worth-legacy-planner","title":"The High-Net-Worth Legacy Planner: Transferring Wealth on Your Terms","key":"high-net-worth legacy"},{"num":"025","slug":"the-multiple-old-401ks-consolidator","title":"Scattered Old 401(k)s: Why and How to Bring Them Together","key":"scattered old 401(k)s"},{"num":"026","slug":"the-early-retiree-fire-bridge","title":"The Early Retiree: Bridging the Gap Before 59½, Medicare, and Social Security","key":"the early retiree"},{"num":"027","slug":"the-sandwich-generation-saver","title":"The Sandwich Generation: Funding Everyone Else's Future but Your Own","key":"the sandwich generation"},{"num":"028","slug":"the-long-term-care-worrier","title":"The Long-Term-Care Worrier: Facing Retirement's Biggest Hidden Cost","key":"long-term-care worrier"},{"num":"029","slug":"the-annuity-skeptic-myths-and-truths","title":"The Annuity Skeptic: 'I've Heard Bad Things' — Myths and Truths","key":"the annuity skeptic"},{"num":"030","slug":"the-single-never-married-retiree","title":"The Solo Retiree: Planning Retirement Without a Spouse's Safety Net","key":"the solo retiree"},{"num":"031","slug":"the-couple-protecting-each-other","title":"The Couple Protecting Each Other: Planning as a Team","key":"the couple protecting each other"},{"num":"032","slug":"the-variable-annuity-owner-considering-a-switch","title":"The Variable Annuity Owner: Should You Switch — and How to Do It Tax-Free","key":"the variable annuity owner"},{"num":"033","slug":"the-concentrated-stock-saver","title":"Too Much in One Stock: De-Risking a Concentrated Position","key":"too much in one stock"},{"num":"034","slug":"the-recently-laid-off-pre-retiree","title":"Laid Off at 58: Turning a Forced Exit Into a Secure Retirement","key":"laid off at 58"},{"num":"035","slug":"the-healthcare-cost-shock","title":"The Healthcare-Cost Shock: Planning for Retirement's Most Unpredictable Bill","key":"the healthcare-cost shock"}];
+function caseForSource(src){if(!src)return null;const s=src.toLowerCase();for(const c of CASE_INDEX){if(s.includes(c.key)||s.includes('case study '+c.num)||s.includes('case '+c.num))return c;}return null;}
+
 function botAvatar(){return '<div class="avatar"><svg><use href="#mtn"/></svg></div>';}
 function scrollBottom(){chatscroll.scrollTop=chatscroll.scrollHeight;}
 
@@ -837,11 +867,17 @@ function streamText(textEl,full,cb){
   };tick();
 }
 
+function sourceLineHTML(src){const c=caseForSource(src);
+  if(c)return `<a class="src-link" href="/cases/${c.slug}.html" target="_blank" rel="noopener">📖 ${src} <span class="src-go">Read the full story →</span></a>`;
+  return `<span class="src-plain">${src}</span>`;}
 function finalizeAI(contentEl,answerText,source,opts){
-  // sources (collapsible)
-  if(source){
-    const d=el('details','sources');
-    d.innerHTML=`<summary>📎 Sources <span class="chev">▾</span></summary><div class="src-body"><b>${source}</b> — educational reference used for this answer.</div>`;
+  opts=opts||{};
+  // sources (collapsible) — list each real source; link case studies to their branded page
+  const srcArr=(opts.sourcesArr&&opts.sourcesArr.length)?opts.sourcesArr:(source?[source]:[]);
+  if(srcArr.length){
+    const d=el('details','sources');d.open=true;
+    const rows=srcArr.map(sourceLineHTML).join('');
+    d.innerHTML=`<summary>📎 Sources & stories <span class="chev">▾</span></summary><div class="src-body">${rows}</div>`;
     contentEl.appendChild(d);
   }
   // controls
@@ -854,8 +890,9 @@ function finalizeAI(contentEl,answerText,source,opts){
   contentEl.appendChild(ctrls);
   // pro card
   if(opts&&opts.pro){contentEl.appendChild(proCard());}
-  // follow-ups
-  const fus=pickFollowups();
+  // follow-ups — prefer the brain's source-driven suggestions, fall back to the pool
+  let fus=(opts.followups||[]).filter(q=>q&&!asked.has(q.toLowerCase())).slice(0,3);
+  if(!fus.length)fus=pickFollowups();
   if(fus.length){const wrap=el('div','followups');fus.forEach(q=>{const b=el('button','fu',q);b.onclick=()=>send(q);wrap.appendChild(b);});contentEl.appendChild(wrap);}
   currentConvo.push({role:'ai',html:contentEl.querySelector('.text').innerHTML,source:source||null});
   saveConvo();scrollBottom();
@@ -882,18 +919,15 @@ function send(q){
   addUser(q);
   const m=addAI();const textEl=m.querySelector('.text');const contentEl=m.querySelector('.content');
   (async()=>{
-    let answerText,source;const advice=ADVICE.test(q);
-    if(advice){
-      answerText=`That's a personalized question — and giving individualized financial, tax, or investment advice is something only a licensed professional should do for your exact situation. I'd rather get you to the right answer than offer a generic guess. I'm glad to explain the general concepts behind it, and the best next step is a quick, no-obligation conversation with a licensed professional who can look at your real numbers.`;
-      source='Educational guardrail';
-    } else {
-      try{ const r=await AAI.askAI(q); answerText=r.answer; source=(r.sources||[]).join(', ')||'AskAnnuityAI knowledge base'; }
-      catch(e){ answerText="Sorry — I had trouble reaching the assistant just now. Please try again in a moment."; source=''; }
-    }
+    // Every question goes to the brain now — including "should I…" ones. The brain
+    // answers them educationally and leads with the relevant real story. No more canned punt.
+    let answerText,source,sourcesArr=[],followups=[];const advice=ADVICE.test(q);
+    try{ const r=await AAI.askAI(q); answerText=r.answer; sourcesArr=r.sources||[]; followups=r.followups||[]; source=sourcesArr.join(', ')||'AskAnnuityAI knowledge base'; }
+    catch(e){ answerText="Sorry — I had trouble reaching the assistant just now. Please try again in a moment."; source=''; }
     let showPro=false;
     if(advice||HUMAN.test(q)||dueForPro()){showPro=true;proCount++;lastProAt=exchanges;}
     textEl.innerHTML='';
-    streamText(textEl,answerText,()=>finalizeAI(contentEl,answerText,source,{pro:showPro}));
+    streamText(textEl,answerText,()=>finalizeAI(contentEl,answerText,source,{pro:showPro,sourcesArr,followups}));
   })();
 }
 
@@ -1031,7 +1065,17 @@ document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.
 $('adminBtn').onclick=()=>$('adminModal').classList.add('open');
 $('adminBtn2').onclick=()=>$('adminModal').classList.add('open');
 $('adLoginBtn').onclick=adLogin;$('adPass').addEventListener('keydown',e=>{if(e.key==='Enter')adLogin();});
-function adLogin(){if($('adPass').value===getCfg().adminPassword){$('adLogin').style.display='none';$('adPanel').style.display='block';$('adminTitle').textContent='⚙️ Admin Console';renderKB();renderAnalytics();renderLeads();fillSettings();}else $('adErr').textContent='Incorrect password.';}
+function adLogin(){if($('adPass').value===getCfg().adminPassword){$('adLogin').style.display='none';$('adPanel').style.display='block';$('adminTitle').textContent='⚙️ Admin Console';renderKB();renderLibrary();renderAnalytics();renderLeads();fillSettings();}else $('adErr').textContent='Incorrect password.';}
+function libRowHTML(c){return `<div class="librow"><span class="libnum">${c.num}</span><span class="libttl">${c.title.replace(/</g,'&lt;')}</span><span class="libacts"><a class="libbtn open" href="/cases/${c.slug}.html" target="_blank" rel="noopener">Open ↗</a><a class="libbtn pdf" href="/cases/${c.slug}.html?pdf=1" target="_blank" rel="noopener">⤓ PDF</a></span></div>`;}
+function renderLibrary(){
+  const cases=[...CASE_INDEX].sort((a,b)=>a.num.localeCompare(b.num));
+  $('libCaseCount').textContent=cases.length;
+  $('libDocCount').textContent=cases.length+10; // 9 foundation articles + death-benefit doc + cases
+  const list=$('libList'),cnt=$('libCount'),search=$('libSearch');
+  const draw=(arr)=>{list.innerHTML=arr.map(libRowHTML).join('');cnt.textContent=arr.length+' of '+cases.length+' stories';};
+  const run=()=>{const s=(search.value||'').toLowerCase().trim();if(!s)return draw(cases);draw(cases.filter(c=>(c.num+' '+c.title+' '+c.key).toLowerCase().includes(s)));};
+  search.oninput=run;draw(cases);
+}
 document.querySelectorAll('[data-dtab]').forEach(t=>t.onclick=()=>{document.querySelectorAll('[data-dtab]').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelectorAll('.dpane').forEach(p=>p.style.display='none');document.querySelector(`[data-dpane="${t.dataset.dtab}"]`).style.display='block';});
 function renderKB(){const admin=loadAdminKB();$('kbCount').textContent=DEFAULT_KB.length+admin.length;const list=$('kbList');list.innerHTML='';
   [...admin.map(x=>({...x,_a:true})),...DEFAULT_KB.map(x=>({...x,_a:false}))].forEach(it=>{const d=el('div','kbi');
