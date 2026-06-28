@@ -10,7 +10,7 @@
 <meta property="og:url" content="https://askannuityai.com" />
 <meta property="og:title" content="AskAnnuityAI — Ask anything about retirement & annuities" />
 <meta property="og:description" content="Unbiased, AI-powered answers about annuities & retirement income — free, instant, and never pushy." />
-<meta property="og:image" content="https://askannuityai.com/og-image.png" />
+<meta property="og:image" content="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&h=630&q=80" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -424,22 +424,25 @@
     .talk{grid-template-columns:1fr;padding:30px}
     .fld.two,.grid2,.stat-grid{grid-template-columns:1fr}
     .nav-links{display:none}
-    .nav-ghost.sm-hide{display:none}
+    .sm-hide{display:none}
+    #newChatBtn{display:none}
+    .nav{gap:10px}
+    .brand{font-size:18px}
+    .nav-right{gap:6px}
+    #bookNav{padding:8px 13px;font-size:13.5px}
     .hero{min-height:calc(100svh - var(--hd));padding-top:20px}
     .chatscroll-inner{padding:22px 16px 140px}
     .composerbar{padding:12px 14px 16px}
   }
-  /* Mobile "use desktop" banner */
+  /* Mobile "use desktop" banner — slim top strip, never overlaps the composer */
   .mdb{display:none}
   @media(max-width:880px){
-    .mdb{display:flex;position:fixed;left:10px;right:10px;bottom:10px;z-index:9999;
-      align-items:center;gap:11px;padding:13px 14px;border-radius:15px;
-      background:var(--navy);color:#fff;line-height:1.4;font-size:13.5px;
-      box-shadow:0 12px 34px rgba(8,43,99,.4);border:1px solid rgba(212,161,43,.55);
-      animation:mdbUp .5s cubic-bezier(.2,.7,.2,1) both}
+    .mdb{display:flex;align-items:center;gap:10px;padding:9px 15px;
+      background:var(--navy);color:#fff;line-height:1.35;font-size:12.5px;
+      border-bottom:1px solid rgba(212,161,43,.5)}
   }
   @keyframes mdbUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-  .mdb .mdb-ic{font-size:21px;flex:none}
+  .mdb .mdb-ic{font-size:16px;flex:none}
   .mdb b{color:var(--gold);font-weight:650}
   .mdb .mdb-x{margin-left:auto;flex:none;width:27px;height:27px;border-radius:8px;cursor:pointer;
     background:rgba(255,255,255,.15);border:none;color:#fff;font-size:14px;line-height:1}
