@@ -83,7 +83,7 @@
   body{
     font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;
     background-color:var(--bg);
-    background-image:linear-gradient(to bottom, var(--bg) 0%, color-mix(in srgb,var(--bg) 90%,transparent) 22%, color-mix(in srgb,var(--bg) 52%,transparent) 52%, color-mix(in srgb,var(--bg) 14%,transparent) 80%, transparent 100%), url("https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=2400&q=80");
+    background-image:linear-gradient(to bottom, var(--bg) 0%, color-mix(in srgb,var(--bg) 90%,transparent) 22%, color-mix(in srgb,var(--bg) 52%,transparent) 52%, color-mix(in srgb,var(--bg) 14%,transparent) 80%, transparent 100%), url("https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=2400&q=80");
     background-repeat:no-repeat,no-repeat;background-position:center,bottom center;background-size:cover,cover;background-attachment:fixed,fixed;
     color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;letter-spacing:-.011em;transition:background-color .35s var(--ease),color .35s var(--ease)
@@ -429,8 +429,23 @@
     .chatscroll-inner{padding:22px 16px 140px}
     .composerbar{padding:12px 14px 16px}
   }
+  /* Mobile "use desktop" banner */
+  .mdb{display:none}
+  @media(max-width:880px){
+    .mdb{display:flex;position:fixed;left:10px;right:10px;bottom:10px;z-index:9999;
+      align-items:center;gap:11px;padding:13px 14px;border-radius:15px;
+      background:var(--navy);color:#fff;line-height:1.4;font-size:13.5px;
+      box-shadow:0 12px 34px rgba(8,43,99,.4);border:1px solid rgba(212,161,43,.55);
+      animation:mdbUp .5s cubic-bezier(.2,.7,.2,1) both}
+  }
+  @keyframes mdbUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .mdb .mdb-ic{font-size:21px;flex:none}
+  .mdb b{color:var(--gold);font-weight:650}
+  .mdb .mdb-x{margin-left:auto;flex:none;width:27px;height:27px;border-radius:8px;cursor:pointer;
+    background:rgba(255,255,255,.15);border:none;color:#fff;font-size:14px;line-height:1}
+  .mdb .mdb-x:hover{background:rgba(255,255,255,.28)}
   @media print{
-    header,.composerbar,.prompts,.scrollcue,.ctrls,.followups,.procard,.icon-btn,.ov{display:none !important}
+    header,.composerbar,.prompts,.scrollcue,.ctrls,.followups,.procard,.icon-btn,.ov,.mdb{display:none !important}
     body.chatting .chatpane{position:static}
     .chatscroll{overflow:visible}
   }
@@ -438,6 +453,13 @@
 </style>
 </head>
 <body>
+
+<!-- MOBILE: nudge to desktop -->
+<div class="mdb" id="mdb">
+  <span class="mdb-ic">🖥️</span>
+  <span>For the full experience, open <b>AskAnnuityAI</b> on a desktop or laptop.</span>
+  <button class="mdb-x" id="mdbX" aria-label="Dismiss">✕</button>
+</div>
 
 <svg style="display:none">
   <symbol id="mtn" viewBox="0 0 24 24" fill="none">
@@ -718,12 +740,13 @@
       <div class="welcome-head">
         <div class="w-orb"></div>
         <h3>Get the most out of <span style="color:var(--gold)">AskAnnuityAI</span></h3>
-        <p>Three quick steps to smarter retirement answers.</p>
+        <p>Four quick steps to smarter retirement answers.</p>
       </div>
       <div class="steps">
-        <div class="step"><div class="num">1</div><div><h4>Ask anything</h4><p>Type any retirement or annuity question and get a clear, instant answer — share as much or as little as you like.</p></div></div>
-        <div class="step"><div class="num">2</div><div><h4>Create a free account</h4><p>Sign in with Google so your conversations, answers, and favorites are saved across every visit.</p></div></div>
-        <div class="step"><div class="num">3</div><div><h4>Keep learning</h4><p>Unlock curated resources and pick up right where you left off, anytime.</p></div></div>
+        <div class="step"><div class="num">1</div><div><h4>Use a computer browser</h4><p>For the best experience, open AskAnnuityAI on a desktop or laptop — everything is roomier and easier to read.</p></div></div>
+        <div class="step"><div class="num">2</div><div><h4>Ask anything</h4><p>Type any retirement or annuity question and get a clear, instant answer — share as much or as little as you like.</p></div></div>
+        <div class="step"><div class="num">3</div><div><h4>Create a free account</h4><p>Sign in with Google so your conversations, answers, and favorites are saved across every visit.</p></div></div>
+        <div class="step"><div class="num">4</div><div><h4>Keep learning</h4><p>Unlock curated resources and pick up right where you left off, anytime.</p></div></div>
       </div>
       <div class="auth-btns">
         <button id="welcomeGoogle" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:0 0 18px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continue with Google</button>
@@ -739,7 +762,7 @@
 <script>
 /* ===================== STORAGE ===================== */
 const LS={kb:'aai2_kb',leads:'aai2_leads',cfg:'aai2_cfg',user:'aai2_user',convos:'aai2_convos',favs:'aai2_favs',stats:'aai2_stats',theme:'aai2_theme',welcomed:'aai2_welcomed'};
-const DEFAULT_CFG={phone:'(555) 555-0123',phoneRaw:'+15555550123',leadEmail:'stevenson@pacificridgewayinsurance.com',
+const DEFAULT_CFG={phone:'(619) 374-8100',phoneRaw:'+16193748100',leadEmail:'stevenson@pacificridgewayinsurance.com',
   booking:'https://calendly.com/pacific-ridgeway/retirement-review',bookLink:'https://pacificridgeway.com/book',
   uniLink:'https://pacificridgeway.com/university',adminPassword:'ridgeway2026'};
 const getCfg=()=>{try{return{...DEFAULT_CFG,...JSON.parse(localStorage.getItem(LS.cfg)||'{}')}}catch(e){return{...DEFAULT_CFG}}};
@@ -971,6 +994,11 @@ function applyCfg(){const c=getCfg();$('phoneLabel').textContent=c.phone;$('okPh
   $('bookNav').onclick=()=>{document.body.classList.remove('chatting');location.hash='#talk';};}
 applyCfg();refreshAuthUI();if(getUser()&&innerWidth>=1024)openSidebar();
 window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}}});});
+
+/* ---- mobile "use desktop" banner ---- */
+(function(){var b=$('mdb');if(!b)return;
+  if(localStorage.getItem('aai_mdb_dismissed'))b.style.display='none';
+  var x=$('mdbX');if(x)x.onclick=function(){b.style.display='none';localStorage.setItem('aai_mdb_dismissed','1');};})();
 
 /* ---- welcome / how-it-works popup ---- */
 function registerLearnerLead(u){const leads=J(LS.leads,[]);
