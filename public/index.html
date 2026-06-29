@@ -425,6 +425,9 @@
   .librow .libbtn.pdf{color:#fff;background:var(--navy,#082B63);border-color:var(--navy,#082B63)}
   .librow .libbtn:hover{opacity:.88}
   @media(max-width:620px){.librow{flex-wrap:wrap}.librow .libttl{flex:1 1 100%;order:2}.librow .libacts{order:3}}
+  .libsec{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin:18px 2px 9px}
+  .librow .libnum.brain{color:var(--navy,#082B63);background:rgba(8,43,99,.07);letter-spacing:.08em}
+  .librow .libtag{font-size:12px;font-weight:600;color:var(--muted);background:var(--bg-warm);border:1px solid var(--line);border-radius:9px;padding:6px 11px;white-space:nowrap}
   .del{background:none;border:0;color:#d4503f;cursor:pointer;font-size:12px;font-weight:600}
   .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
   .stat{background:var(--bg-warm);border:1px solid var(--line);border-radius:15px;padding:18px}
@@ -855,6 +858,19 @@ const FOLLOWPOOL=['What are the fees and surrender charges?','Are annuities safe
 /* Case-study index — lets source citations link to the branded Pacific Ridgeway story pages. */
 const CASE_INDEX=[{"num":"001","slug":"betty-bad-advice-guaranteed-income","title":"Betty's Story: Recovering From Bad Advice With Guaranteed Income","key":"betty's story"},{"num":"002","slug":"classy-rob-protection-and-growth","title":"Classy Rob: The Saver Whose Advisor Wouldn't Show Him the Option","key":"classy rob"},{"num":"003","slug":"sue-the-teacher-tax-free-income","title":"Sue the Teacher: Building Tax-Free Retirement Income Early","key":"sue the teacher"},{"num":"004","slug":"john-and-the-40-40-40-trap","title":"John and the 40-40-40 Trap: Designing a $5,000-a-Month Paycheck","key":"john and the 40-40-40 trap"},{"num":"005","slug":"the-72t-strategy-early-access","title":"The 72(t) Strategy: Reaching Retirement Money Early Without the 10% Penalty","key":"the 72(t) strategy"},{"num":"006","slug":"the-401k-fee-trap","title":"The 401(k) Fee Trap: How Hidden Costs Quietly Drain a Nest Egg","key":"the 401(k) fee trap"},{"num":"007","slug":"the-pension-decision-lump-sum-vs-income","title":"The Pension Decision: Lump Sum or Lifetime Income?","key":"the pension decision"},{"num":"008","slug":"the-widows-income-gap","title":"The Widow's Income Gap: Protecting the Surviving Spouse","key":"the widow's income gap"},{"num":"009","slug":"the-business-owner-self-funded-retirement","title":"The Business Owner: Building Retirement Without a Safety Net","key":"the business owner"},{"num":"010","slug":"social-security-timing","title":"Social Security Timing: Claim at 62, Full Retirement Age, or 70?","key":"social security timing"},{"num":"011","slug":"the-doctor-late-start-high-income","title":"The Doctor: A Late Start, A High Income, and a Chance to Catch Up Fast","key":"the doctor"},{"num":"012","slug":"the-dentist-practice-sale-to-income","title":"The Dentist: Turning a Practice Into a Paycheck for Life","key":"the dentist"},{"num":"013","slug":"the-federal-employee-fers-tsp-pension","title":"The Federal Employee: Making the Most of FERS, TSP, and a Pension","key":"the federal employee"},{"num":"014","slug":"divorce-in-retirement-rebuilding-income","title":"Divorce in Retirement: Splitting a Nest Egg and Rebuilding Income","key":"divorce in retirement"},{"num":"015","slug":"the-large-inheritance-windfall-to-security","title":"The Large Inheritance: Turning a Windfall Into Lasting Security","key":"the large inheritance"},{"num":"016","slug":"the-cd-investor-safe-money-alternative","title":"The CD Investor: A Safer-Money Option Most Savers Never Hear About","key":"the cd investor"},{"num":"017","slug":"the-bond-investor-after-2022","title":"The Bond Investor: When the 'Safe' Part of the Portfolio Falls","key":"the bond investor"},{"num":"018","slug":"the-inflation-worried-retiree","title":"The Inflation-Worried Retiree: Protecting Purchasing Power","key":"the inflation-worried retiree"},{"num":"019","slug":"afraid-to-lose-money-loss-aversion","title":"The Saver Who's Afraid to Lose Money: When Fear Is Its Own Risk","key":"afraid to lose money"},{"num":"020","slug":"when-a-fixed-indexed-annuity-is-not-right","title":"When a Fixed Indexed Annuity Is NOT the Right Choice","key":"when a fixed indexed annuity is not"},{"num":"021","slug":"the-conservative-pre-retiree-fragile-decade","title":"The Conservative Pre-Retiree: Surviving the Fragile Decade","key":"the conservative pre-retiree"},{"num":"022","slug":"the-already-retired-now-what-review","title":"Already Retired, No Real Plan: The 'Now What?' Review","key":"already retired"},{"num":"023","slug":"the-rmd-age-retiree-managing-distributions","title":"The RMD-Age Retiree: Managing Required Distributions at 73","key":"the rmd-age retiree"},{"num":"024","slug":"the-high-net-worth-legacy-planner","title":"The High-Net-Worth Legacy Planner: Transferring Wealth on Your Terms","key":"high-net-worth legacy"},{"num":"025","slug":"the-multiple-old-401ks-consolidator","title":"Scattered Old 401(k)s: Why and How to Bring Them Together","key":"scattered old 401(k)s"},{"num":"026","slug":"the-early-retiree-fire-bridge","title":"The Early Retiree: Bridging the Gap Before 59½, Medicare, and Social Security","key":"the early retiree"},{"num":"027","slug":"the-sandwich-generation-saver","title":"The Sandwich Generation: Funding Everyone Else's Future but Your Own","key":"the sandwich generation"},{"num":"028","slug":"the-long-term-care-worrier","title":"The Long-Term-Care Worrier: Facing Retirement's Biggest Hidden Cost","key":"long-term-care worrier"},{"num":"029","slug":"the-annuity-skeptic-myths-and-truths","title":"The Annuity Skeptic: 'I've Heard Bad Things' — Myths and Truths","key":"the annuity skeptic"},{"num":"030","slug":"the-single-never-married-retiree","title":"The Solo Retiree: Planning Retirement Without a Spouse's Safety Net","key":"the solo retiree"},{"num":"031","slug":"the-couple-protecting-each-other","title":"The Couple Protecting Each Other: Planning as a Team","key":"the couple protecting each other"},{"num":"032","slug":"the-variable-annuity-owner-considering-a-switch","title":"The Variable Annuity Owner: Should You Switch — and How to Do It Tax-Free","key":"the variable annuity owner"},{"num":"033","slug":"the-concentrated-stock-saver","title":"Too Much in One Stock: De-Risking a Concentrated Position","key":"too much in one stock"},{"num":"034","slug":"the-recently-laid-off-pre-retiree","title":"Laid Off at 58: Turning a Forced Exit Into a Secure Retirement","key":"laid off at 58"},{"num":"035","slug":"the-healthcare-cost-shock","title":"The Healthcare-Cost Shock: Planning for Retirement's Most Unpredictable Bill","key":"the healthcare-cost shock"}];
 function caseForSource(src){if(!src)return null;const s=src.toLowerCase();for(const c of CASE_INDEX){if(s.includes(c.key)||s.includes('case study '+c.num)||s.includes('case '+c.num))return c;}return null;}
+/* Foundation documents in the AI brain (no individual case page — these are reference knowledge). */
+const FOUNDATION_DOCS=[
+ {title:"What Happens to Your Annuity When You Die (Frank & Susan)",key:"death benefit, beneficiary, spouse, probate, spousal continuation"},
+ {title:"Annuity Types Overview",key:"fixed, variable, indexed, immediate, deferred"},
+ {title:"Income Riders & the GLWB Math",key:"income rider, glwb, guaranteed withdrawal, payout"},
+ {title:"Immediate Annuity (SPIA) Payouts",key:"spia, immediate annuity, monthly income per 100k"},
+ {title:"Index Crediting: Caps, Participation & Spreads",key:"caps, participation rate, spread, crediting"},
+ {title:"MYGA: Safe-Money Growth",key:"myga, multi year guaranteed, cd alternative, safe money"},
+ {title:"Joint-Life & Age-Gap Couples",key:"joint life, couples, age gap, survivor"},
+ {title:"Taxes, RMDs, Liquidity & Surrender",key:"taxes, rmd, liquidity, surrender charge"},
+ {title:"Suitability: When an Annuity Is and Isn't Appropriate",key:"suitability, when appropriate, not right"},
+ {title:"Annuity Glossary",key:"glossary, terms, definitions"}
+];
 
 function botAvatar(){return '<div class="avatar"><svg><use href="#mtn"/></svg></div>';}
 function scrollBottom(){chatscroll.scrollTop=chatscroll.scrollHeight;}
@@ -888,10 +904,14 @@ function sourceLineHTML(src){const c=caseForSource(src);
 function finalizeAI(contentEl,answerText,source,opts){
   opts=opts||{};
   // sources (collapsible) — list each real source; link case studies to their branded page
-  const srcArr=(opts.sourcesArr&&opts.sourcesArr.length)?opts.sourcesArr:(source?[source]:[]);
+  let srcArr=(opts.sourcesArr&&opts.sourcesArr.length)?opts.sourcesArr.slice():(source?[source]:[]);
+  // Put the clickable case-study stories first, then cap the list so it doesn't tower.
+  srcArr.sort((a,b)=>(caseForSource(b)?1:0)-(caseForSource(a)?1:0));
   if(srcArr.length){
+    const CAP=5;const shown=srcArr.slice(0,CAP);const extra=srcArr.length-shown.length;
     const d=el('details','sources');d.open=true;
-    const rows=srcArr.map(sourceLineHTML).join('');
+    let rows=shown.map(sourceLineHTML).join('');
+    if(extra>0)rows+=`<span class="src-plain">+ ${extra} more reference${extra>1?'s':''} from the knowledge base</span>`;
     d.innerHTML=`<summary>📎 Sources & stories <span class="chev">▾</span></summary><div class="src-body">${rows}</div>`;
     contentEl.appendChild(d);
   }
@@ -1084,14 +1104,26 @@ $('adminBtn2').onclick=()=>$('adminModal').classList.add('open');
 $('adLoginBtn').onclick=adLogin;$('adPass').addEventListener('keydown',e=>{if(e.key==='Enter')adLogin();});
 function adLogin(){if($('adPass').value===getCfg().adminPassword){$('adLogin').style.display='none';$('adPanel').style.display='block';$('adminTitle').textContent='⚙️ Admin Console';renderKB();renderLibrary();renderAnalytics();renderLeads();fillSettings();}else $('adErr').textContent='Incorrect password.';}
 function libRowHTML(c){return `<div class="librow"><span class="libnum">${c.num}</span><span class="libttl">${c.title.replace(/</g,'&lt;')}</span><span class="libacts"><a class="libbtn open" href="/cases/${c.slug}.html" target="_blank" rel="noopener">Open ↗</a><a class="libbtn pdf" href="/cases/${c.slug}.html?pdf=1" target="_blank" rel="noopener">⤓ PDF</a></span></div>`;}
+function docRowHTML(d){return `<div class="librow"><span class="libnum brain">BRAIN</span><span class="libttl">${d.title.replace(/</g,'&lt;')}</span><span class="libacts"><span class="libtag">Knowledge base</span></span></div>`;}
 function renderLibrary(){
   const cases=[...CASE_INDEX].sort((a,b)=>a.num.localeCompare(b.num));
+  const docs=FOUNDATION_DOCS;
+  const total=cases.length+docs.length;
   $('libCaseCount').textContent=cases.length;
-  $('libDocCount').textContent=cases.length+10; // 9 foundation articles + death-benefit doc + cases
+  $('libDocCount').textContent=total; // case studies + foundation knowledge docs = full brain
   const list=$('libList'),cnt=$('libCount'),search=$('libSearch');
-  const draw=(arr)=>{list.innerHTML=arr.map(libRowHTML).join('');cnt.textContent=arr.length+' of '+cases.length+' stories';};
-  const run=()=>{const s=(search.value||'').toLowerCase().trim();if(!s)return draw(cases);draw(cases.filter(c=>(c.num+' '+c.title+' '+c.key).toLowerCase().includes(s)));};
-  search.oninput=run;draw(cases);
+  const draw=(cs,ds)=>{
+    let html='';
+    if(cs.length){html+=`<div class="libsec">Case studies (${cs.length})</div>`+cs.map(libRowHTML).join('');}
+    if(ds.length){html+=`<div class="libsec">Foundation knowledge in the AI brain (${ds.length})</div>`+ds.map(docRowHTML).join('');}
+    list.innerHTML=html||'<div style="color:var(--faint);font-size:14px;padding:14px 2px">No documents match that search.</div>';
+    cnt.textContent=(cs.length+ds.length)+' of '+total+' documents';
+  };
+  const run=()=>{const s=(search.value||'').toLowerCase().trim();
+    if(!s)return draw(cases,docs);
+    draw(cases.filter(c=>(c.num+' '+c.title+' '+c.key).toLowerCase().includes(s)),
+         docs.filter(d=>(d.title+' '+d.key).toLowerCase().includes(s)));};
+  search.oninput=run;draw(cases,docs);
 }
 document.querySelectorAll('[data-dtab]').forEach(t=>t.onclick=()=>{document.querySelectorAll('[data-dtab]').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelectorAll('.dpane').forEach(p=>p.style.display='none');document.querySelector(`[data-dpane="${t.dataset.dtab}"]`).style.display='block';});
 function renderKB(){const admin=loadAdminKB();$('kbCount').textContent=DEFAULT_KB.length+admin.length;const list=$('kbList');list.innerHTML='';
