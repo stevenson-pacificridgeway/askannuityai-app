@@ -57,6 +57,7 @@ footer{background:var(--navy);color:#fff;margin-top:50px;border-top:3px solid va
 .cta.ghost{background:transparent;color:#fff;border:1px solid rgba(212,161,43,.55)}
 .cta.ghost:hover{background:rgba(212,161,43,.15)}
 @media(max-width:720px){.cta.ghost{display:none}}
+.printhead{display:none}
 @media print{
   .topbar{position:static;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .topbar .tp{display:flex!important}
@@ -65,9 +66,18 @@ footer{background:var(--navy);color:#fff;margin-top:50px;border-top:3px solid va
   body{font-size:11.5pt;line-height:1.55}
   h1{font-size:25pt}h2{font-size:16pt;break-after:avoid}
   .faq details{break-inside:avoid}
-  .hero{padding:18px 0 12px}
+  .hero{padding:10px 0 12px}
   footer{margin-top:24px}
+  /* Print-only branded contact bar — dark ink so it shows even when background graphics are OFF */
+  .printhead{display:block!important;border-bottom:2px solid var(--gold);padding:0 0 9px;margin:0 0 6px}
+  .printhead .pn{font-weight:800;letter-spacing:.04em;font-size:13.5pt;color:var(--navy)}
+  .printhead .pn b{color:var(--gold-ink)}
+  .printhead .pc{font-size:10pt;color:#33415c;margin-top:3px}
+  .printhead .pc b{color:var(--navy)}
+  .printfoot{display:block!important;margin-top:14px;padding-top:9px;border-top:1px solid #cbd3e0;font-size:9.5pt;color:#33415c}
+  .printfoot b{color:var(--navy)}
 }
+.printfoot{display:none}
 @page{margin:14mm}
 </style></head><body>
 <header class="topbar"><div class="in">
@@ -77,6 +87,7 @@ footer{background:var(--navy);color:#fff;margin-top:50px;border-top:3px solid va
 <a class="cta ghost" href="javascript:window.print()" title="Download this case study as a PDF">&#10515; PDF</a>
 <a class="cta" href="https://pacificridgeway.com/book">Book a Review</a></div></div></header>
 <article><div class="wrap">
+<div class="printhead"><div class="pn">PACIFIC <b>RIDGEWAY</b></div><div class="pc">Retirement Income Strategists &nbsp;&middot;&nbsp; <b>(619) 374-8100</b> &nbsp;&middot;&nbsp; pacificridgeway.com &nbsp;&middot;&nbsp; stevenson@pacificridgewayinsurance.com</div></div>
 <div class="hero"><span class="eyebrow"><span class="dot"></span>Educational Case Study &middot; No. 005</span>
 <h1>The 72(t) Strategy: Reaching Retirement Money Early Without the 10% Penalty</h1><p class="dek">Need income before 59 and a half? A little-known IRS rule can unlock penalty-free distributions — if it&#x27;s done exactly right.</p>
 <div class="meta"><span class="pill gold">Difficulty: Advanced</span><span class="pill">12 min read</span><span class="pill nav">72(t)</span><span class="pill nav">Early Retirement</span><span class="pill nav">Distribution Strategy</span><span class="pill nav">Tax</span><span class="pill nav">SEPP</span></div></div>
@@ -106,6 +117,7 @@ footer{background:var(--navy);color:#fff;margin-top:50px;border-top:3px solid va
 <div class="ti">Author of <em>Indexed Annuity Secrets</em></div><p>Educational Case Study authored by Gregory Stevenson, Author of <em>Indexed Annuity Secrets</em>. This hypothetical example is designed to illustrate retirement planning concepts and should not be interpreted as individualized financial, tax, investment, or legal advice.</p></div></div>
 <div class="disc"><b>Important:</b> Annuities are insurance products. Guarantees are backed by the claims-paying ability of the issuing insurer. Index-linked interest is subject to caps, participation rates, and spreads that can change, and surrender charges may apply to early withdrawals. This material is for general education and is not financial, tax, or legal advice. Please consult a licensed professional about your specific situation.</div>
 <a class="backlink" href="/cases/">&larr; Back to the Case Study Library</a>
+<div class="printfoot"><b>Pacific Ridgeway</b> &middot; Retirement Income Strategists &middot; <b>(619) 374-8100</b> &middot; pacificridgeway.com &middot; stevenson@pacificridgewayinsurance.com &mdash; Educational case study by Gregory Stevenson, Author of Indexed Annuity Secrets. Not individualized financial, tax, or legal advice.</div>
 </div></article>
 <footer><div class="foot">
 <div class="b2"><span class="mark" style="width:40px;height:40px"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M1 20 L7.5 8.5 L11 14 L14.5 6.5 L23 20 Z" fill="#fff"/><path d="M6 12.2 L8.4 10 L9.6 11.9 Z" fill="#082B63"/><path d="M13.4 9.6 L15.6 11.8 L17.4 9.6 Z" fill="#082B63"/></svg></span><span class="wm">PACIFIC <b>RIDGEWAY</b></span></div>
