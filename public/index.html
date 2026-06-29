@@ -216,6 +216,17 @@
     background-size:400% 100%;animation:shimmer 1.4s ease infinite;display:block}
   .skel i:nth-child(1){width:92%}.skel i:nth-child(2){width:99%}.skel i:nth-child(3){width:74%}
   @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+  /* AI "thinking" — turning gears + cycling status */
+  .thinking{display:flex;align-items:center;gap:13px;padding-top:3px}
+  .gears{position:relative;width:42px;height:36px;flex:none}
+  .gears .gw{position:absolute;display:block}
+  .gears .g1{width:30px;height:30px;left:0;top:3px;color:var(--gold);animation:gspin 2.6s linear infinite}
+  .gears .g2{width:21px;height:21px;left:22px;top:13px;color:var(--ink-2);animation:gspinr 1.9s linear infinite}
+  @keyframes gspin{to{transform:rotate(360deg)}}
+  @keyframes gspinr{to{transform:rotate(-360deg)}}
+  .tstatus{font-size:14.5px;color:var(--muted);font-weight:500;letter-spacing:.01em}
+  .tstatus::after{content:'';display:inline-block;width:0;animation:tdots 1.2s steps(4,end) infinite;overflow:hidden;vertical-align:bottom}
+  @keyframes tdots{0%{width:0}100%{width:1.1em}}
 
   .sources{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg-warm)}
   .sources summary{cursor:pointer;list-style:none;padding:11px 15px;font-size:13px;font-weight:600;color:var(--ink-2);display:flex;align-items:center;gap:8px}
@@ -854,7 +865,11 @@ function fmtFull(text){let t=text.replace(/&/g,'&amp;').replace(/</g,'&lt;');t=t
 function enterChat(){if(!document.body.classList.contains('chatting')){document.body.classList.add('chatting');}}
 function addUser(text){enterChat();const m=el('div','msg user');m.innerHTML=`<div class="content"><div class="bubble">${text.replace(/</g,'&lt;')}</div></div>`;msgsEl.appendChild(m);currentConvo.push({role:'user',html:m.querySelector('.bubble').innerHTML});scrollBottom();}
 
-function addAI(){const m=el('div','msg ai');m.innerHTML=`${botAvatar()}<div class="content"><div class="text"><div class="skel"><i></i><i></i><i></i></div></div></div>`;msgsEl.appendChild(m);scrollBottom();return m;}
+const GEAR=`<svg class="gw __C__" viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="17" stroke-dasharray="7 9.7" stroke-linecap="butt"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="8"/></svg>`;
+function thinkingHTML(){return `<div class="thinking"><span class="gears">${GEAR.replace('__C__','g1')}${GEAR.replace('__C__','g2')}</span><span class="tstatus">Searching the case&#8209;study library</span></div>`;}
+const TSTATUS=['Searching the case-study library','Reading Gregory’s Indexed Annuity Secrets','Matching your situation','Weighing the options','Composing your answer'];
+function startThinking(m){const t=m.querySelector('.tstatus');if(!t)return null;let i=0;return setInterval(()=>{i=(i+1)%TSTATUS.length;t.textContent=TSTATUS[i];},1150);}
+function addAI(){const m=el('div','msg ai');m.innerHTML=`${botAvatar()}<div class="content"><div class="text">${thinkingHTML()}</div></div>`;msgsEl.appendChild(m);scrollBottom();return m;}
 
 function streamText(textEl,full,cb){
   streaming=true;const words=full.split(' ');let i=0;
@@ -918,6 +933,7 @@ function send(q){
   asked.add(q.toLowerCase());logStat(q);exchanges++;
   addUser(q);
   const m=addAI();const textEl=m.querySelector('.text');const contentEl=m.querySelector('.content');
+  const think=startThinking(m);
   (async()=>{
     // Every question goes to the brain now — including "should I…" ones. The brain
     // answers them educationally and leads with the relevant real story. No more canned punt.
@@ -926,6 +942,7 @@ function send(q){
     catch(e){ answerText="Sorry — I had trouble reaching the assistant just now. Please try again in a moment."; source=''; }
     let showPro=false;
     if(advice||HUMAN.test(q)||dueForPro()){showPro=true;proCount++;lastProAt=exchanges;}
+    if(think)clearInterval(think);
     textEl.innerHTML='';
     streamText(textEl,answerText,()=>finalizeAI(contentEl,answerText,source,{pro:showPro,sourcesArr,followups}));
   })();
