@@ -1107,8 +1107,8 @@ function registerLearnerLead(u){const leads=J(LS.leads,[]);
 $('welcomeGoogle').onclick=()=>{localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
 $('welcomeSkip').onclick=()=>{$('welcomeModal').classList.remove('open');S(LS.welcomed,1);};
 $('welcomeModal').addEventListener('click',e=>{if(e.target===$('welcomeModal'))S(LS.welcomed,1);});
-/* Show the 4-step welcome popup on every visit (not just the first). */
-setTimeout(()=>{if(!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);
+/* Show the 4-step welcome popup on every visit while signed OUT; never once signed in. */
+if(!getUser())setTimeout(()=>{if(!getUser()&&!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);
 
 /* ===================== THEME ===================== */
 const themeBtn=$('themeBtn');
