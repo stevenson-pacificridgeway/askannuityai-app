@@ -315,6 +315,26 @@
   .rcard h3{font-size:18px;font-weight:700;margin:16px 0 7px}
   .rcard p{color:var(--muted);font-size:14px;margin:0;flex:1}
   .rcard .arrow{margin-top:18px;font-weight:700;font-size:14px;color:var(--ink-2);transition:.25s var(--ease);align-self:flex-start}
+  .rcard.tool{cursor:pointer}
+  /* calculator tools */
+  .calc label{display:block;font-size:13.5px;font-weight:600;color:var(--ink-2);margin:14px 0 6px}
+  .calc input[type=number],.calc select{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;outline:none;background:var(--surface);color:var(--ink);-webkit-appearance:none}
+  .calc input:focus,.calc select:focus{border-color:var(--gold)}
+  .calc input[type=range]{width:100%;accent-color:var(--gold)}
+  .crow{display:flex;gap:12px}.crow>div{flex:1;min-width:0}
+  .cinline{display:flex!important;align-items:center;gap:8px;font-weight:500!important;margin-top:14px}
+  .cinline input{width:auto!important}
+  .cresult{margin-top:18px;background:var(--bg-warm);border:1px solid var(--line);border-radius:14px;padding:18px 20px;text-align:center}
+  .cbig{font-size:34px;font-weight:800;color:var(--navy);line-height:1.1}.cbig span{font-size:17px;font-weight:600;color:var(--muted)}
+  .csub{color:var(--ink-2);font-size:14.5px;margin-top:5px}
+  .cnote{color:var(--muted);font-size:12.5px;margin-top:8px}
+  .cgrid3{display:flex;gap:10px;margin-top:16px}
+  .cmini{flex:1;background:var(--bg-warm);border:1px solid var(--line);border-radius:13px;padding:14px 6px;text-align:center}
+  .cmini.hl{border-color:var(--gold);background:rgba(212,161,43,.10)}
+  .cmini span{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+  .cmini b{display:block;font-size:20px;font-weight:800;color:var(--navy);margin-top:4px}
+  .cmini i{font-size:11.5px;color:var(--muted);font-style:normal}
+  .cdisc{font-size:11.5px;color:var(--faint);margin-top:16px;line-height:1.5}
 
   footer{border-top:1px solid var(--line);padding:34px 0;margin-top:30px}
   .foot{display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-start;color:var(--muted);font-size:12.5px;line-height:1.55}
@@ -642,7 +662,16 @@
         <a class="rcard" id="cardSite" href="https://pacificridgeway.com" target="_blank" rel="noopener">
           <div class="emoji">🌐</div><h3>Pacific Ridgeway</h3><p>Meet the licensed team behind the answers and how they help.</p><span class="arrow">Visit site →</span></a>
       </div>
+      <div class="res" style="margin-top:18px">
+        <a class="rcard tool" href="#" data-tool="income">
+          <div class="emoji">💵</div><h3>Annuity Income Estimator</h3><p>See how much guaranteed lifetime income your savings could create.</p><span class="arrow">Open tool →</span></a>
+        <a class="rcard tool" href="#" data-tool="lasts">
+          <div class="emoji">⏳</div><h3>Will My Money Last?</h3><p>Estimate how long your savings could last at your spending level.</p><span class="arrow">Open tool →</span></a>
+        <a class="rcard tool" href="#" data-tool="ssa">
+          <div class="emoji">📅</div><h3>Social Security Optimizer</h3><p>Compare claiming at 62, full retirement age, and 70 — and find your break-even.</p><span class="arrow">Open tool →</span></a>
+      </div>
     </section>
+    <div class="ov" id="toolModal"><div class="sheet sm"><div class="sh-head"><h3 id="toolTitle">Tool</h3><button class="x" data-close>✕</button></div><div class="sh-body" id="toolBody"></div></div></div>
 
     <footer>
       <div class="wrap foot">
@@ -1097,6 +1126,53 @@ const hdr=$('hdr');addEventListener('scroll',()=>{hdr.classList.toggle('scrolled
 /* ===================== MODALS ===================== */
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.ov').classList.remove('open'));
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+/* ===================== FREE INTERACTIVE TOOLS ===================== */
+function _money(n){return '$'+Math.round(n).toLocaleString();}
+function _payoutPct(age,joint){let p;if(age<60)p=4.0;else if(age<65)p=4.5;else if(age<70)p=5.0;else if(age<75)p=5.5;else if(age<80)p=6.0;else p=7.0;if(joint)p-=0.5;return Math.max(3.0,p);}
+const TOOLINFO={income:'💵 Annuity Income Estimator',lasts:'⏳ Will My Money Last?',ssa:'📅 Social Security Optimizer'};
+const _DISC='<p class="cdisc">Educational estimate only — not a quote or a personalized illustration. Actual figures vary by product, carrier, age, and current rates. For numbers specific to you, speak with a licensed professional.</p>';
+function _calcIncome(b){
+  b.innerHTML=`<div class="calc">
+    <label>How much would you put toward income?</label>
+    <input id="ti_amt" type="number" inputmode="numeric" value="500000">
+    <div class="crow"><div><label>Your age</label><input id="ti_age" type="number" value="65"></div>
+    <div><label>Start income</label><select id="ti_when"><option value="0">Right away</option><option value="10">In ~10 years</option></select></div></div>
+    <label class="cinline"><input type="checkbox" id="ti_joint"> Cover two lives (you + spouse)</label>
+    <div class="cresult" id="ti_out"></div>${_DISC}</div>`;
+  const calc=()=>{const amt=Math.max(0,+$('ti_amt').value||0);const age=Math.max(40,Math.min(85,+$('ti_age').value||65));
+    const defer=+$('ti_when').value;const joint=$('ti_joint').checked;const startAge=age+defer;
+    const base=defer?amt*Math.pow(1.06,defer):amt;const pct=_payoutPct(startAge,joint);const mo=base*(pct/100)/12;
+    $('ti_out').innerHTML=`<div class="cbig">${_money(mo)}<span>/mo</span></div><div class="csub">about ${_money(mo*12)} per year for life${joint?', until the second spouse passes':''}</div><div class="cnote">Roughly a ${pct.toFixed(1)}% lifetime payout at age ${startAge}${defer?` (after ~${defer} yrs of growth)`:''}.</div>`;};
+  ['ti_amt','ti_age','ti_when','ti_joint'].forEach(id=>{$(id).addEventListener('input',calc);$(id).addEventListener('change',calc);});calc();}
+function _calcLasts(b){
+  b.innerHTML=`<div class="calc">
+    <div class="crow"><div><label>Savings</label><input id="tl_amt" type="number" value="500000"></div>
+    <div><label>Monthly spending from savings</label><input id="tl_w" type="number" value="3000"></div></div>
+    <label>Average annual growth: <b id="tl_rl">5%</b></label><input id="tl_r" type="range" min="0" max="10" step="0.5" value="5">
+    <div class="cresult" id="tl_out"></div>${_DISC}</div>`;
+  const calc=()=>{let bal=Math.max(0,+$('tl_amt').value||0);const w=Math.max(0,+$('tl_w').value||0);
+    const r=(+$('tl_r').value||0)/100;$('tl_rl').textContent=(+$('tl_r').value)+'%';let m=0;const max=40*12;
+    while(bal>0&&m<max){bal=bal*(1+r/12)-w;m++;}
+    let out;if(m>=max){out=`<div class="cbig">40+ <span>years</span></div><div class="csub">Your growth keeps pace — at this rate your savings could last indefinitely.</div>`;}
+    else{const y=Math.floor(m/12),mm=m%12;out=`<div class="cbig">${y} yr${y!=1?'s':''}${mm?` ${mm} mo`:''}</div><div class="csub">until your savings would run out at this spending level.</div>`;}
+    $('tl_out').innerHTML=out;};
+  ['tl_amt','tl_w','tl_r'].forEach(id=>$(id).addEventListener('input',calc));calc();}
+function _calcSSA(b){
+  b.innerHTML=`<div class="calc">
+    <label>Your estimated monthly benefit at full retirement age (67)</label>
+    <input id="ts_fra" type="number" value="2400">
+    <div class="cgrid3" id="ts_out"></div><div class="cnote" id="ts_be"></div>${_DISC}</div>`;
+  const be=(eAmt,lAmt,eAge,lAge)=>{let ce=0,cl=0;const diff=(lAge-eAge)*12;for(let k=0;k<45*12;k++){ce+=eAmt;if(k>=diff)cl+=lAmt;if(k>=diff&&cl>=ce)return eAge+k/12;}return null;};
+  const calc=()=>{const fra=Math.max(0,+$('ts_fra').value||0);const a62=fra*0.70,a67=fra,a70=fra*1.24;
+    $('ts_out').innerHTML=`<div class="cmini"><span>Claim at 62</span><b>${_money(a62)}</b><i>/mo</i></div><div class="cmini hl"><span>At 67 (FRA)</span><b>${_money(a67)}</b><i>/mo</i></div><div class="cmini"><span>Wait to 70</span><b>${_money(a70)}</b><i>/mo</i></div>`;
+    const b1=be(a62,a67,62,67),b2=be(a67,a70,67,70);
+    $('ts_be').innerHTML=`Rough break-even: waiting to 67 pays off by about age ${b1?Math.round(b1):'—'}; waiting to 70 pays off by about age ${b2?Math.round(b2):'—'}. Excludes cost-of-living raises and taxes; full retirement age is 67 for anyone born in 1960 or later.`;};
+  $('ts_fra').addEventListener('input',calc);calc();}
+function openTool(kind){$('toolTitle').textContent=TOOLINFO[kind]||'Tool';const b=$('toolBody');
+  if(kind==='income')_calcIncome(b);else if(kind==='lasts')_calcLasts(b);else _calcSSA(b);
+  $('toolModal').classList.add('open');}
+document.querySelectorAll('.rcard.tool').forEach(c=>c.onclick=e=>{e.preventDefault();openTool(c.dataset.tool);});
 
 /* ===================== ADMIN ===================== */
 $('adminBtn').onclick=()=>$('adminModal').classList.add('open');
