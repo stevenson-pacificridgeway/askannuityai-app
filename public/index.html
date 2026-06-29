@@ -711,12 +711,8 @@
       <div class="auth-btns">
         <button id="googleBtn" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:0 0 18px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Sign in with Google</button>
       </div>
-      <div class="divider">or use email</div>
-      <div class="fld"><label>Name</label><input id="auName" placeholder="Your name"></div>
-      <div class="fld"><label>Email</label><input id="auEmail" type="email" placeholder="you@email.com"></div>
-      <button class="btn btn-soft btn-lg" id="emailAuthBtn" style="width:100%;justify-content:center">Continue with email</button>
       <div class="err" id="authErr"></div>
-      <p style="font-size:12px;color:var(--muted);text-align:center;margin:14px 0 0">A free account saves your conversations across visits. We never store sensitive financial data without your consent.</p>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin:18px 0 0">Sign in securely with your Google account — it's the only sign-in we use. A free account saves your conversations across visits. We never store sensitive financial data without your consent.</p>
     </div>
   </div>
 </div>
@@ -1048,7 +1044,6 @@ function openAuth(t){$('authTitle').textContent=t||'Create your free account';$(
 function loginAs(u){setUser(u);$('authModal').classList.remove('open');openSidebar();toast('Signed in');}
 $('loginBtn').onclick=()=>{getUser()?toggleSidebar():openAuth('Sign in to AskAnnuityAI');};
 $('googleBtn').onclick=()=>AAI.signInWithGoogle();
-$('emailAuthBtn').onclick=()=>{const n=$('auName').value.trim(),e=$('auEmail').value.trim();if(!e||!/.+@.+\..+/.test(e)){$('authErr').textContent='Enter a valid email.';return;}loginAs({name:n||e.split('@')[0],email:e,provider:'email'});};
 
 /* ---- saved-area sidebar ---- */
 function openSidebar(){if(getUser())document.body.classList.add('sidebar-open');}
@@ -1112,7 +1107,8 @@ function registerLearnerLead(u){const leads=J(LS.leads,[]);
 $('welcomeGoogle').onclick=()=>{localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
 $('welcomeSkip').onclick=()=>{$('welcomeModal').classList.remove('open');S(LS.welcomed,1);};
 $('welcomeModal').addEventListener('click',e=>{if(e.target===$('welcomeModal'))S(LS.welcomed,1);});
-if(!getUser()&&!J(LS.welcomed,0)){setTimeout(()=>{if(!getUser()&&!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);}
+/* Show the 4-step welcome popup on every visit (not just the first). */
+setTimeout(()=>{if(!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);
 
 /* ===================== THEME ===================== */
 const themeBtn=$('themeBtn');
@@ -1132,19 +1128,29 @@ function _money(n){return '$'+Math.round(n).toLocaleString();}
 function _payoutPct(age,joint){let p;if(age<60)p=4.0;else if(age<65)p=4.5;else if(age<70)p=5.0;else if(age<75)p=5.5;else if(age<80)p=6.0;else p=7.0;if(joint)p-=0.5;return Math.max(3.0,p);}
 const TOOLINFO={income:'💵 Annuity Income Estimator',lasts:'⏳ Will My Money Last?',ssa:'📅 Social Security Optimizer'};
 const _DISC='<p class="cdisc">Educational estimate only — not a quote or a personalized illustration. Actual figures vary by product, carrier, age, and current rates. For numbers specific to you, speak with a licensed professional.</p>';
+/* GLWB model calibrated to the Midland MNL Income Planning Annuity (IPA):
+   benefit base rolls up ~8%/yr during deferral, then an age-banded lifetime
+   payout is applied. Anchored to Midland's published example
+   ($100k premium, age 66, start income at 70, single, yearly = $11,340). */
+function _ipaBase(age,joint){let f=0.083352+(age-70)*0.0013;if(joint)f-=0.006;return Math.max(0.045,f);}
 function _calcIncome(b){
   b.innerHTML=`<div class="calc">
-    <label>How much would you put toward income?</label>
-    <input id="ti_amt" type="number" inputmode="numeric" value="500000">
-    <div class="crow"><div><label>Your age</label><input id="ti_age" type="number" value="65"></div>
-    <div><label>Start income</label><select id="ti_when"><option value="0">Right away</option><option value="10">In ~10 years</option></select></div></div>
-    <label class="cinline"><input type="checkbox" id="ti_joint"> Cover two lives (you + spouse)</label>
+    <label>Premium — how much would you put toward income?</label>
+    <input id="ti_amt" type="number" inputmode="numeric" value="100000">
+    <div class="crow"><div><label>Your current age</label><input id="ti_age" type="number" value="66"></div>
+    <div><label>Age to start income</label><input id="ti_start" type="number" value="70"></div></div>
+    <label class="cinline"><input type="checkbox" id="ti_joint"> Cover two lives (joint, you + spouse)</label>
     <div class="cresult" id="ti_out"></div>${_DISC}</div>`;
-  const calc=()=>{const amt=Math.max(0,+$('ti_amt').value||0);const age=Math.max(40,Math.min(85,+$('ti_age').value||65));
-    const defer=+$('ti_when').value;const joint=$('ti_joint').checked;const startAge=age+defer;
-    const base=defer?amt*Math.pow(1.06,defer):amt;const pct=_payoutPct(startAge,joint);const mo=base*(pct/100)/12;
-    $('ti_out').innerHTML=`<div class="cbig">${_money(mo)}<span>/mo</span></div><div class="csub">about ${_money(mo*12)} per year for life${joint?', until the second spouse passes':''}</div><div class="cnote">Roughly a ${pct.toFixed(1)}% lifetime payout at age ${startAge}${defer?` (after ~${defer} yrs of growth)`:''}.</div>`;};
-  ['ti_amt','ti_age','ti_when','ti_joint'].forEach(id=>{$(id).addEventListener('input',calc);$(id).addEventListener('change',calc);});calc();}
+  const calc=()=>{
+    const amt=Math.max(0,+$('ti_amt').value||0);
+    const age=Math.max(40,Math.min(85,+$('ti_age').value||66));
+    const start=Math.max(age,Math.min(90,+$('ti_start').value||age));
+    const joint=$('ti_joint').checked;
+    const defer=Math.min(15,Math.max(0,start-age));
+    const yr=amt*_ipaBase(start,joint)*Math.pow(1.08,defer);
+    $('ti_out').innerHTML=`<div class="cbig">${_money(yr)}<span>/yr</span></div><div class="csub">about ${_money(yr/12)} per month, guaranteed for life${joint?', until the second spouse passes':''}</div><div class="cnote">Starting income at age ${start}${defer?` after deferring ${defer} year${defer>1?'s':''}`:' (right away)'}. Modeled on the MNL Income Planning Annuity’s guaranteed lifetime withdrawal benefit; confirm exact figures against Midland’s current calculator.</div>`;
+  };
+  ['ti_amt','ti_age','ti_start','ti_joint'].forEach(id=>{$(id).addEventListener('input',calc);$(id).addEventListener('change',calc);});calc();}
 function _calcLasts(b){
   b.innerHTML=`<div class="calc">
     <div class="crow"><div><label>Savings</label><input id="tl_amt" type="number" value="500000"></div>
