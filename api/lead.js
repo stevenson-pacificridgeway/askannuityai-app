@@ -1,10 +1,30 @@
-// POST /api/lead  { name, email, phone, amount, message, source } -> stores a lead
-import { supabaseAdmin, readJson, cors } from './_lib.js';
+// /api/lead
+//   POST { name, email, phone, amount, message, source }  -> stores a lead (public)
+//   GET   (ADMIN ONLY, Bearer token)                       -> returns all leads
+import { supabaseAdmin, isAdmin, getUserFromReq, readJson, cors } from './_lib.js';
 
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+
+  // ---- Admin reads the central leads list ----
+  if (req.method === 'GET') {
+    const user = await getUserFromReq(req);
+    if (!user || !isAdmin(user.email)) return res.status(403).json({ error: 'Admin only' });
+    try {
+      const { data, error } = await supabaseAdmin.from('leads').select('*').limit(2000);
+      if (error) throw error;
+      const leads = (data || []).sort(
+        (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)
+      );
+      return res.status(200).json({ leads });
+    } catch (e) {
+      return res.status(500).json({ error: String(e?.message || e) });
+    }
+  }
+
+  // ---- Anyone can submit a lead from the contact form ----
+  if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST only' });
 
   const b = await readJson(req);
   try {
