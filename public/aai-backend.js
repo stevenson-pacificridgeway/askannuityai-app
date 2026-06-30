@@ -10,9 +10,22 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const cfg = window.AAI_CONFIG || {};
 const sb = createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
+function tokenFromStorage() {
+  try {
+    for (const k of Object.keys(localStorage)) {
+      if (k.startsWith("sb-") && k.includes("auth-token")) {
+        const v = JSON.parse(localStorage.getItem(k) || "{}");
+        return v.access_token || (v.currentSession && v.currentSession.access_token) || "";
+      }
+    }
+  } catch (e) {}
+  return "";
+}
 async function token() {
-  const { data } = await sb.auth.getSession();
-  return data?.session?.access_token || "";
+  // Fast localStorage read first (sb.auth.getSession() can hang); fall back to the client.
+  const t = tokenFromStorage();
+  if (t) return t;
+  try { const { data } = await sb.auth.getSession(); return data?.session?.access_token || ""; } catch (e) { return ""; }
 }
 
 const AAI = {
@@ -85,6 +98,15 @@ const AAI = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(data)
     });
+  },
+  // ---------- ADMIN: read every captured lead from the database ----------
+  async getLeads() {
+    const r = await fetch("/api/lead", {
+      headers: { authorization: "Bearer " + (await token()) }
+    });
+    if (!r.ok) throw new Error("leads fetch failed: " + r.status);
+    const j = await r.json();
+    return j.leads || [];
   },
 
   // ---------- CONVERSATIONS (synced history; optional) ----------
