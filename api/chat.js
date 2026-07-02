@@ -23,6 +23,31 @@ OUTPUT FORMAT (exactly):
 2. A line starting with "SOURCES:" listing the names of the case studies/articles you actually used, comma-separated.
 3. A line starting with "FOLLOWUPS:" with exactly three short follow-up questions a curious reader would naturally ask next — each tied to the stories and topics you just discussed — separated by " | ".`;
 
+// Best-effort per-IP rate limits (protects against abuse / runaway API cost).
+const LIMIT_MIN = 15;    // max questions per 60 seconds per IP
+const LIMIT_HOUR = 200;  // max questions per hour per IP
+
+function clientIp(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim())
+    || req.socket?.remoteAddress || 'unknown';
+}
+
+// Returns true if this IP is over the limit. Fails OPEN on any DB error.
+async function overRateLimit(ip) {
+  try {
+    const nowMs = Date.now();
+    const minIso = new Date(nowMs - 60 * 1000).toISOString();
+    const hourIso = new Date(nowMs - 60 * 60 * 1000).toISOString();
+    const [{ count: perMin }, { count: perHour }] = await Promise.all([
+      supabaseAdmin.from('chat_logs').select('*', { count: 'exact', head: true }).eq('ip', ip).gte('created_at', minIso),
+      supabaseAdmin.from('chat_logs').select('*', { count: 'exact', head: true }).eq('ip', ip).gte('created_at', hourIso)
+    ]);
+    return (perMin || 0) >= LIMIT_MIN || (perHour || 0) >= LIMIT_HOUR;
+  } catch (_) {
+    return false; // don't block real users if logging/table is unavailable
+  }
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -31,6 +56,13 @@ export default async function handler(req, res) {
   const body = await readJson(req);
   const question = (body.question || '').toString().slice(0, 2000).trim();
   if (!question) return res.status(400).json({ error: 'Missing question' });
+
+  const ip = clientIp(req);
+  if (await overRateLimit(ip)) {
+    return res.status(429).json({ error: 'Too many questions in a short time. Please wait a minute and try again.' });
+  }
+  // Log the question (powers real analytics + rate limiting). Best-effort.
+  try { await supabaseAdmin.from('chat_logs').insert({ question, ip }); } catch (_) {}
 
   try {
     const qvec = await embed(question);
