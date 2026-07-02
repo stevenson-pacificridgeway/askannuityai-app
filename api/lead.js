@@ -28,9 +28,18 @@ export default async function handler(req, res) {
 
   const b = await readJson(req);
   try {
+    const source = b.source || 'website';
+    const email = (b.email || '').trim();
+    // Auto-signups (welcome popup) can fire repeatedly for the same person — dedupe them
+    // so real prospects aren't buried. Genuine contact-form submissions are never deduped.
+    if (email && /welcome/i.test(source)) {
+      const { data: dupes } = await supabaseAdmin
+        .from('leads').select('id').eq('email', email).eq('source', source).limit(1);
+      if (dupes && dupes.length) return res.status(200).json({ ok: true, deduped: true });
+    }
     const { error } = await supabaseAdmin.from('leads').insert({
-      name: b.name || '', email: b.email || '', phone: b.phone || '',
-      amount: b.amount || '', message: b.message || '', source: b.source || 'website'
+      name: b.name || '', email, phone: b.phone || '',
+      amount: b.amount || '', message: b.message || '', source
     });
     if (error) throw error;
     res.status(200).json({ ok: true });

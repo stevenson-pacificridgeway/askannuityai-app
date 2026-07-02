@@ -10,6 +10,8 @@ HOW TO ANSWER — FIRST, JUDGE THE QUESTION TYPE:
 - NEVER force a story that doesn't match the question's topic. It makes no sense to answer "what is an annuity, simply?" by opening with a story about someone dying. A mismatched or morbid story is worse than no story. When in doubt, just answer the question well.
 - If the question is clearly outside retirement/annuities/personal finance, politely say it's outside what you cover and offer to help with a retirement question instead.
 - Ground every answer in the provided context. Never invent facts, figures, names, dollar amounts, or quotes. If the context doesn't cover it, say so plainly and suggest a quick call for specifics. Do not fabricate a person or a case to satisfy the "lead with a story" idea.
+- If a provided source is not clearly relevant to THIS question, ignore it entirely and do not list it under SOURCES. Only cite sources you actually used.
+- For a short follow-up (e.g. "what about her?", "and if I wait?"), interpret it using the earlier conversation turns rather than treating it as a brand-new topic.
 - "Should I…" questions are NOT off-limits — answer them educationally and usefully, then add ONE brief closing line that their exact numbers should be confirmed with a licensed professional. The disclaimer is a closing note, never the opener and never the whole answer.
 
 WRITING STYLE — VERY IMPORTANT:
@@ -57,6 +59,9 @@ export default async function handler(req, res) {
   const question = (body.question || '').toString().slice(0, 2000).trim();
   if (!question) return res.status(400).json({ error: 'Missing question' });
 
+  // Prior conversation turns (for follow-up context). Normalized below.
+  const rawHistory = Array.isArray(body.history) ? body.history.slice(-6) : [];
+
   const ip = clientIp(req);
   if (await overRateLimit(ip)) {
     return res.status(429).json({ error: 'Too many questions in a short time. Please wait a minute and try again.' });
@@ -67,7 +72,7 @@ export default async function handler(req, res) {
   try {
     const qvec = await embed(question);
     const { data: chunks, error } = await supabaseAdmin.rpc('match_documents', {
-      query_embedding: qvec, match_threshold: 0.15, match_count: 8
+      query_embedding: qvec, match_threshold: 0.22, match_count: 8
     });
     if (error) throw error;
 
@@ -76,14 +81,31 @@ export default async function handler(req, res) {
       .join('\n\n');
     const sources = [...new Set((chunks || []).map(c => c.source).filter(Boolean))];
 
+    // Build a clean, strictly-alternating message list: prior turns first, then this question.
+    let turns = rawHistory
+      .map(t => ({
+        role: (t.role === 'ai' || t.role === 'assistant') ? 'assistant' : 'user',
+        content: String(t.content || '').slice(0, 1500).trim()
+      }))
+      .filter(t => t.content);
+    while (turns.length && turns[0].role !== 'user') turns.shift();            // must start with user
+    const norm = [];
+    for (const t of turns) {                                                    // collapse consecutive same-role
+      if (norm.length && norm[norm.length - 1].role === t.role) norm[norm.length - 1] = t;
+      else norm.push(t);
+    }
+    if (norm.length && norm[norm.length - 1].role === 'user') norm.pop();        // end on assistant so we can append
+
+    const messages = [
+      ...norm,
+      { role: 'user', content: `Context:\n${context || '(no relevant documents were found in the knowledge base)'}\n\nQuestion: ${question}` }
+    ];
+
     const msg = await anthropic.messages.create({
       model: 'claude-sonnet-4-6', // Claude Sonnet 4.6 — swap to claude-opus-4-8 or claude-haiku-4-5-20251001 anytime
       max_tokens: 800,
       system: SYSTEM,
-      messages: [{
-        role: 'user',
-        content: `Context:\n${context || '(no relevant documents were found in the knowledge base)'}\n\nQuestion: ${question}`
-      }]
+      messages
     });
 
     let raw = (msg.content || []).map(b => b.text || '').join('').trim();
