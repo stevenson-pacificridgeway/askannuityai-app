@@ -59,69 +59,80 @@ export default async function handler(req, res) {
   const question = (body.question || '').toString().slice(0, 2000).trim();
   if (!question) return res.status(400).json({ error: 'Missing question' });
 
-  // Prior conversation turns (for follow-up context). Normalized below.
   const rawHistory = Array.isArray(body.history) ? body.history.slice(-6) : [];
-
   const ip = clientIp(req);
-  if (await overRateLimit(ip)) {
-    return res.status(429).json({ error: 'Too many questions in a short time. Please wait a minute and try again.' });
-  }
-  // Log the question (powers real analytics + rate limiting). Best-effort.
-  try { await supabaseAdmin.from('chat_logs').insert({ question, ip }); } catch (_) {}
 
+  // --- Pre-work (JSON errors OK here, before we start streaming) ---
+  // Rate-limit check and the question embedding are independent → run them together.
+  let over = false, qvec = null;
   try {
-    const qvec = await embed(question);
-    const { data: chunks, error } = await supabaseAdmin.rpc('match_documents', {
+    [over, qvec] = await Promise.all([overRateLimit(ip), embed(question)]);
+  } catch (e) {
+    return res.status(500).json({ error: String(e?.message || e) });
+  }
+  if (over) return res.status(429).json({ error: 'Too many questions in a short time. Please wait a minute and try again.' });
+
+  // Log the question for analytics — fire-and-forget so it never adds latency.
+  Promise.resolve(supabaseAdmin.from('chat_logs').insert({ question, ip })).catch(() => {});
+
+  let chunks = [];
+  try {
+    const { data, error } = await supabaseAdmin.rpc('match_documents', {
       query_embedding: qvec, match_threshold: 0.22, match_count: 8
     });
     if (error) throw error;
+    chunks = data || [];
+  } catch (e) {
+    return res.status(500).json({ error: String(e?.message || e) });
+  }
 
-    const context = (chunks || [])
-      .map((c, i) => `[Source ${i + 1}: ${c.source || 'Document'}]\n${c.content}`)
-      .join('\n\n');
-    const sources = [...new Set((chunks || []).map(c => c.source).filter(Boolean))];
+  const context = chunks
+    .map((c, i) => `[Source ${i + 1}: ${c.source || 'Document'}]\n${c.content}`)
+    .join('\n\n');
+  const sources = [...new Set(chunks.map(c => c.source).filter(Boolean))];
 
-    // Build a clean, strictly-alternating message list: prior turns first, then this question.
-    let turns = rawHistory
-      .map(t => ({
-        role: (t.role === 'ai' || t.role === 'assistant') ? 'assistant' : 'user',
-        content: String(t.content || '').slice(0, 1500).trim()
-      }))
-      .filter(t => t.content);
-    while (turns.length && turns[0].role !== 'user') turns.shift();            // must start with user
-    const norm = [];
-    for (const t of turns) {                                                    // collapse consecutive same-role
-      if (norm.length && norm[norm.length - 1].role === t.role) norm[norm.length - 1] = t;
-      else norm.push(t);
-    }
-    if (norm.length && norm[norm.length - 1].role === 'user') norm.pop();        // end on assistant so we can append
+  // Build a clean, strictly-alternating message list: prior turns first, then this question.
+  let turns = rawHistory
+    .map(t => ({
+      role: (t.role === 'ai' || t.role === 'assistant') ? 'assistant' : 'user',
+      content: String(t.content || '').slice(0, 1500).trim()
+    }))
+    .filter(t => t.content);
+  while (turns.length && turns[0].role !== 'user') turns.shift();
+  const norm = [];
+  for (const t of turns) {
+    if (norm.length && norm[norm.length - 1].role === t.role) norm[norm.length - 1] = t;
+    else norm.push(t);
+  }
+  if (norm.length && norm[norm.length - 1].role === 'user') norm.pop();
 
-    const messages = [
-      ...norm,
-      { role: 'user', content: `Context:\n${context || '(no relevant documents were found in the knowledge base)'}\n\nQuestion: ${question}` }
-    ];
+  const messages = [
+    ...norm,
+    { role: 'user', content: `Context:\n${context || '(no relevant documents were found in the knowledge base)'}\n\nQuestion: ${question}` }
+  ];
 
-    const msg = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6', // Claude Sonnet 4.6 — swap to claude-opus-4-8 or claude-haiku-4-5-20251001 anytime
-      max_tokens: 800,
+  // --- Stream the answer token-by-token ---
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('X-Accel-Buffering', 'no'); // ask proxies not to buffer
+  res.write(JSON.stringify({ sources }) + '\n'); // first line = metadata (sources known before generation)
+
+  try {
+    const stream = anthropic.messages.stream({
+      model: 'claude-sonnet-4-6', // keep Sonnet for answer quality; streaming makes it feel instant
+      max_tokens: 700,
       system: SYSTEM,
       messages
     });
-
-    let raw = (msg.content || []).map(b => b.text || '').join('').trim();
-
-    // Pull out the FOLLOWUPS line, then the SOURCES line, leaving a clean answer.
-    let followups = [];
-    const fuMatch = raw.match(/FOLLOWUPS:\s*(.+)$/is);
-    if (fuMatch) {
-      followups = fuMatch[1].split('|').map(s => s.trim().replace(/^[-*\d.\s]+/, '').trim()).filter(Boolean).slice(0, 3);
-      raw = raw.slice(0, fuMatch.index).trim();
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta && event.delta.type === 'text_delta') {
+        res.write(event.delta.text);
+        if (typeof res.flush === 'function') res.flush();
+      }
     }
-    const srcMatch = raw.match(/SOURCES:\s*(.+)$/is);
-    if (srcMatch) raw = raw.slice(0, srcMatch.index).trim();
-
-    res.status(200).json({ answer: raw, sources, followups });
+    res.end();
   } catch (e) {
-    res.status(500).json({ error: String(e?.message || e) });
+    try { res.write('\n\nSorry — the assistant was interrupted. Please try again.'); } catch (_) {}
+    res.end();
   }
 }
