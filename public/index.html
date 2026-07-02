@@ -835,7 +835,7 @@
 /* ===================== STORAGE ===================== */
 const LS={kb:'aai2_kb',leads:'aai2_leads',cfg:'aai2_cfg',user:'aai2_user',convos:'aai2_convos',favs:'aai2_favs',stats:'aai2_stats',theme:'aai2_theme',welcomed:'aai2_welcomed'};
 const DEFAULT_CFG={phone:'(619) 374-8100',phoneRaw:'+16193748100',leadEmail:'stevenson@pacificridgewayinsurance.com',
-  booking:'https://calendly.com/pacific-ridgeway/retirement-review',bookLink:'https://pacificridgeway.com/book',
+  booking:'https://calendly.com/gregorystevenson/phone-call-with-agent',bookLink:'https://pacificridgeway.com/book',
   uniLink:'https://pacificridgeway.com/university'};
 const getCfg=()=>{try{return{...DEFAULT_CFG,...JSON.parse(localStorage.getItem(LS.cfg)||'{}')}}catch(e){return{...DEFAULT_CFG}}};
 const saveCfg=c=>localStorage.setItem(LS.cfg,JSON.stringify(c));
