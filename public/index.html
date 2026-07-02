@@ -999,7 +999,7 @@ function finalizeAI(contentEl,answerText,source,opts){
   let fus=(opts.followups||[]).filter(q=>q&&!asked.has(q.toLowerCase())).slice(0,3);
   if(!fus.length)fus=pickFollowups();
   if(fus.length){const wrap=el('div','followups');fus.forEach(q=>{const b=el('button','fu',q);b.onclick=()=>send(q);wrap.appendChild(b);});contentEl.appendChild(wrap);}
-  currentConvo.push({role:'ai',html:contentEl.querySelector('.text').innerHTML,source:source||null});
+  currentConvo.push({role:'ai',html:contentEl.querySelector('.text').innerHTML,source:source||null,sources:(opts&&opts.sourcesArr&&opts.sourcesArr.length)?opts.sourcesArr.slice():null});
   saveConvo();scrollBottom();
 }
 function proCard(){const cfg=getCfg();const c=el('div','procard');
@@ -1134,7 +1134,7 @@ function renderHistory(f){const u=getUser();const list=(J(LS.convos,{})[u.email]
 $('histSearch').addEventListener('input',e=>renderHistory(e.target.value));
 function loadConvo(c){msgsEl.innerHTML='';currentConvo=[];convoId=c.id;document.body.classList.add('chatting');
   c.messages.forEach(m=>{if(m.role==='user'){const x=el('div','msg user');x.innerHTML=`<div class="content"><div class="bubble">${m.html}</div></div>`;msgsEl.appendChild(x);currentConvo.push(m);}
-    else{const x=el('div','msg ai');x.innerHTML=`${botAvatar()}<div class="content"><div class="text">${m.html}</div></div>`;if(m.source){const d=el('details','sources');d.innerHTML=`<summary>📎 Sources <span class="chev">▾</span></summary><div class="src-body"><b>${_escHTML(m.source)}</b> — educational reference.</div>`;x.querySelector('.content').appendChild(d);}msgsEl.appendChild(x);currentConvo.push(m);}});
+    else{const x=el('div','msg ai');x.innerHTML=`${botAvatar()}<div class="content"><div class="text">${m.html}</div></div>`;if(m.source||(m.sources&&m.sources.length)){const d=el('details','sources');d.open=true;const arr=(m.sources&&m.sources.length)?m.sources:String(m.source||'').split(/,\s*(?=[A-Z])/).filter(Boolean);const rows=arr.map(sourceLineHTML).join('');d.innerHTML=`<summary>📎 Sources & stories <span class="chev">▾</span></summary><div class="src-body">${rows}</div>`;x.querySelector('.content').appendChild(d);}msgsEl.appendChild(x);currentConvo.push(m);}});
   $('acctModal').classList.remove('open');if(getUser())renderSidebar();scrollBottom();}
 function saveFav(text,source){const u=getUser();if(!u){openAuth('Sign in to save');return;}const favs=J(LS.favs,{});const list=favs[u.email]||[];list.unshift({text,source,ts:new Date().toISOString()});favs[u.email]=list;S(LS.favs,favs);toast('Saved to favorites');}
 function renderFavs(){const u=getUser();const favs=(J(LS.favs,{})[u.email]||[]);const box=$('favList');box.innerHTML='';if(!favs.length){box.innerHTML='<div class="empty"><div class="e">⭐</div>Tap “Save” on any answer to keep it here.</div>';return;}favs.forEach(f=>{const d=el('div','row');d.innerHTML=`${f.text.slice(0,260).replace(/</g,'&lt;')}${f.text.length>260?'…':''}${f.source?`<div class="meta">📎 ${_escHTML(f.source)}</div>`:''}`;box.appendChild(d);});}
