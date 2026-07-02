@@ -131,6 +131,5 @@ function search(){const raw=q.value.trim();if(!raw)return render(ITEMS);
  const scored=ITEMS.map(c=>{const hay=(c.title+' '+c.dek+' '+c.tags.join(' ')+' '+c.keywords.join(' ')).toLowerCase();let sc=0;t.forEach(w=>{if(hay.includes(w))sc++;});return {c,sc};}).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc);
  render(scored.length?scored.map(x=>x.c):ITEMS);}
 q.addEventListener('input',search);
-const _urlq=new URLSearchParams(location.search).get('q');
-if(_urlq){q.value=_urlq;search();}else{render(ITEMS);}
+render(ITEMS);
 </script></body></html>
