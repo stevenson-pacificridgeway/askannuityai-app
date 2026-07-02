@@ -15,7 +15,7 @@
 <meta property="og:url" content="https://askannuityai.com" />
 <meta property="og:title" content="AskAnnuityAI — Ask anything about retirement & annuities" />
 <meta property="og:description" content="Unbiased, AI-powered answers about annuities & retirement income — free, instant, and never pushy." />
-<meta property="og:image" content="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&h=630&q=80" />
+<meta property="og:image" content="https://askannuityai.com/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -963,12 +963,14 @@ function streamText(textEl,full,cb){
   };tick();
 }
 
+function _escHTML(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function sourceLineHTML(src){
+  const s=_escHTML(src);
   const exact=caseForSource(src);
-  if(exact)return `<a class="src-link" href="/cases/${exact.slug}" target="_blank" rel="noopener">\u{1F4D6} ${src} <span class="src-go">Read the full story \u2192</span></a>`;
+  if(exact)return `<a class="src-link" href="/cases/${exact.slug}" target="_blank" rel="noopener">\u{1F4D6} ${s} <span class="src-go">Read the full story \u2192</span></a>`;
   const rel=bestCase(src);
-  if(rel)return `<a class="src-link" href="/cases/${rel.slug}" target="_blank" rel="noopener">\u{1F4D6} ${src} <span class="src-go">Related story: ${_shortTitle(rel)} \u2192</span></a>`;
-  return `<a class="src-link src-ref" href="/cases/" target="_blank" rel="noopener">\u{1F4CE} ${src} <span class="src-go">Open in the library \u2192</span></a>`;}
+  if(rel)return `<a class="src-link" href="/cases/${rel.slug}" target="_blank" rel="noopener">\u{1F4D6} ${s} <span class="src-go">Related story: ${_escHTML(_shortTitle(rel))} \u2192</span></a>`;
+  return `<a class="src-link src-ref" href="/cases/" target="_blank" rel="noopener">\u{1F4CE} ${s} <span class="src-go">Open in the library \u2192</span></a>`;}
 function finalizeAI(contentEl,answerText,source,opts){
   opts=opts||{};
   // sources (collapsible) — list each real source; link case studies to their branded page
@@ -1132,10 +1134,10 @@ function renderHistory(f){const u=getUser();const list=(J(LS.convos,{})[u.email]
 $('histSearch').addEventListener('input',e=>renderHistory(e.target.value));
 function loadConvo(c){msgsEl.innerHTML='';currentConvo=[];convoId=c.id;document.body.classList.add('chatting');
   c.messages.forEach(m=>{if(m.role==='user'){const x=el('div','msg user');x.innerHTML=`<div class="content"><div class="bubble">${m.html}</div></div>`;msgsEl.appendChild(x);currentConvo.push(m);}
-    else{const x=el('div','msg ai');x.innerHTML=`${botAvatar()}<div class="content"><div class="text">${m.html}</div></div>`;if(m.source){const d=el('details','sources');d.innerHTML=`<summary>📎 Sources <span class="chev">▾</span></summary><div class="src-body"><b>${m.source}</b> — educational reference.</div>`;x.querySelector('.content').appendChild(d);}msgsEl.appendChild(x);currentConvo.push(m);}});
+    else{const x=el('div','msg ai');x.innerHTML=`${botAvatar()}<div class="content"><div class="text">${m.html}</div></div>`;if(m.source){const d=el('details','sources');d.innerHTML=`<summary>📎 Sources <span class="chev">▾</span></summary><div class="src-body"><b>${_escHTML(m.source)}</b> — educational reference.</div>`;x.querySelector('.content').appendChild(d);}msgsEl.appendChild(x);currentConvo.push(m);}});
   $('acctModal').classList.remove('open');if(getUser())renderSidebar();scrollBottom();}
 function saveFav(text,source){const u=getUser();if(!u){openAuth('Sign in to save');return;}const favs=J(LS.favs,{});const list=favs[u.email]||[];list.unshift({text,source,ts:new Date().toISOString()});favs[u.email]=list;S(LS.favs,favs);toast('Saved to favorites');}
-function renderFavs(){const u=getUser();const favs=(J(LS.favs,{})[u.email]||[]);const box=$('favList');box.innerHTML='';if(!favs.length){box.innerHTML='<div class="empty"><div class="e">⭐</div>Tap “Save” on any answer to keep it here.</div>';return;}favs.forEach(f=>{const d=el('div','row');d.innerHTML=`${f.text.slice(0,260).replace(/</g,'&lt;')}${f.text.length>260?'…':''}${f.source?`<div class="meta">📎 ${f.source}</div>`:''}`;box.appendChild(d);});}
+function renderFavs(){const u=getUser();const favs=(J(LS.favs,{})[u.email]||[]);const box=$('favList');box.innerHTML='';if(!favs.length){box.innerHTML='<div class="empty"><div class="e">⭐</div>Tap “Save” on any answer to keep it here.</div>';return;}favs.forEach(f=>{const d=el('div','row');d.innerHTML=`${f.text.slice(0,260).replace(/</g,'&lt;')}${f.text.length>260?'…':''}${f.source?`<div class="meta">📎 ${_escHTML(f.source)}</div>`:''}`;box.appendChild(d);});}
 document.querySelectorAll('[data-atab]').forEach(t=>t.onclick=()=>{document.querySelectorAll('[data-atab]').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelectorAll('.apane').forEach(p=>p.style.display='none');document.querySelector(`[data-apane="${t.dataset.atab}"]`).style.display='block';});
 $('logoutBtn').onclick=()=>{localStorage.removeItem(LS.user);refreshAuthUI();$('acctModal').classList.remove('open');toast('Signed out');};
 
