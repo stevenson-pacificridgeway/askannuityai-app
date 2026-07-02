@@ -124,7 +124,13 @@ const ITEMS=[{"num": "001", "slug": "betty-bad-advice-guaranteed-income", "title
 const list=document.getElementById('list'),q=document.getElementById('q'),count=document.getElementById('count');
 function card(c){return `<a class="row" href="/cases/${c.slug}.html"><div class="n">CASE STUDY ${c.num} &middot; ${c.difficulty}</div><h3>${c.title}</h3><p>${c.dek}</p><div class="tg">${c.tags.map(t=>`<span>${t}</span>`).join('')}</div></a>`;}
 function render(items){list.innerHTML=items.map(card).join('');count.textContent=items.length+' of '+ITEMS.length+' stories';}
-function search(){const s=q.value.toLowerCase().trim();if(!s)return render(ITEMS);
- const r=ITEMS.filter(c=>(c.title+' '+c.dek+' '+c.tags.join(' ')+' '+c.keywords.join(' ')).toLowerCase().includes(s));render(r);}
-q.addEventListener('input',search);render(ITEMS);
+const STOP=['the','and','for','what','how','are','you','your','when','with','does','ask','annuityai','basics','about','overview','from','into','a','an','of','is','to','in'];
+function toks(s){return s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>2&&!STOP.includes(w));}
+function search(){const raw=q.value.trim();if(!raw)return render(ITEMS);
+ const t=toks(raw);if(!t.length)return render(ITEMS);
+ const scored=ITEMS.map(c=>{const hay=(c.title+' '+c.dek+' '+c.tags.join(' ')+' '+c.keywords.join(' ')).toLowerCase();let sc=0;t.forEach(w=>{if(hay.includes(w))sc++;});return {c,sc};}).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc);
+ render(scored.length?scored.map(x=>x.c):ITEMS);}
+q.addEventListener('input',search);
+const _urlq=new URLSearchParams(location.search).get('q');
+if(_urlq){q.value=_urlq;search();}else{render(ITEMS);}
 </script></body></html>
