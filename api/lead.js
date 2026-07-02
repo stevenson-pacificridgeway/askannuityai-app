@@ -1,7 +1,49 @@
 // /api/lead
 //   POST { name, email, phone, amount, message, source }  -> stores a lead (public)
 //   GET   (ADMIN ONLY, Bearer token)                       -> returns all leads
+// On a new lead, emails an instant notification via Resend (best-effort).
 import { supabaseAdmin, isAdmin, getUserFromReq, readJson, cors } from './_lib.js';
+
+const esc = (x) => String(x == null ? '' : x)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Send an instant "new lead" email. No-ops quietly if RESEND_API_KEY isn't set,
+// and never throws — a notification failure must not break saving the lead.
+async function notifyNewLead(lead) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return;
+  const to = process.env.LEAD_NOTIFY_EMAIL || 'gregorystevenson@indexedannuitysecrets.com';
+  const from = process.env.LEAD_NOTIFY_FROM || 'AskAnnuityAI Leads <onboarding@resend.dev>';
+  const when = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const who = lead.name || lead.email || 'Website visitor';
+  const row = (k, v) => v ? `<tr><td style="padding:4px 12px 4px 0;color:#64748b">${k}</td><td style="padding:4px 0;color:#0f172a"><b>${esc(v)}</b></td></tr>` : '';
+  const html = `
+    <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:560px">
+      <h2 style="color:#082B63;margin:0 0 4px">New lead from AskAnnuityAI</h2>
+      <p style="color:#64748b;margin:0 0 16px">${esc(who)} — ${esc(lead.source || 'website')} · ${esc(when)} PT</p>
+      <table style="border-collapse:collapse;font-size:15px">
+        ${row('Name', lead.name)}${row('Email', lead.email)}${row('Phone', lead.phone)}
+        ${row('Amount', lead.amount)}${row('Source', lead.source)}${row('Message', lead.message)}
+      </table>
+      ${lead.phone ? `<p style="margin:18px 0 0"><a href="tel:${esc(String(lead.phone).replace(/[^0-9+]/g,''))}" style="background:#D4A12B;color:#0a1730;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:8px;display:inline-block">Call ${esc(lead.phone)}</a></p>` : ''}
+      <p style="color:#94a3b8;font-size:12px;margin:20px 0 0">Sent automatically by AskAnnuityAI.</p>
+    </div>`;
+  const text = `New lead from AskAnnuityAI\n${who} — ${lead.source || 'website'} · ${when} PT\n\n`
+    + ['name', 'email', 'phone', 'amount', 'source', 'message']
+        .filter(k => lead[k]).map(k => `${k}: ${lead[k]}`).join('\n');
+  const subject = `New lead: ${who}${lead.source ? ' (' + lead.source + ')' : ''}`;
+
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + key, 'content-type': 'application/json' },
+      body: JSON.stringify({ from, to, subject, html, text, reply_to: lead.email || undefined }),
+      signal: ctrl.signal
+    });
+  } catch (_) { /* best-effort */ } finally { clearTimeout(t); }
+}
 
 export default async function handler(req, res) {
   cors(res);
@@ -37,11 +79,14 @@ export default async function handler(req, res) {
         .from('leads').select('id').eq('email', email).eq('source', source).limit(1);
       if (dupes && dupes.length) return res.status(200).json({ ok: true, deduped: true });
     }
-    const { error } = await supabaseAdmin.from('leads').insert({
+    const lead = {
       name: b.name || '', email, phone: b.phone || '',
       amount: b.amount || '', message: b.message || '', source
-    });
+    };
+    const { error } = await supabaseAdmin.from('leads').insert(lead);
     if (error) throw error;
+    // Notify on every new lead (best-effort; never blocks the save).
+    await notifyNewLead(lead);
     res.status(200).json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: String(e?.message || e) });
