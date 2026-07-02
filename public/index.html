@@ -1024,19 +1024,33 @@ function send(q){
   addUser(q);
   const m=addAI();const textEl=m.querySelector('.text');const contentEl=m.querySelector('.content');
   const think=startThinking(m);
+  streaming=true;
   (async()=>{
-    // Every question goes to the brain now — including "should I…" ones. The brain
-    // answers them educationally and leads with the relevant real story. No more canned punt.
-    let answerText,source,sourcesArr=[],followups=[];const advice=ADVICE.test(q);
+    let answerText='',source,sourcesArr=[],followups=[];const advice=ADVICE.test(q);
     // Send the last few turns (excluding the question just added) so follow-ups have context.
-    const hist=currentConvo.slice(0,-1).slice(-6).map(m=>({role:m.role,content:(m.html||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()})).filter(m=>m.content);
-    try{ const r=await AAI.askAI(q,hist); answerText=r.answer; sourcesArr=r.sources||[]; followups=r.followups||[]; source=sourcesArr.join(', ')||'AskAnnuityAI knowledge base'; }
-    catch(e){ answerText="Sorry — I had trouble reaching the assistant just now. Please try again in a moment."; source=''; }
+    const hist=currentConvo.slice(0,-1).slice(-6).map(mm=>({role:mm.role,content:(mm.html||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()})).filter(mm=>mm.content);
+    const strip=t=>t.replace(/\n*(SOURCES:|FOLLOWUPS:)[\s\S]*$/i,'');
+    let first=true;
+    try{
+      // Stream the answer live — words appear as the model writes them.
+      const r=await AAI.askAIStream(q,hist,(bodyText,meta)=>{
+        if(meta&&meta.sources)sourcesArr=meta.sources;
+        if(!bodyText)return;
+        if(first){if(think)clearInterval(think);first=false;}
+        textEl.innerHTML=fmtFull(strip(bodyText))+'<span class="cursor"></span>';
+        scrollBottom();
+      });
+      const full=r.full||'';if(r.meta&&r.meta.sources)sourcesArr=r.meta.sources;
+      const fu=full.match(/FOLLOWUPS:\s*(.+)$/is);if(fu)followups=fu[1].split('|').map(s=>s.trim().replace(/^[-*\d.\s]+/,'').trim()).filter(Boolean).slice(0,3);
+      answerText=strip(full).trim();
+      source=sourcesArr.join(', ')||'AskAnnuityAI knowledge base';
+    }catch(e){ answerText="Sorry — I had trouble reaching the assistant just now. Please try again in a moment."; source=''; sourcesArr=[]; followups=[]; }
+    if(think)clearInterval(think);
     let showPro=false;
     if(advice||HUMAN.test(q)||dueForPro()){showPro=true;proCount++;lastProAt=exchanges;}
-    if(think)clearInterval(think);
-    textEl.innerHTML='';
-    streamText(textEl,answerText,()=>finalizeAI(contentEl,answerText,source,{pro:showPro,sourcesArr,followups}));
+    streaming=false;
+    textEl.innerHTML=fmtFull(answerText||'Sorry — please try again.');
+    finalizeAI(contentEl,answerText,source,{pro:showPro,sourcesArr,followups});
   })();
 }
 

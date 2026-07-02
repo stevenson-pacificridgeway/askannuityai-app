@@ -78,15 +78,55 @@ const AAI = {
     AAI.currentUser().then(cb);
   },
 
-  // ---------- CHAT (RAG over your documents) ----------
-  async askAI(question, history) {
+  // ---------- CHAT (RAG over your documents, streamed live) ----------
+  // Streams the answer token-by-token. onUpdate(bodyText, meta) is called as text arrives.
+  // The response is: one JSON line {"sources":[...]} then the raw answer text.
+  async askAIStream(question, history, onUpdate) {
     const r = await fetch("/api/chat", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ question, history: Array.isArray(history) ? history : [] })
     });
-    if (!r.ok) throw new Error("chat failed: " + r.status);
-    return r.json(); // { answer, sources: [], followups: [] }
+    if (!r.ok) {
+      let j = {}; try { j = await r.json(); } catch (_) {}
+      throw new Error(j.error || ("chat failed: " + r.status));
+    }
+    // No streaming support (older browsers / proxies): read the whole body at once.
+    if (!r.body || !r.body.getReader) {
+      const txt = await r.text();
+      const nl = txt.indexOf("\n");
+      let meta = { sources: [] }, bodyText = txt;
+      if (nl >= 0) { try { meta = JSON.parse(txt.slice(0, nl)); } catch (_) {} bodyText = txt.slice(nl + 1); }
+      onUpdate && onUpdate(bodyText, meta);
+      return { full: bodyText, meta };
+    }
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let acc = "", meta = null, metaEnd = -1;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      acc += dec.decode(value, { stream: true });
+      if (meta === null) {
+        const nl = acc.indexOf("\n");
+        if (nl < 0) continue;
+        metaEnd = nl;
+        try { meta = JSON.parse(acc.slice(0, nl)); } catch (_) { meta = { sources: [] }; }
+      }
+      onUpdate && onUpdate(acc.slice(metaEnd + 1), meta);
+    }
+    if (meta === null) meta = { sources: [] };
+    return { full: metaEnd >= 0 ? acc.slice(metaEnd + 1) : acc, meta };
+  },
+  // Non-incremental convenience wrapper (parses the finished answer).
+  async askAI(question, history) {
+    const { full, meta } = await AAI.askAIStream(question, history, null);
+    let raw = full || "", followups = [];
+    const fu = raw.match(/FOLLOWUPS:\s*(.+)$/is);
+    if (fu) { followups = fu[1].split("|").map(s => s.trim().replace(/^[-*\d.\s]+/, "").trim()).filter(Boolean).slice(0, 3); raw = raw.slice(0, fu.index); }
+    const sm = raw.match(/SOURCES:\s*(.+)$/is);
+    if (sm) raw = raw.slice(0, sm.index);
+    return { answer: raw.trim(), sources: (meta && meta.sources) || [], followups };
   },
 
   // ---------- ADMIN: upload a file (brochure/PDF/etc.) into the brain ----------
