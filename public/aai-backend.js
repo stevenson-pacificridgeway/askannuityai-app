@@ -21,11 +21,34 @@ function tokenFromStorage() {
   } catch (e) {}
   return "";
 }
+// True if the JWT is missing/expired (with a 60s safety buffer).
+function jwtExpired(jwt) {
+  try {
+    const p = JSON.parse(atob(jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    return !p.exp || (p.exp * 1000 < Date.now() + 60000);
+  } catch (e) { return true; }
+}
+// Race a promise against a timeout so a hung getSession() can't freeze the admin UI.
+function withTimeout(p, ms) {
+  return Promise.race([p, new Promise((r) => setTimeout(() => r(null), ms))]);
+}
 async function token() {
-  // Fast localStorage read first (sb.auth.getSession() can hang); fall back to the client.
+  // Use the stored access token only while it's still valid.
   const t = tokenFromStorage();
-  if (t) return t;
-  try { const { data } = await sb.auth.getSession(); return data?.session?.access_token || ""; } catch (e) { return ""; }
+  if (t && !jwtExpired(t)) return t;
+  // Expired or missing → let the Supabase client refresh it (auto-uses the refresh token).
+  try {
+    const res = await withTimeout(sb.auth.getSession(), 4000);
+    const at = res?.data?.session?.access_token;
+    if (at && !jwtExpired(at)) return at;
+  } catch (e) {}
+  // Last resort: force a refresh.
+  try {
+    const res = await withTimeout(sb.auth.refreshSession(), 4000);
+    const at = res?.data?.session?.access_token;
+    if (at) return at;
+  } catch (e) {}
+  return t || ""; // whatever we have, so the caller can surface a clean error
 }
 
 const AAI = {
