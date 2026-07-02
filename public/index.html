@@ -741,11 +741,10 @@
   <div class="sheet">
     <div class="sh-head"><h3 id="adminTitle">🔒 Admin</h3><button class="x" data-close>✕</button></div>
     <div class="sh-body">
-      <div id="adLogin" style="max-width:340px;margin:6px auto;text-align:center">
+      <div id="adLogin" style="max-width:360px;margin:6px auto;text-align:center">
         <div style="font-size:32px;margin-bottom:8px">🔐</div>
-        <p style="color:var(--muted);font-size:14px;margin:0 0 18px">Enter the admin password to manage the knowledge base.</p>
-        <div class="fld"><input id="adPass" type="password" placeholder="Password" style="text-align:center;letter-spacing:2px"></div>
-        <button class="btn btn-accent btn-lg" id="adLoginBtn" style="width:100%;justify-content:center">Unlock</button>
+        <p style="color:var(--muted);font-size:14px;margin:0 0 18px">The admin console is restricted to Pacific Ridgeway staff. Sign in with your authorized Google account to continue.</p>
+        <button class="btn btn-accent btn-lg" id="adGoogleBtn" style="width:100%;justify-content:center">Sign in with Google</button>
         <div class="err" id="adErr"></div>
       </div>
       <div id="adPanel" style="display:none">
@@ -793,7 +792,7 @@
           <div class="grid2"><div class="fld"><label>Phone</label><input id="setPhone"></div><div class="fld"><label>Lead email</label><input id="setEmail"></div></div>
           <div class="fld"><label>Booking link</label><input id="setBooking" placeholder="https://calendly.com/…"></div>
           <div class="grid2"><div class="fld"><label>Book link</label><input id="setBook"></div><div class="fld"><label>University link</label><input id="setUni"></div></div>
-          <div class="fld"><label>Admin password</label><input id="setPass"></div>
+          <div class="hint" style="margin-top:6px">🔒 Admin access is controlled by Google sign-in (authorized staff emails only) — there's no shared password to manage.</div>
           <div class="save-row"><button class="btn btn-accent" id="saveSetBtn">Save settings</button><span class="flash" id="setFlash">Saved ✓</span></div>
         </div>
       </div>
@@ -832,7 +831,7 @@
 const LS={kb:'aai2_kb',leads:'aai2_leads',cfg:'aai2_cfg',user:'aai2_user',convos:'aai2_convos',favs:'aai2_favs',stats:'aai2_stats',theme:'aai2_theme',welcomed:'aai2_welcomed'};
 const DEFAULT_CFG={phone:'(619) 374-8100',phoneRaw:'+16193748100',leadEmail:'stevenson@pacificridgewayinsurance.com',
   booking:'https://calendly.com/pacific-ridgeway/retirement-review',bookLink:'https://pacificridgeway.com/book',
-  uniLink:'https://pacificridgeway.com/university',adminPassword:'ridgeway2026'};
+  uniLink:'https://pacificridgeway.com/university'};
 const getCfg=()=>{try{return{...DEFAULT_CFG,...JSON.parse(localStorage.getItem(LS.cfg)||'{}')}}catch(e){return{...DEFAULT_CFG}}};
 const saveCfg=c=>localStorage.setItem(LS.cfg,JSON.stringify(c));
 const J=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch(e){return d}};
@@ -1220,10 +1219,28 @@ function openTool(kind){$('toolTitle').textContent=TOOLINFO[kind]||'Tool';const 
 document.querySelectorAll('.rcard.tool').forEach(c=>c.onclick=e=>{e.preventDefault();openTool(c.dataset.tool);});
 
 /* ===================== ADMIN ===================== */
-$('adminBtn').onclick=()=>$('adminModal').classList.add('open');
-$('adminBtn2').onclick=()=>$('adminModal').classList.add('open');
-$('adLoginBtn').onclick=adLogin;$('adPass').addEventListener('keydown',e=>{if(e.key==='Enter')adLogin();});
-function adLogin(){if($('adPass').value===getCfg().adminPassword){$('adLogin').style.display='none';$('adPanel').style.display='block';$('adminTitle').textContent='⚙️ Admin Console';renderKB();renderLibrary();renderAnalytics();renderLeads();fillSettings();}else $('adErr').textContent='Incorrect password.';}
+/* Admin UI is gated by the signed-in Google account. This is a UI gate only —
+   the real security is server-side (isAdmin(email) + Bearer token) in /api/*. */
+const ADMIN_EMAILS=['stevenson@pacificridgewayinsurance.com','gregorystevenson@indexedannuitysecrets.com'];
+function clientIsAdmin(){const u=getUser();return !!(u&&u.email&&ADMIN_EMAILS.includes(u.email.toLowerCase()));}
+function openAdmin(){
+  $('adminModal').classList.add('open');
+  if(clientIsAdmin()){
+    $('adLogin').style.display='none';$('adPanel').style.display='block';
+    $('adminTitle').textContent='⚙️ Admin Console';
+    renderKB();renderLibrary();renderAnalytics();renderLeads();fillSettings();
+  } else {
+    $('adPanel').style.display='none';$('adLogin').style.display='block';
+    $('adminTitle').textContent='🔒 Admin';
+    const u=getUser();
+    $('adErr').textContent=(u&&u.email)?('“'+u.email+'” isn’t an authorized admin account.'):'';
+  }
+}
+$('adminBtn').onclick=openAdmin;
+$('adminBtn2').onclick=openAdmin;
+$('adGoogleBtn').onclick=()=>{ if(window.AAI&&AAI.signInWithGoogle){AAI.signInWithGoogle();} else {openAuth('Sign in'); } };
+/* Re-evaluate admin access whenever auth state changes while the modal is open. */
+if(window.AAI&&AAI.onAuth){AAI.onAuth(()=>{if($('adminModal').classList.contains('open'))openAdmin();});}
 function libRowHTML(c){return `<div class="librow"><span class="libnum">${c.num}</span><span class="libttl">${c.title.replace(/</g,'&lt;')}</span><span class="libacts"><a class="libbtn open" href="/cases/${c.slug}.html" target="_blank" rel="noopener">Open ↗</a><a class="libbtn pdf" href="/cases/${c.slug}.html?pdf=1" target="_blank" rel="noopener">⤓ PDF</a></span></div>`;}
 function docRowHTML(d){return `<div class="librow"><span class="libnum brain">BRAIN</span><span class="libttl">${d.title.replace(/</g,'&lt;')}</span><span class="libacts"><span class="libtag">Knowledge base</span></span></div>`;}
 function renderLibrary(){
@@ -1260,8 +1277,22 @@ const drop=$('drop'),fileInput=$('fileInput');drop.onclick=()=>fileInput.click()
 drop.addEventListener('drop',e=>handleFiles(e.dataTransfer.files));fileInput.addEventListener('change',e=>handleFiles(e.target.files));
 function handleFiles(files){[...files].forEach(async file=>{try{toast('Uploading "'+file.name+'"…');const r=await AAI.uploadDoc(file);toast('Added "'+r.title+'" ('+r.chunks+' chunks)');}catch(e){toast('Upload failed: '+(e.message||e));}});}
 $('exportKbBtn').onclick=()=>{const b=new Blob([JSON.stringify(loadAdminKB(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='askannuityai-knowledge.json';a.click();};
-function renderAnalytics(){const s=J(LS.stats,{total:0,questions:{}});const leads=J(LS.leads,[]);$('stQ').textContent=s.total;$('stLeads').textContent=leads.length;$('stKb').textContent=DEFAULT_KB.length+loadAdminKB().length;
-  const top=Object.entries(s.questions).sort((a,b)=>b[1]-a[1]).slice(0,8);const box=$('topQ');box.innerHTML='';if(!top.length){box.innerHTML='<div class="empty"><div class="e">📊</div>No questions yet.</div>';return;}top.forEach(([q,n])=>{const d=el('div','row');d.innerHTML=`<b>${n}×</b> &nbsp;${q.replace(/</g,'&lt;')}`;box.appendChild(d);});}
+async function renderAnalytics(){
+  $('stKb').textContent=DEFAULT_KB.length+loadAdminKB().length;
+  const box=$('topQ');box.innerHTML='<div class="empty"><div class="e">⏳</div>Loading real usage…</div>';
+  try{
+    const st=await AAI.getStats();
+    $('stQ').textContent=st.total||0;
+    const top=(st.top||[]);
+    box.innerHTML='';
+    if(!top.length){box.innerHTML='<div class="empty"><div class="e">📊</div>No questions logged yet. Real questions will appear here as visitors use the AI.</div>';}
+    else top.forEach(t=>{const d=el('div','row');d.innerHTML=`<b>${t.count}×</b> &nbsp;${(t.q||'').replace(/</g,'&lt;')}`;box.appendChild(d);});
+  }catch(e){
+    // Fall back to the old per-browser counter if the stats endpoint is unavailable.
+    const s=J(LS.stats,{total:0,questions:{}});$('stQ').textContent=s.total;
+    box.innerHTML='<div class="empty"><div class="e">📊</div>Live analytics unavailable right now.</div>';
+  }
+}
 async function renderLeads(){$('leadEmailLabel').textContent=getCfg().leadEmail;const box=$('leadsList');
   box.innerHTML='<div class="empty"><div class="e">⏳</div>Loading leads…</div>';
   let leads=[],errd=false;
@@ -1270,8 +1301,8 @@ async function renderLeads(){$('leadEmailLabel').textContent=getCfg().leadEmail;
   if(!leads.length){box.innerHTML='<div class="empty"><div class="e">📥</div>'+(errd?'Couldn\'t load leads — make sure you\'re signed in with your admin Google account.':'No leads captured yet.')+'</div>';return;}
   box.innerHTML='';leads.forEach(l=>{const d=el('div','row');const ts=l.created_at||l.ts;d.innerHTML=`<b>${(l.name||'').replace(/</g,'&lt;')}</b> — ${l.email||''} · ${l.phone||''}<div class="meta">${l.amount||'amount n/a'} • ${ts?new Date(ts).toLocaleString():''}${l.source?' • '+l.source.replace(/</g,'&lt;'):''}</div>${l.message?(l.message.replace(/</g,'&lt;')):''}`;box.appendChild(d);});}
 $('exportLeadsBtn').onclick=()=>{const leads=window.__leads||J(LS.leads,[]);const rows=[['name','email','phone','amount','message','source','submitted'],...leads.map(l=>[l.name,l.email,l.phone,l.amount,(l.message||'').replace(/\n/g,' '),l.source||'',l.created_at||l.ts||''])];const csv=rows.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='askannuityai-leads.csv';a.click();};
-function fillSettings(){const c=getCfg();$('setPhone').value=c.phone;$('setEmail').value=c.leadEmail;$('setBooking').value=c.booking;$('setBook').value=c.bookLink;$('setUni').value=c.uniLink;$('setPass').value=c.adminPassword;}
-$('saveSetBtn').onclick=()=>{const c=getCfg();c.phone=$('setPhone').value.trim()||c.phone;c.phoneRaw='+'+c.phone.replace(/[^0-9]/g,'');c.leadEmail=$('setEmail').value.trim()||c.leadEmail;c.booking=$('setBooking').value.trim()||c.booking;c.bookLink=$('setBook').value.trim()||c.bookLink;c.uniLink=$('setUni').value.trim()||c.uniLink;c.adminPassword=$('setPass').value.trim()||c.adminPassword;saveCfg(c);applyCfg();flash('setFlash');};
+function fillSettings(){const c=getCfg();$('setPhone').value=c.phone;$('setEmail').value=c.leadEmail;$('setBooking').value=c.booking;$('setBook').value=c.bookLink;$('setUni').value=c.uniLink;}
+$('saveSetBtn').onclick=()=>{const c=getCfg();c.phone=$('setPhone').value.trim()||c.phone;c.phoneRaw='+'+c.phone.replace(/[^0-9]/g,'');c.leadEmail=$('setEmail').value.trim()||c.leadEmail;c.booking=$('setBooking').value.trim()||c.booking;c.bookLink=$('setBook').value.trim()||c.bookLink;c.uniLink=$('setUni').value.trim()||c.uniLink;saveCfg(c);applyCfg();flash('setFlash');};
 
 /* ===================== TOAST + SHORTCUTS ===================== */
 let toastT;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800);}

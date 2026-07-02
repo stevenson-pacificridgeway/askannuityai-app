@@ -108,6 +108,14 @@ const AAI = {
     const j = await r.json();
     return j.leads || [];
   },
+  // ---------- ADMIN: real usage analytics (questions asked, top asks) ----------
+  async getStats() {
+    const r = await fetch("/api/stats", {
+      headers: { authorization: "Bearer " + (await token()) }
+    });
+    if (!r.ok) throw new Error("stats fetch failed: " + r.status);
+    return r.json(); // { total, top:[{q,count}], recent:[] }
+  },
 
   // ---------- CONVERSATIONS (synced history; optional) ----------
   async listConversations() {
