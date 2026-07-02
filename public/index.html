@@ -956,7 +956,8 @@ function streamText(textEl,full,cb){
 
 function sourceLineHTML(src){const c=caseForSource(src);
   if(c)return `<a class="src-link" href="/cases/${c.slug}.html" target="_blank" rel="noopener">📖 ${src} <span class="src-go">Read the full story →</span></a>`;
-  return `<span class="src-plain">${src}</span>`;}
+  // Every other source (foundation docs, "Basics" entries) links to the branded library so nothing is dead text.
+  return `<a class="src-link src-ref" href="/cases/?q=${encodeURIComponent(src)}" target="_blank" rel="noopener">📎 ${src} <span class="src-go">Open in the library →</span></a>`;}
 function finalizeAI(contentEl,answerText,source,opts){
   opts=opts||{};
   // sources (collapsible) — list each real source; link case studies to their branded page
@@ -967,7 +968,7 @@ function finalizeAI(contentEl,answerText,source,opts){
     const CAP=5;const shown=srcArr.slice(0,CAP);const extra=srcArr.length-shown.length;
     const d=el('details','sources');d.open=true;
     let rows=shown.map(sourceLineHTML).join('');
-    if(extra>0)rows+=`<span class="src-plain">+ ${extra} more reference${extra>1?'s':''} from the knowledge base</span>`;
+    if(extra>0)rows+=`<a class="src-link src-ref" href="/cases/" target="_blank" rel="noopener">＋ ${extra} more reference${extra>1?'s':''} in the library <span class="src-go">Browse all →</span></a>`;
     d.innerHTML=`<summary>📎 Sources & stories <span class="chev">▾</span></summary><div class="src-body">${rows}</div>`;
     contentEl.appendChild(d);
   }
