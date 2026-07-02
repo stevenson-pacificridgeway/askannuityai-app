@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 <title>AskAnnuityAI — Ask anything about retirement & annuities</title>
 <meta name="description" content="The premium AI for retirement & annuity questions. Ask anything and get clear, unbiased, educational answers — instantly. Talk to a licensed professional when you're ready." />
+<link rel="canonical" href="https://askannuityai.com/" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/favicon.svg" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#082B63" />
 <!-- Link preview (Open Graph + Twitter) -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://askannuityai.com" />
@@ -560,7 +565,7 @@
     </nav>
     <button class="nav-ghost" id="newChatBtn">＋ New chat</button>
     <div class="nav-right">
-      <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
+      <button class="icon-btn" id="themeBtn" title="Theme" aria-label="Toggle light or dark theme">🌙</button>
       <button class="nav-ghost sm-hide" id="loginBtn">Sign in</button>
       <button class="btn btn-soft sm-hide" id="adminBtn">Admin</button>
       <button class="btn btn-accent" id="bookNav">Book a Professional</button>
@@ -582,9 +587,9 @@
 
       <div class="askbox">
         <div class="askwrap">
-          <textarea id="heroInput" rows="1" placeholder="Ask me anything about retirement…"></textarea>
-          <button class="micbtn" id="heroMic" title="Speak your question" type="button"><svg><use href="#mic"/></svg></button>
-          <button class="sendbtn" id="heroSend" title="Ask" disabled><svg><use href="#send"/></svg></button>
+          <textarea id="heroInput" rows="1" placeholder="Ask me anything about retirement…" aria-label="Ask a retirement or annuity question"></textarea>
+          <button class="micbtn" id="heroMic" title="Speak your question" type="button" aria-label="Speak your question"><svg><use href="#mic"/></svg></button>
+          <button class="sendbtn" id="heroSend" title="Ask" aria-label="Send question" disabled><svg><use href="#send"/></svg></button>
         </div>
         <div class="kbd-hint">Press <span class="kbd">/</span> to focus · <span class="kbd">⌘K</span> for history</div>
       </div>
@@ -671,7 +676,7 @@
           <div class="emoji">📅</div><h3>Social Security Optimizer</h3><p>Compare claiming at 62, full retirement age, and 70 — and find your break-even.</p><span class="arrow">Open tool →</span></a>
       </div>
     </section>
-    <div class="ov" id="toolModal"><div class="sheet sm"><div class="sh-head"><h3 id="toolTitle">Tool</h3><button class="x" data-close>✕</button></div><div class="sh-body" id="toolBody"></div></div></div>
+    <div class="ov" id="toolModal"><div class="sheet sm"><div class="sh-head"><h3 id="toolTitle">Tool</h3><button class="x" data-close aria-label="Close">✕</button></div><div class="sh-body" id="toolBody"></div></div></div>
 
     <footer>
       <div class="wrap foot">
@@ -690,13 +695,13 @@
   <!-- CHAT MODE -->
   <div class="chatpane">
     <div class="chatscroll" id="chatscroll">
-      <div class="chatscroll-inner" id="msgs"></div>
+      <div class="chatscroll-inner" id="msgs" role="log" aria-live="polite" aria-atomic="false" aria-label="Conversation with AskAnnuityAI"></div>
     </div>
     <div class="composerbar">
       <div class="composer">
-        <textarea id="chatInput" rows="1" placeholder="Ask a follow-up…"></textarea>
-        <button class="micbtn" id="chatMic" title="Speak your question" type="button"><svg><use href="#mic"/></svg></button>
-        <button class="sendbtn" id="chatSend" title="Send"><svg><use href="#send"/></svg></button>
+        <textarea id="chatInput" rows="1" placeholder="Ask a follow-up…" aria-label="Ask a follow-up question"></textarea>
+        <button class="micbtn" id="chatMic" title="Speak your question" type="button" aria-label="Speak your question"><svg><use href="#mic"/></svg></button>
+        <button class="sendbtn" id="chatSend" title="Send" aria-label="Send message"><svg><use href="#send"/></svg></button>
       </div>
       <div class="disc">AI-generated education — not financial, tax, or legal advice. Verify with a licensed professional.</div>
     </div>
@@ -706,7 +711,7 @@
 <!-- AUTH MODAL -->
 <div class="ov" id="authModal">
   <div class="sheet sm">
-    <div class="sh-head"><h3 id="authTitle">Create your free account</h3><button class="x" data-close>✕</button></div>
+    <div class="sh-head"><h3 id="authTitle">Create your free account</h3><button class="x" data-close aria-label="Close">✕</button></div>
     <div class="sh-body">
       <div class="auth-btns">
         <button id="googleBtn" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:0 0 18px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Sign in with Google</button>
@@ -720,7 +725,7 @@
 <!-- ACCOUNT MODAL -->
 <div class="ov" id="acctModal">
   <div class="sheet">
-    <div class="sh-head"><h3 id="acctHi">Your account</h3><button class="x" data-close>✕</button></div>
+    <div class="sh-head"><h3 id="acctHi">Your account</h3><button class="x" data-close aria-label="Close">✕</button></div>
     <div class="sh-body">
       <div class="tabs">
         <button class="tab active" data-atab="history">History</button>
@@ -739,7 +744,7 @@
 <!-- ADMIN MODAL -->
 <div class="ov" id="adminModal">
   <div class="sheet">
-    <div class="sh-head"><h3 id="adminTitle">🔒 Admin</h3><button class="x" data-close>✕</button></div>
+    <div class="sh-head"><h3 id="adminTitle">🔒 Admin</h3><button class="x" data-close aria-label="Close">✕</button></div>
     <div class="sh-body">
       <div id="adLogin" style="max-width:360px;margin:6px auto;text-align:center">
         <div style="font-size:32px;margin-bottom:8px">🔐</div>
@@ -756,7 +761,7 @@
           <button class="tab" data-dtab="settings">Settings</button>
         </div>
         <div class="dpane" data-dpane="kb">
-          <div class="hint">Upload PDFs, books, carrier guides, IRS docs, FAQs, training material. Text files (.txt, .md, .csv, .json) are indexed automatically; PDFs/Word are logged by name — automatic vector extraction runs in the live hosted version.</div>
+          <div class="hint">Upload PDFs, books, carrier guides, IRS docs, FAQs, training material. PDF, Word (.docx), and text files (.txt, .md, .csv, .json) are all read, chunked, and indexed into the AI's knowledge automatically — the full text becomes searchable, not just the file name.</div>
           <div class="drop" id="drop"><div class="big">＋</div><div><b>Drop files here</b> or click to browse</div><div style="font-size:12px;margin-top:4px;color:var(--faint)">PDF · DOCX · TXT · MD · CSV · JSON</div><input type="file" id="fileInput" multiple style="display:none"></div>
           <div style="margin-top:16px">
             <div class="fld"><input id="kbTitle" placeholder="Title (e.g. 'Our top fixed annuity rates')"></div>
@@ -960,9 +965,9 @@ function streamText(textEl,full,cb){
 
 function sourceLineHTML(src){
   const exact=caseForSource(src);
-  if(exact)return `<a class="src-link" href="/cases/${exact.slug}.html" target="_blank" rel="noopener">\u{1F4D6} ${src} <span class="src-go">Read the full story \u2192</span></a>`;
+  if(exact)return `<a class="src-link" href="/cases/${exact.slug}" target="_blank" rel="noopener">\u{1F4D6} ${src} <span class="src-go">Read the full story \u2192</span></a>`;
   const rel=bestCase(src);
-  if(rel)return `<a class="src-link" href="/cases/${rel.slug}.html" target="_blank" rel="noopener">\u{1F4D6} ${src} <span class="src-go">Related story: ${_shortTitle(rel)} \u2192</span></a>`;
+  if(rel)return `<a class="src-link" href="/cases/${rel.slug}" target="_blank" rel="noopener">\u{1F4D6} ${src} <span class="src-go">Related story: ${_shortTitle(rel)} \u2192</span></a>`;
   return `<a class="src-link src-ref" href="/cases/" target="_blank" rel="noopener">\u{1F4CE} ${src} <span class="src-go">Open in the library \u2192</span></a>`;}
 function finalizeAI(contentEl,answerText,source,opts){
   opts=opts||{};
@@ -1021,7 +1026,9 @@ function send(q){
     // Every question goes to the brain now — including "should I…" ones. The brain
     // answers them educationally and leads with the relevant real story. No more canned punt.
     let answerText,source,sourcesArr=[],followups=[];const advice=ADVICE.test(q);
-    try{ const r=await AAI.askAI(q); answerText=r.answer; sourcesArr=r.sources||[]; followups=r.followups||[]; source=sourcesArr.join(', ')||'AskAnnuityAI knowledge base'; }
+    // Send the last few turns (excluding the question just added) so follow-ups have context.
+    const hist=currentConvo.slice(0,-1).slice(-6).map(m=>({role:m.role,content:(m.html||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()})).filter(m=>m.content);
+    try{ const r=await AAI.askAI(q,hist); answerText=r.answer; sourcesArr=r.sources||[]; followups=r.followups||[]; source=sourcesArr.join(', ')||'AskAnnuityAI knowledge base'; }
     catch(e){ answerText="Sorry — I had trouble reaching the assistant just now. Please try again in a moment."; source=''; }
     let showPro=false;
     if(advice||HUMAN.test(q)||dueForPro()){showPro=true;proCount++;lastProAt=exchanges;}
@@ -1103,7 +1110,20 @@ function renderSidebar(f){const u=getUser();if(!u)return;
 function saveConvo(){const u=getUser();if(!u||!currentConvo.length)return;const all=J(LS.convos,{});const list=all[u.email]||[];
   if(!convoId)convoId='c'+Date.now();const first=currentConvo.find(m=>m.role==='user');const title=first?first.html.replace(/<[^>]+>/g,'').slice(0,64):'Conversation';
   const rec={id:convoId,title,ts:new Date().toISOString(),messages:currentConvo.slice()};const i=list.findIndex(c=>c.id===convoId);
-  if(i>=0)list[i]=rec;else list.unshift(rec);all[u.email]=list;S(LS.convos,all);renderSidebar();}
+  if(i>=0)list[i]=rec;else list.unshift(rec);all[u.email]=list;S(LS.convos,all);renderSidebar();
+  // Best-effort sync to the cloud so history follows the user across devices.
+  if(window.AAI&&AAI.saveConversationRemote)AAI.saveConversationRemote(rec).catch(()=>{});}
+// On sign-in, pull cloud history and merge it into this browser's list (newer wins).
+async function mergeRemoteHistory(u){
+  if(!u||!(window.AAI&&AAI.listConversationsRemote))return;
+  try{
+    const remote=await AAI.listConversationsRemote();if(!remote.length)return;
+    const all=J(LS.convos,{});const byId={};(all[u.email]||[]).forEach(c=>{if(c&&c.id)byId[c.id]=c;});
+    remote.forEach(c=>{if(c&&c.id){const ex=byId[c.id];if(!ex||new Date(c.ts||0)>=new Date(ex.ts||0))byId[c.id]=c;}});
+    all[u.email]=Object.values(byId).sort((a,b)=>new Date(b.ts||0)-new Date(a.ts||0));
+    S(LS.convos,all);if(getUser())renderSidebar();
+  }catch(_){}
+}
 function openAcct(){const u=getUser();if(!u)return openAuth('Welcome back');$('acctHi').textContent='Hi, '+(u.name||'there');renderHistory();renderFavs();$('acctModal').classList.add('open');}
 function renderHistory(f){const u=getUser();const list=(J(LS.convos,{})[u.email]||[]);const ff=(f||'').toLowerCase();const box=$('histList');box.innerHTML='';
   const shown=list.filter(c=>!ff||JSON.stringify(c.messages).toLowerCase().includes(ff)||c.title.toLowerCase().includes(ff));
@@ -1129,7 +1149,7 @@ function applyCfg(){const c=getCfg();$('phoneLabel').textContent=c.phone;$('okPh
   $('bookLink').href=c.booking;$('cardBook').href=c.bookLink;$('cardUni').href=c.uniLink;$('yr').textContent=new Date().getFullYear();
   $('bookNav').onclick=()=>{document.body.classList.remove('chatting');location.hash='#talk';};}
 applyCfg();refreshAuthUI();if(getUser()&&innerWidth>=1024)openSidebar();
-window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}}});});
+window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});mergeRemoteHistory(u);if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}}});});
 
 /* ---- mobile "use desktop" banner ---- */
 (function(){var b=$('mdb');if(!b)return;

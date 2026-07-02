@@ -79,14 +79,14 @@ const AAI = {
   },
 
   // ---------- CHAT (RAG over your documents) ----------
-  async askAI(question) {
+  async askAI(question, history) {
     const r = await fetch("/api/chat", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ question })
+      body: JSON.stringify({ question, history: Array.isArray(history) ? history : [] })
     });
     if (!r.ok) throw new Error("chat failed: " + r.status);
-    return r.json(); // { answer, sources: [] }
+    return r.json(); // { answer, sources: [], followups: [] }
   },
 
   // ---------- ADMIN: upload a file (brochure/PDF/etc.) into the brain ----------
@@ -140,22 +140,21 @@ const AAI = {
     return r.json(); // { total, top:[{q,count}], recent:[] }
   },
 
-  // ---------- CONVERSATIONS (synced history; optional) ----------
-  async listConversations() {
-    const { data } = await sb.from("conversations").select("*").order("created_at", { ascending: false });
-    return data || [];
-  },
-  async createConversation(title) {
+  // ---------- CONVERSATION HISTORY (synced across devices) ----------
+  // Each conversation is stored as one JSON row keyed by (user_id, convo_id).
+  async saveConversationRemote(rec) {
+    if (!rec || !rec.id) return;
     const u = await AAI.currentUser();
-    const { data } = await sb.from("conversations").insert({ user_id: u.id, title }).select().single();
-    return data;
+    if (!u) return;
+    await sb.from("user_conversations").upsert({
+      user_id: u.id, convo_id: rec.id, title: rec.title || "Conversation",
+      data: rec, updated_at: new Date().toISOString()
+    }, { onConflict: "user_id,convo_id" });
   },
-  async addMessage(conversationId, role, content, sources) {
-    await sb.from("messages").insert({ conversation_id: conversationId, role, content, sources: sources || null });
-  },
-  async getMessages(conversationId) {
-    const { data } = await sb.from("messages").select("*").eq("conversation_id", conversationId).order("created_at");
-    return data || [];
+  async listConversationsRemote() {
+    const { data } = await sb.from("user_conversations")
+      .select("data, updated_at").order("updated_at", { ascending: false });
+    return (data || []).map(r => r.data).filter(Boolean);
   }
 };
 

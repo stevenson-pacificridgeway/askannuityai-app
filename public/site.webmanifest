@@ -1,0 +1,12 @@
+{
+  "name": "AskAnnuityAI",
+  "short_name": "AskAnnuityAI",
+  "description": "The premium AI for retirement & annuity questions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0f14",
+  "theme_color": "#082B63",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
