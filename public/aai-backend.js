@@ -81,11 +81,11 @@ const AAI = {
   // ---------- CHAT (RAG over your documents, streamed live) ----------
   // Streams the answer token-by-token. onUpdate(bodyText, meta) is called as text arrives.
   // The response is: one JSON line {"sources":[...]} then the raw answer text.
-  async askAIStream(question, history, onUpdate) {
+  async askAIStream(question, history, onUpdate, email) {
     const r = await fetch("/api/chat", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ question, history: Array.isArray(history) ? history : [] })
+      body: JSON.stringify({ question, history: Array.isArray(history) ? history : [], email: email || "" })
     });
     if (!r.ok) {
       let j = {}; try { j = await r.json(); } catch (_) {}

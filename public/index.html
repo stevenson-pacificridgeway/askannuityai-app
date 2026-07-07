@@ -1033,13 +1033,14 @@ function send(q){
     let first=true;
     try{
       // Stream the answer live — words appear as the model writes them.
+      const whoEmail=(getUser()&&getUser().email)||'';
       const r=await AAI.askAIStream(q,hist,(bodyText,meta)=>{
         if(meta&&meta.sources)sourcesArr=meta.sources;
         if(!bodyText)return;
         if(first){if(think)clearInterval(think);first=false;}
         textEl.innerHTML=fmtFull(strip(bodyText))+'<span class="cursor"></span>';
         scrollBottom();
-      });
+      },whoEmail);
       const full=r.full||'';if(r.meta&&r.meta.sources)sourcesArr=r.meta.sources;
       const fu=full.match(/FOLLOWUPS:\s*(.+)$/is);if(fu)followups=fu[1].split('|').map(s=>s.trim().replace(/^[-*\d.\s]+/,'').trim()).filter(Boolean).slice(0,3);
       answerText=strip(full).trim();
