@@ -61,6 +61,8 @@ export default async function handler(req, res) {
 
   const rawHistory = Array.isArray(body.history) ? body.history.slice(-6) : [];
   const ip = clientIp(req);
+  // If the visitor is signed in with Google, the front-end passes their email so we know WHO asked.
+  const askerEmail = (body.email || '').toString().slice(0, 200).trim();
 
   // --- Pre-work (JSON errors OK here, before we start streaming) ---
   // Rate-limit check and the question embedding are independent → run them together.
@@ -72,8 +74,8 @@ export default async function handler(req, res) {
   }
   if (over) return res.status(429).json({ error: 'Too many questions in a short time. Please wait a minute and try again.' });
 
-  // Log the question for analytics — fire-and-forget so it never adds latency.
-  Promise.resolve(supabaseAdmin.from('chat_logs').insert({ question, ip })).catch(() => {});
+  // Log the question (+ who asked, if signed in) — fire-and-forget so it never adds latency.
+  Promise.resolve(supabaseAdmin.from('chat_logs').insert({ question, ip, email: askerEmail || null })).catch(() => {});
 
   let chunks = [];
   try {
