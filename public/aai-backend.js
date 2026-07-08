@@ -156,11 +156,16 @@ const AAI = {
 
   // ---------- LEADS ----------
   async saveLead(data) {
-    await fetch("/api/lead", {
+    const r = await fetch("/api/lead", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(data)
     });
+    if (!r.ok) {
+      let j = {}; try { j = await r.json(); } catch (_) {}
+      throw new Error(j.error || ("lead save failed: " + r.status));
+    }
+    return r.json().catch(() => ({ ok: true }));
   },
   // ---------- ADMIN: read every captured lead from the database ----------
   async getLeads() {

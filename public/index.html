@@ -641,15 +641,16 @@
           <form id="leadForm">
             <h3>Request your free review</h3>
             <p class="s">A licensed professional will reach out. No obligation.</p>
-            <div class="fld"><label>Full name</label><input name="name" required placeholder="Jane Saver"></div>
+            <div class="fld"><label for="lf_name">Full name</label><input id="lf_name" name="name" required placeholder="Jane Saver"></div>
             <div class="fld two">
-              <div><label>Email</label><input name="email" type="email" required placeholder="jane@email.com"></div>
-              <div><label>Phone</label><input name="phone" type="tel" required placeholder="(555) 555-0123"></div>
+              <div><label for="lf_email">Email</label><input id="lf_email" name="email" type="email" required placeholder="jane@email.com"></div>
+              <div><label for="lf_phone">Phone</label><input id="lf_phone" name="phone" type="tel" required placeholder="(555) 555-0123"></div>
             </div>
-            <div class="fld"><label>Amount you're considering (optional)</label>
-              <select name="amount"><option value="">Prefer not to say</option><option>Under $50k</option><option>$50k–$150k</option><option>$150k–$500k</option><option>$500k+</option></select></div>
-            <div class="fld"><label>What can we help with? (optional)</label><textarea name="message" rows="2" placeholder="e.g. I'm 60 and want guaranteed income at 67…"></textarea></div>
+            <div class="fld"><label for="lf_amount">Amount you're considering (optional)</label>
+              <select id="lf_amount" name="amount"><option value="">Prefer not to say</option><option>Under $50k</option><option>$50k–$150k</option><option>$150k–$500k</option><option>$500k+</option></select></div>
+            <div class="fld"><label for="lf_message">What can we help with? (optional)</label><textarea id="lf_message" name="message" rows="2" placeholder="e.g. I'm 60 and want guaranteed income at 67…"></textarea></div>
             <button type="submit" class="btn btn-accent btn-lg" style="width:100%;justify-content:center">Request my free review →</button>
+            <div class="err" id="leadFormErr" role="alert" style="margin-top:10px"></div>
           </form>
           <div class="leadok" id="leadOk"><div class="big">✓</div><h3>Thank you.</h3><p class="s">Your request is in. A licensed professional will reach out shortly. Prefer to talk now? Call <b id="okPhone">(555) 555-0123</b>.</p></div>
         </div>
@@ -676,7 +677,7 @@
           <div class="emoji">📅</div><h3>Social Security Optimizer</h3><p>Compare claiming at 62, full retirement age, and 70 — and find your break-even.</p><span class="arrow">Open tool →</span></a>
       </div>
     </section>
-    <div class="ov" id="toolModal"><div class="sheet sm"><div class="sh-head"><h3 id="toolTitle">Tool</h3><button class="x" data-close aria-label="Close">✕</button></div><div class="sh-body" id="toolBody"></div></div></div>
+    <div class="ov" id="toolModal"><div class="sheet sm" role="dialog" aria-modal="true" aria-labelledby="toolTitle"><div class="sh-head"><h3 id="toolTitle">Tool</h3><button class="x" data-close aria-label="Close">✕</button></div><div class="sh-body" id="toolBody"></div></div></div>
 
     <footer>
       <div class="wrap foot">
@@ -710,7 +711,7 @@
 
 <!-- AUTH MODAL -->
 <div class="ov" id="authModal">
-  <div class="sheet sm">
+  <div class="sheet sm" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="sh-head"><h3 id="authTitle">Create your free account</h3><button class="x" data-close aria-label="Close">✕</button></div>
     <div class="sh-body">
       <div class="auth-btns">
@@ -724,7 +725,7 @@
 
 <!-- ACCOUNT MODAL -->
 <div class="ov" id="acctModal">
-  <div class="sheet">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="acctHi">
     <div class="sh-head"><h3 id="acctHi">Your account</h3><button class="x" data-close aria-label="Close">✕</button></div>
     <div class="sh-body">
       <div class="tabs">
@@ -743,7 +744,7 @@
 
 <!-- ADMIN MODAL -->
 <div class="ov" id="adminModal">
-  <div class="sheet">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
     <div class="sh-head"><h3 id="adminTitle">🔒 Admin</h3><button class="x" data-close aria-label="Close">✕</button></div>
     <div class="sh-body">
       <div id="adLogin" style="max-width:360px;margin:6px auto;text-align:center">
@@ -794,9 +795,9 @@
         </div>
         <div class="dpane" data-dpane="settings" style="display:none">
           <div class="hint">These power the “Book a Professional” buttons and resource links.</div>
-          <div class="grid2"><div class="fld"><label>Phone</label><input id="setPhone"></div><div class="fld"><label>Lead email</label><input id="setEmail"></div></div>
-          <div class="fld"><label>Booking link</label><input id="setBooking" placeholder="https://calendly.com/…"></div>
-          <div class="grid2"><div class="fld"><label>Book link</label><input id="setBook"></div><div class="fld"><label>University link</label><input id="setUni"></div></div>
+          <div class="grid2"><div class="fld"><label for="setPhone">Phone</label><input id="setPhone"></div><div class="fld"><label for="setEmail">Lead email</label><input id="setEmail"></div></div>
+          <div class="fld"><label for="setBooking">Booking link</label><input id="setBooking" placeholder="https://calendly.com/…"></div>
+          <div class="grid2"><div class="fld"><label for="setBook">Book link</label><input id="setBook"></div><div class="fld"><label for="setUni">University link</label><input id="setUni"></div></div>
           <div class="hint" style="margin-top:6px">🔒 Admin access is controlled by Google sign-in (authorized staff emails only) — there's no shared password to manage.</div>
           <div class="save-row"><button class="btn btn-accent" id="saveSetBtn">Save settings</button><span class="flash" id="setFlash">Saved ✓</span></div>
         </div>
@@ -807,11 +808,11 @@
 
 <!-- WELCOME / HOW IT WORKS POPUP -->
 <div class="ov" id="welcomeModal">
-  <div class="sheet sm">
+  <div class="sheet sm" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
     <div class="sh-body" style="padding:30px 28px 26px">
       <div class="welcome-head">
         <div class="w-orb"></div>
-        <h3>Get the most out of <span style="color:var(--gold)">AskAnnuityAI</span></h3>
+        <h3 id="welcomeTitle">Get the most out of <span style="color:var(--gold)">AskAnnuityAI</span></h3>
         <p>Four quick steps to smarter retirement answers.</p>
       </div>
       <div class="steps">
@@ -1157,9 +1158,16 @@ document.querySelectorAll('[data-atab]').forEach(t=>t.onclick=()=>{document.quer
 $('logoutBtn').onclick=()=>{localStorage.removeItem(LS.user);refreshAuthUI();$('acctModal').classList.remove('open');toast('Signed out');};
 
 /* ===================== LEAD FORM ===================== */
-$('leadForm').addEventListener('submit',e=>{e.preventDefault();const cfg=getCfg();const f=e.target;const d=Object.fromEntries(new FormData(f).entries());d.ts=new Date().toISOString();
-  try{AAI.saveLead({name:d.name,email:d.email,phone:d.phone,amount:d.amount,message:d.message,source:'Contact form'});}catch(_){}
-  f.style.display='none';$('leadOk').style.display='block';});
+$('leadForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;const btn=f.querySelector('button[type=submit]');if(btn&&btn.disabled)return;const err=$('leadFormErr');if(err)err.textContent='';
+  const d=Object.fromEntries(new FormData(f).entries());
+  if(btn){btn.dataset._t=btn.dataset._t||btn.textContent;btn.disabled=true;btn.textContent='Sending…';}
+  try{
+    await AAI.saveLead({name:d.name,email:d.email,phone:d.phone,amount:d.amount,message:d.message,source:'Contact form'});
+    f.style.display='none';$('leadOk').style.display='block';
+  }catch(_){
+    if(btn){btn.disabled=false;btn.textContent=btn.dataset._t||'Request my free review →';}
+    if(err)err.textContent='Sorry — that didn’t go through. Please try again, or call us directly.';
+  }});
 
 /* ===================== CONFIG -> UI ===================== */
 function applyCfg(){const c=getCfg();$('phoneLabel').textContent=c.phone;$('okPhone').textContent=c.phone;$('callLink').href='tel:'+c.phoneRaw;
@@ -1182,8 +1190,8 @@ function registerLearnerLead(u){const leads=J(LS.leads,[]);
 $('welcomeGoogle').onclick=()=>{localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
 $('welcomeSkip').onclick=()=>{$('welcomeModal').classList.remove('open');S(LS.welcomed,1);};
 $('welcomeModal').addEventListener('click',e=>{if(e.target===$('welcomeModal'))S(LS.welcomed,1);});
-/* Show the 4-step welcome popup on every visit while signed OUT; never once signed in. */
-if(!getUser())setTimeout(()=>{if(!getUser()&&!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);
+/* Show the 4-step welcome popup once for signed-OUT visitors; never after it's been dismissed or once signed in. */
+if(!getUser()&&!J(LS.welcomed,0))setTimeout(()=>{if(!getUser()&&!J(LS.welcomed,0)&&!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);
 
 /* ===================== THEME ===================== */
 const themeBtn=$('themeBtn');
@@ -1197,6 +1205,17 @@ const hdr=$('hdr');addEventListener('scroll',()=>{hdr.classList.toggle('scrolled
 /* ===================== MODALS ===================== */
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.ov').classList.remove('open'));
 document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+/* Accessibility: move focus into a dialog on open, trap Tab inside it, restore focus on close. */
+(function(){let lastFocus=null;
+  const foc=box=>[...box.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);
+  const obs=new MutationObserver(ms=>ms.forEach(m=>{const o=m.target;if(!o.classList||!o.classList.contains('ov'))return;const open=o.classList.contains('open');
+    if(open&&!o.dataset._open){o.dataset._open='1';lastFocus=document.activeElement;const f=foc(o.querySelector('.sheet')||o);if(f.length)setTimeout(()=>{try{f[0].focus();}catch(_){}},30);}
+    else if(!open&&o.dataset._open){delete o.dataset._open;if(lastFocus&&lastFocus.focus){try{lastFocus.focus();}catch(_){}}}
+  }));
+  document.querySelectorAll('.ov').forEach(o=>obs.observe(o,{attributes:true,attributeFilter:['class']}));
+  document.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const o=document.querySelector('.ov.open');if(!o)return;const f=foc(o.querySelector('.sheet')||o);if(!f.length)return;const a=f[0],z=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}});
+})();
 
 /* ===================== FREE INTERACTIVE TOOLS ===================== */
 function _money(n){return '$'+Math.round(n).toLocaleString();}
