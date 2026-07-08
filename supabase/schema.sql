@@ -142,8 +142,13 @@ create table if not exists public.chat_logs (
   id bigint generated always as identity primary key,
   question text not null,
   ip text,
+  email text,                        -- who asked, if signed in with Google
+  answer text,                       -- the answer the AI actually gave (filled in after streaming)
   created_at timestamptz not null default now()
 );
+-- If upgrading an existing install, add the newer columns:
+alter table public.chat_logs add column if not exists email text;
+alter table public.chat_logs add column if not exists answer text;
 create index if not exists chat_logs_ip_created_idx on public.chat_logs (ip, created_at desc);
 create index if not exists chat_logs_created_idx on public.chat_logs (created_at desc);
 alter table public.chat_logs enable row level security;
