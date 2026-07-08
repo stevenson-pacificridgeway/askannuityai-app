@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       .sort((a, b) => b.count - a.count)
       .slice(0, 15);
 
-    const recent = (rows || []).slice(0, 25);
+    const recent = (rows || []).slice(0, 300);
     return res.status(200).json({ total: total || 0, top, recent });
   } catch (e) {
     return res.status(500).json({ error: String(e?.message || e) });
