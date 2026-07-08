@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     // Pull the most recent questions to tally the top asks.
     const { data: rows, error } = await supabaseAdmin
       .from('chat_logs')
-      .select('question, email, created_at')
+      .select('question, email, answer, created_at')
       .order('created_at', { ascending: false })
       .limit(2000);
     if (error) throw error;

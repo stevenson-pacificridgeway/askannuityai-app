@@ -22,6 +22,15 @@ export async function embed(text) {
   return r.data[0].embedding;
 }
 
+// Embed many texts in ONE API call (used by ingest for speed + to beat the 60s function limit).
+export async function embedMany(texts) {
+  const r = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: texts.map(t => String(t).slice(0, 8000))
+  });
+  return r.data.map(d => d.embedding);
+}
+
 // Is this email allowed into the admin console?
 export function isAdmin(email) {
   return (process.env.ADMIN_EMAILS || '')
@@ -51,5 +60,5 @@ export async function readJson(req) {
 export function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'authorization, content-type');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 }

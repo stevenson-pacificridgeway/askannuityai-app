@@ -2,7 +2,7 @@
 //   { path: "uploads/brochure.pdf" }      -> downloads from Storage, extracts text
 //   OR { title, text, source }            -> ingests pasted text directly
 // Chunks the text, embeds each chunk, and stores it as the AI's knowledge.
-import { supabaseAdmin, embed, isAdmin, getUserFromReq, readJson, cors } from './_lib.js';
+import { supabaseAdmin, embedMany, isAdmin, getUserFromReq, readJson, cors } from './_lib.js';
 import pdf from 'pdf-parse';
 import mammoth from 'mammoth';
 
@@ -50,12 +50,17 @@ export default async function handler(req, res) {
 
     const chunks = chunkText(text);
     let n = 0;
-    for (const c of chunks) {
-      const v = await embed(c);
-      const { error } = await supabaseAdmin.from('doc_chunks')
-        .insert({ document_id: doc.id, content: c, source, embedding: v });
-      if (!error) n++;
+    // Embed + insert in batches so large documents finish well within the 60s limit.
+    const BATCH = 64;
+    for (let i = 0; i < chunks.length; i += BATCH) {
+      const slice = chunks.slice(i, i + BATCH);
+      const vecs = await embedMany(slice);
+      const rows = slice.map((c, j) => ({ document_id: doc.id, content: c, source, embedding: vecs[j] }));
+      const { error } = await supabaseAdmin.from('doc_chunks').insert(rows);
+      if (!error) n += rows.length;
     }
+    // Nothing stored? Roll back the empty document row so it doesn't linger.
+    if (n === 0) { try { await supabaseAdmin.from('documents').delete().eq('id', doc.id); } catch (_) {} }
 
     res.status(200).json({ ok: true, document_id: doc.id, title, chunks: n });
   } catch (e) {

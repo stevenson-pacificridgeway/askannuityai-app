@@ -74,8 +74,15 @@ export default async function handler(req, res) {
   }
   if (over) return res.status(429).json({ error: 'Too many questions in a short time. Please wait a minute and try again.' });
 
-  // Log the question (+ who asked, if signed in) — fire-and-forget so it never adds latency.
-  Promise.resolve(supabaseAdmin.from('chat_logs').insert({ question, ip, email: askerEmail || null })).catch(() => {});
+  // Reserve a log row NOW (answer filled in after streaming). This makes the request
+  // immediately visible to the rate limiter, so concurrent bursts from one IP can't all
+  // slip through by racing the end-of-stream insert.
+  let logId = null;
+  try {
+    const { data: ins } = await supabaseAdmin
+      .from('chat_logs').insert({ question, ip, email: askerEmail || null }).select('id').single();
+    logId = ins?.id ?? null;
+  } catch (_) { /* logging is best-effort; never block the answer */ }
 
   let chunks = [];
   try {
@@ -119,6 +126,7 @@ export default async function handler(req, res) {
   res.setHeader('X-Accel-Buffering', 'no'); // ask proxies not to buffer
   res.write(JSON.stringify({ sources }) + '\n'); // first line = metadata (sources known before generation)
 
+  let answerText = '';
   try {
     const stream = anthropic.messages.stream({
       model: 'claude-sonnet-4-6', // keep Sonnet for answer quality; streaming makes it feel instant
@@ -128,13 +136,21 @@ export default async function handler(req, res) {
     });
     for await (const event of stream) {
       if (event.type === 'content_block_delta' && event.delta && event.delta.type === 'text_delta') {
-        res.write(event.delta.text);
+        const t = event.delta.text;
+        answerText += t;
+        res.write(t);
         if (typeof res.flush === 'function') res.flush();
       }
     }
-    res.end();
   } catch (e) {
     try { res.write('\n\nSorry — the assistant was interrupted. Please try again.'); } catch (_) {}
-    res.end();
   }
+  // Log the question + the answer the AI actually gave (+ who asked, if signed in).
+  // Tokens are already delivered, so this adds no perceptible latency.
+  const cleanAnswer = answerText.replace(/\n*(SOURCES:|FOLLOWUPS:)[\s\S]*$/i, '').trim().slice(0, 8000);
+  try {
+    if (logId) await supabaseAdmin.from('chat_logs').update({ answer: cleanAnswer || null }).eq('id', logId);
+    else await supabaseAdmin.from('chat_logs').insert({ question, ip, email: askerEmail || null, answer: cleanAnswer || null });
+  } catch (_) {}
+  res.end();
 }
