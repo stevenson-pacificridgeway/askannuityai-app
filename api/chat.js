@@ -67,8 +67,9 @@ function baseIncomePer100k(age) {
   }
   return anchors[anchors.length - 1][1];
 }
-function midlandEstimate(age, amount, targetAge) {
-  const per100 = baseIncomePer100k(age);
+function midlandEstimate(age, amount, targetAge, joint) {
+  // Joint-life (based on the younger person) runs ~90.5% of single life on Midland's calculator.
+  const per100 = baseIncomePer100k(age) * (joint ? 0.905 : 1);
   const units = amount / 100000;
   const defYears = Math.max(0, Math.min(10, (targetAge || age) - age));
   const round100 = n => Math.round(n / 100) * 100;
@@ -107,17 +108,24 @@ function parseTargetAge(text, curAge) {
 // Build a "use these numbers" directive if the question is an income question with an age + amount.
 function incomeEstimateDirective(question) {
   try {
-    const amt = parseMoney(question), age = parseAge(question);
+    const amt = parseMoney(question);
     const incomeish = /(income|paycheck|401\s*\(?k\)?|\bira\b|roll\s* ?over|retire|nest egg|savings|turn .* into|guaranteed)/i.test(question);
-    if (!amt || !age || !incomeish || age < 50 || age > 85) return '';
+    if (!amt || !incomeish) return '';
+    // Detect a couple / joint case; joint payouts are based on the YOUNGER person's age.
+    const joint = /\b(joint|couple|married|spouse|my (?:wife|husband|partner)|our (?:savings|money|nest egg|retirement|401|ira)|both of us|we(?:'re| are| both)?)\b/i.test(question);
+    const ages = [...question.toLowerCase().matchAll(/\b(\d{2})\b/g)].map(x => +x[1]).filter(a => a >= 45 && a <= 85);
+    let age = parseAge(question);
+    if (joint && ages.length) age = Math.min(...ages);
+    if (!age || age < 50 || age > 85) return '';
     const tgt = parseTargetAge(question, age) || (age + 5);
-    const e = midlandEstimate(age, amt, tgt);
+    const e = midlandEstimate(age, amt, tgt, joint);
     const fmt = n => '$' + n.toLocaleString('en-US');
+    const kind = joint ? 'joint-life (based on the younger person)' : 'single-life';
     return `\n\nINCOME ESTIMATE — use these figures (rounded) as an ESTIMATE, not a quote:\n`
-      + `Source: Midland National's public MNL Income Planning Annuity calculator (single life, guaranteed lifetime withdrawal benefit). `
+      + `Source: Midland National's public MNL Income Planning Annuity calculator (${kind}, guaranteed lifetime withdrawal benefit). `
       + `About ${fmt(amt)} at age ${age} could produce roughly ${fmt(e.immediate)} per year of guaranteed lifetime income starting now, `
       + `or about ${fmt(e.deferred)} per year if they wait until age ${e.targetAge} (${e.defYears} years). `
-      + `Say they'd roll the money into the annuity, give both numbers as rough single-life estimates, and note the exact figure comes from a licensed illustration. Never call it a guaranteed quote.`;
+      + `Say they'd roll the money into the annuity, give both numbers as rough ${kind} estimates, and note the exact figure comes from a licensed illustration. Never call it a guaranteed quote.`;
   } catch (_) { return ''; }
 }
 // ---------------------------------------------------------------------------
