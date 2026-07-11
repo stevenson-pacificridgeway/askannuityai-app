@@ -88,6 +88,25 @@
   .spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
   .ghost .spin{border-color:rgba(8,43,99,.25);border-top-color:var(--navy)}
   @keyframes sp{to{transform:rotate(360deg)}}
+  /* live activity strip */
+  .live-strip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 18px;margin:4px 0 16px;box-shadow:0 4px 16px rgba(8,43,99,.05)}
+  .live-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .live-badge{display:inline-flex;align-items:center;gap:7px;background:#0f172a;color:#fff;font-size:11px;font-weight:800;letter-spacing:.7px;padding:4px 11px;border-radius:20px}
+  .pulse{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.65)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  .live-status{font-weight:700;font-size:14.5px;color:var(--navy)}
+  .live-status.hot{color:#0f9d58}
+  .live-status.cold{color:var(--muted);font-weight:600}
+  .live-hint{font-size:12px;color:var(--faint)}
+  .live-sp{flex:1}
+  .live-bottom{display:flex;align-items:flex-end;gap:26px;margin-top:14px;flex-wrap:wrap}
+  .live-metrics{display:flex;gap:26px}
+  .lm b{font-size:22px;font-weight:800;color:var(--navy);line-height:1}
+  .lm span{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
+  .spark{flex:1;display:flex;align-items:flex-end;gap:2px;height:44px;min-width:200px}
+  .spark .bar{flex:1;background:linear-gradient(var(--navy2),var(--navy));border-radius:2px 2px 0 0;min-height:2px;opacity:.9;transition:height .3s}
+  .spark .bar.now{background:linear-gradient(#22c55e,#0f9d58)}
+  .spark-cap{font-size:10.5px;color:var(--faint);white-space:nowrap;align-self:center}
   .hidden{display:none!important}
   @media(max-width:720px){.cards{grid-template-columns:repeat(2,1fr)}header.top .who{display:none}}
 </style>
@@ -115,6 +134,23 @@
 
 <!-- BOARD -->
 <main id="board" class="hidden">
+  <div class="live-strip">
+    <div class="live-top">
+      <span class="live-badge"><span class="pulse"></span> LIVE</span>
+      <span class="live-status cold" id="actStatus">Checking…</span>
+      <span class="live-sp"></span>
+      <span class="live-hint" id="actHint">Auto-updates every 15 seconds</span>
+    </div>
+    <div class="live-bottom">
+      <div class="live-metrics">
+        <div class="lm"><b id="actHour">0</b><span>in the last hour</span></div>
+        <div class="lm"><b id="actToday">0</b><span>in the last 24 hours</span></div>
+        <div class="lm"><b id="actLast">—</b><span>most recent question</span></div>
+      </div>
+      <span class="spark-cap">questions / hour, last 24h →</span>
+      <div class="spark" id="spark" title="Questions per hour over the last 24 hours"></div>
+    </div>
+  </div>
   <div class="cards">
     <div class="card accent"><b id="stTotal">—</b><span>Questions asked (all time)</span></div>
     <div class="card"><b id="stAnswered">—</b><span>Replies recorded</span></div>
@@ -170,6 +206,9 @@ function relTime(iso){
 function absTime(iso){ return iso ? new Date(iso).toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT' : ''; }
 
 let STATE = { recent:[], leads:[], total:0 };
+let AUTO = null;        // auto-refresh timer
+let LASTSIG = '';       // signature of last data, so we only redraw the feed when it actually changes
+const REFRESH_MS = 15000;
 
 // ---------- rendering ----------
 function renderStats(){
@@ -181,6 +220,28 @@ function renderStats(){
   $('stLeads').textContent = STATE.leads.length.toLocaleString();
   $('qaCount').textContent = STATE.recent.length;
   $('leadCount').textContent = STATE.leads.length;
+}
+
+function renderActivity(){
+  const now=Date.now();
+  const times=STATE.recent.map(r=>new Date(r.created_at).getTime()).filter(t=>!isNaN(t));
+  const last=times.length?Math.max(...times):null;
+  const active=last && (now-last < 3*60000);            // a question in the last 3 minutes = "chatting now"
+  const st=$('actStatus');
+  if(!times.length){ st.textContent='No questions yet'; st.className='live-status cold'; }
+  else if(active){ st.textContent='🟢 Someone is talking to the AI right now'; st.className='live-status hot'; }
+  else { st.textContent='Quiet right now — no one chatting this moment'; st.className='live-status cold'; }
+  $('actLast').textContent = last ? relTime(new Date(last).toISOString()) : '—';
+  $('actHour').textContent = times.filter(t=>now-t < 3600000).length;
+  $('actToday').textContent = times.filter(t=>now-t < 86400000).length;
+  // 24-hour sparkline (bucket by hour; rightmost bar = current hour)
+  const b=new Array(24).fill(0);
+  times.forEach(t=>{ const h=Math.floor((now-t)/3600000); if(h>=0 && h<24) b[23-h]++; });
+  const max=Math.max(1,...b);
+  $('spark').innerHTML=b.map((c,i)=>{
+    const pct=Math.round((c/max)*100);
+    return '<div class="bar'+(i===23?' now':'')+'" style="height:'+(c?Math.max(10,pct):3)+'%" title="'+c+' question'+(c===1?'':'s')+'"></div>';
+  }).join('');
 }
 
 function renderFeed(filter){
@@ -246,7 +307,12 @@ async function load(){
     STATE.total = stats.total||0;
     STATE.recent = Array.isArray(stats.recent)?stats.recent:[];
     STATE.leads = Array.isArray(leads)?leads:[];
-    renderStats(); renderFeed($('qaSearch').value); renderLeads($('leadSearch').value);
+    // Always refresh the cheap, time-sensitive bits (stats + live strip).
+    renderStats(); renderActivity();
+    // Only redraw the feed/leads when the data actually changed, so a poll doesn't
+    // collapse an answer you're mid-read or jump your scroll position.
+    const sig = STATE.recent.length+'|'+(STATE.recent[0]?STATE.recent[0].created_at:'')+'|'+STATE.leads.length+'|'+(STATE.leads[0]?(STATE.leads[0].created_at||STATE.leads[0].ts):'');
+    if(sig!==LASTSIG){ renderFeed($('qaSearch').value); renderLeads($('leadSearch').value); LASTSIG=sig; }
     $('updated').textContent = 'Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   }catch(e){
     $('feed').innerHTML = '<div class="empty">Could not load data. Please refresh, or sign out and back in.<br><small>'+esc(String(e.message||e))+'</small></div>';
@@ -261,8 +327,11 @@ function showBoard(user){
   $('refreshBtn').style.display='';
   $('signoutBtn').style.display='';
   load();
+  if(!AUTO) AUTO=setInterval(load, REFRESH_MS);   // keep the dashboard live
 }
 function showGate(msg){
+  if(AUTO){ clearInterval(AUTO); AUTO=null; }   // stop polling when signed out
+  LASTSIG='';
   $('board').classList.add('hidden');
   $('gate').classList.remove('hidden');
   $('refreshBtn').style.display='none';
