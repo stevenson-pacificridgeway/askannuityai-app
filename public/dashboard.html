@@ -48,6 +48,11 @@
   .card.accent{background:linear-gradient(135deg,var(--navy),var(--navy2));border:0}
   .card.accent b,.card.accent span{color:#fff}
   .card.accent span{color:#c7d6ef}
+  .card.clickable{cursor:pointer;transition:transform .12s,box-shadow .12s}
+  .card.clickable:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(8,43,99,.14)}
+  .card.clickable:after{content:"View ›";display:block;font-size:11px;font-weight:600;color:var(--gold);margin-top:8px;opacity:.85}
+  .card.accent.clickable:after{color:#f0d79a}
+  .card.sel{outline:2px solid var(--gold);outline-offset:2px}
   /* tabs */
   .tabs{display:flex;gap:6px;margin:0 0 14px;border-bottom:1px solid var(--line)}
   .tab{background:none;border:0;padding:11px 16px;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px}
@@ -152,10 +157,10 @@
     </div>
   </div>
   <div class="cards">
-    <div class="card accent"><b id="stTotal">—</b><span>Questions asked (all time)</span></div>
-    <div class="card"><b id="stAnswered">—</b><span>Replies recorded</span></div>
-    <div class="card"><b id="stAskers">—</b><span>Signed-in askers</span></div>
-    <div class="card"><b id="stLeads">—</b><span>Leads captured</span></div>
+    <div class="card accent clickable" id="cardTotal"><b id="stTotal">—</b><span>Questions asked (all time)</span></div>
+    <div class="card clickable" id="cardAnswered"><b id="stAnswered">—</b><span>Replies recorded</span></div>
+    <div class="card clickable" id="cardAskers"><b id="stAskers">—</b><span>Signed-in askers</span></div>
+    <div class="card clickable" id="cardLeads"><b id="stLeads">—</b><span>Leads captured</span></div>
   </div>
 
   <div class="tabs">
@@ -208,6 +213,7 @@ function absTime(iso){ return iso ? new Date(iso).toLocaleString('en-US',{timeZo
 let STATE = { recent:[], leads:[], total:0 };
 let AUTO = null;        // auto-refresh timer
 let LASTSIG = '';       // signature of last data, so we only redraw the feed when it actually changes
+let feedMode = 'all';   // 'all' | 'answered' | 'signedin' — set by clicking a stat card
 const REFRESH_MS = 15000;
 
 // ---------- rendering ----------
@@ -248,10 +254,12 @@ function renderFeed(filter){
   const q = (filter||'').trim().toLowerCase();
   const box = $('feed');
   const rows = STATE.recent.filter(r=>{
+    if(feedMode==='answered' && !(r.answer && r.answer.trim())) return false;
+    if(feedMode==='signedin' && !r.email) return false;
     if(!q) return true;
     return (r.question||'').toLowerCase().includes(q) || (r.answer||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q);
   });
-  if(!rows.length){ box.innerHTML = '<div class="empty">'+(q?'No questions match "'+esc(filter)+'".':'No questions yet.')+'</div>'; return; }
+  if(!rows.length){ box.innerHTML = '<div class="empty">'+((q||feedMode!=='all')?'Nothing matches this filter.':'No questions yet.')+'</div>'; return; }
   box.innerHTML = rows.map((r,i)=>{
     const who = r.email
       ? '<span class="chip who">👤 '+esc(r.email)+'</span>'
@@ -340,12 +348,22 @@ function showGate(msg){
   if(msg) $('gateErr').textContent = msg;
 }
 
-// tab switching
+// tab + card navigation
+function activateTab(name){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===name));
+  document.querySelectorAll('[data-pane]').forEach(p=>p.classList.toggle('hidden', p.dataset.pane!==name));
+}
+function selCard(id){ document.querySelectorAll('.card.clickable').forEach(c=>c.classList.toggle('sel', c.id===id)); }
+// Clicking a tab header resets any card filter and shows everything on that tab.
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');
-  document.querySelectorAll('[data-pane]').forEach(p=>p.classList.toggle('hidden', p.dataset.pane!==t.dataset.tab));
+  activateTab(t.dataset.tab);
+  feedMode='all'; selCard(null); renderFeed($('qaSearch').value);
 });
+// Clicking a stat card jumps to the right tab and filters accordingly.
+$('cardTotal').onclick    = ()=>{ feedMode='all';      selCard('cardTotal');    activateTab('qa'); renderFeed($('qaSearch').value); };
+$('cardAnswered').onclick = ()=>{ feedMode='answered'; selCard('cardAnswered'); activateTab('qa'); renderFeed($('qaSearch').value); };
+$('cardAskers').onclick   = ()=>{ feedMode='signedin'; selCard('cardAskers');   activateTab('qa'); renderFeed($('qaSearch').value); };
+$('cardLeads').onclick    = ()=>{ feedMode='all';      selCard('cardLeads');     activateTab('leads'); };
 $('qaSearch') && ($('qaSearch').oninput = e=>renderFeed(e.target.value));
 $('leadSearch') && ($('leadSearch').oninput = e=>renderLeads(e.target.value));
 $('refreshBtn').onclick = load;
