@@ -13,7 +13,7 @@ HOW TO ANSWER — FIRST, JUDGE THE QUESTION TYPE:
 - If a provided source is not clearly relevant to THIS question, ignore it entirely and do not list it under SOURCES. Only cite sources you actually used.
 - For a short follow-up (e.g. "what about her?", "and if I wait?"), interpret it using the earlier conversation turns rather than treating it as a brand-new topic.
 - "Should I…" questions are NOT off-limits — answer them educationally and usefully, then add ONE brief closing line that their exact numbers should be confirmed with a licensed professional. The disclaimer is a closing note, never the opener and never the whole answer.
-- MONEY/INCOME questions (e.g. "I'm 62 with $300k, how do I turn it into guaranteed income?"): Keep it short and confident. Tell them the play in plain words — roll the old 401(k) or IRA over into a fixed indexed annuity with a guaranteed lifetime income rider, which turns their savings into a paycheck they can't outlive — and note that the longer they wait before switching the income on, the bigger that paycheck. Do NOT state specific dollar amounts, interest rates, or payout figures (you don't have live product numbers) — instead offer to have a licensed agent run their exact numbers. Two or three sentences, then the offer.
+- MONEY/INCOME questions (e.g. "I'm 62 with $300k, how do I turn it into guaranteed income?"): Keep it short and confident. Tell them the play in plain words — roll the old 401(k) or IRA over into a fixed indexed annuity with a guaranteed lifetime income rider, which turns their savings into a paycheck they can't outlive — and note that the longer they wait before switching the income on, the bigger that paycheck. If an "INCOME ESTIMATE" block appears below, USE those two dollar figures (income now vs. deferred) exactly as given, clearly framed as a rough single-life estimate, and close by offering to have a licensed agent run their exact numbers. If there is NO income-estimate block, do NOT invent any dollar amounts or rates — just describe the play and offer the exact numbers on a call. Two to four short sentences.
 
 WRITING STYLE — VERY IMPORTANT (BE BRIEF):
 - Keep answers SHORT — aim for 2 to 4 short sentences. Most people just want a quick, clear answer, not an essay. Never pad or over-explain.
@@ -52,6 +52,76 @@ async function overRateLimit(ip) {
   }
 }
 
+// ---- Midland income estimator ---------------------------------------------
+// Calibrated from Midland National's PUBLIC MNL Income Planning Annuity calculator
+// (single life, guaranteed lifetime withdrawal benefit), pulled July 2026:
+//   immediate income per $100k — age 60: $7,110 · 62: $7,320 · 65: $7,630 · 70: $8,150
+//   deferral grows the payout ~10% for each year you wait, up to 10 years (verified:
+//   60→70 predicted $18,441 vs calculator $18,450). These are ESTIMATES, not quotes.
+function baseIncomePer100k(age) {
+  const anchors = [[55, 6600], [60, 7110], [62, 7320], [65, 7630], [70, 8150], [75, 8670], [80, 9190]];
+  const a = Math.max(55, Math.min(80, age));
+  for (let i = 0; i < anchors.length - 1; i++) {
+    const [a0, v0] = anchors[i], [a1, v1] = anchors[i + 1];
+    if (a >= a0 && a <= a1) return v0 + (v1 - v0) * ((a - a0) / (a1 - a0));
+  }
+  return anchors[anchors.length - 1][1];
+}
+function midlandEstimate(age, amount, targetAge) {
+  const per100 = baseIncomePer100k(age);
+  const units = amount / 100000;
+  const defYears = Math.max(0, Math.min(10, (targetAge || age) - age));
+  const round100 = n => Math.round(n / 100) * 100;
+  return {
+    immediate: round100(units * per100),
+    deferred: round100(units * per100 * Math.pow(1.10, defYears)),
+    defYears, targetAge: targetAge || age
+  };
+}
+function parseMoney(text) {
+  const t = text.toLowerCase();
+  let m = t.match(/\$?\s*([\d.,]+)\s*(?:m|mm|million)\b/);
+  if (m) { const n = parseFloat(m[1].replace(/,/g, '')); if (n > 0 && n < 100) return Math.round(n * 1e6); }
+  m = t.match(/\$?\s*([\d.,]+)\s*(?:k|thousand)\b/);
+  if (m) { const n = parseFloat(m[1].replace(/,/g, '')); if (n > 0) return Math.round(n * 1e3); }
+  m = t.match(/\$\s*([\d,]{2,}(?:\.\d+)?)/) || t.match(/\b(\d{1,3},\d{3})\b/) || t.match(/\b(\d{5,8})\b/);
+  if (m) { const n = Math.round(parseFloat(m[1].replace(/,/g, ''))); if (n >= 10000 && n <= 1e8) return n; }
+  return null;
+}
+function parseAge(text) {
+  const t = text.toLowerCase();
+  let m = t.match(/\b(?:i['’]?m|i am|age|aged|turning)\s*(\d{2})\b/) ||
+          t.match(/\b(\d{2})\s*(?:years?\s*old|yo|-?year-?old|y\/o)\b/);
+  if (m) { const a = +m[1]; if (a >= 45 && a <= 85) return a; }
+  const nums = [...t.matchAll(/\b(\d{2})\b/g)].map(x => +x[1]).filter(a => a >= 45 && a <= 85);
+  return nums.length ? nums[0] : null;
+}
+function parseTargetAge(text, curAge) {
+  const t = text.toLowerCase();
+  let m = t.match(/\b(?:at|by|until|when i['’]?m|start(?:ing)? at)\s*(?:age\s*)?(\d{2})\b/);
+  if (m) { const a = +m[1]; if (a > curAge && a <= 85) return a; }
+  m = t.match(/\b(?:in|wait|after)\s*(\d{1,2})\s*years?\b/);
+  if (m) { const n = +m[1]; if (n > 0 && n <= 20) return curAge + n; }
+  return null;
+}
+// Build a "use these numbers" directive if the question is an income question with an age + amount.
+function incomeEstimateDirective(question) {
+  try {
+    const amt = parseMoney(question), age = parseAge(question);
+    const incomeish = /(income|paycheck|401\s*\(?k\)?|\bira\b|roll\s* ?over|retire|nest egg|savings|turn .* into|guaranteed)/i.test(question);
+    if (!amt || !age || !incomeish || age < 50 || age > 85) return '';
+    const tgt = parseTargetAge(question, age) || (age + 5);
+    const e = midlandEstimate(age, amt, tgt);
+    const fmt = n => '$' + n.toLocaleString('en-US');
+    return `\n\nINCOME ESTIMATE — use these figures (rounded) as an ESTIMATE, not a quote:\n`
+      + `Source: Midland National's public MNL Income Planning Annuity calculator (single life, guaranteed lifetime withdrawal benefit). `
+      + `About ${fmt(amt)} at age ${age} could produce roughly ${fmt(e.immediate)} per year of guaranteed lifetime income starting now, `
+      + `or about ${fmt(e.deferred)} per year if they wait until age ${e.targetAge} (${e.defYears} years). `
+      + `Say they'd roll the money into the annuity, give both numbers as rough single-life estimates, and note the exact figure comes from a licensed illustration. Never call it a guaranteed quote.`;
+  } catch (_) { return ''; }
+}
+// ---------------------------------------------------------------------------
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -65,6 +135,10 @@ export default async function handler(req, res) {
   const ip = clientIp(req);
   // If the visitor is signed in with Google, the front-end passes their email so we know WHO asked.
   const askerEmail = (body.email || '').toString().slice(0, 200).trim();
+
+  // If this is an income question with an age + dollar amount, compute real Midland estimates
+  // and hand them to the model so it can quote concrete numbers (as an estimate).
+  const systemFull = SYSTEM + incomeEstimateDirective(question);
 
   // --- Pre-work (JSON errors OK here, before we start streaming) ---
   // Rate-limit check and the question embedding are independent → run them together.
@@ -133,7 +207,7 @@ export default async function handler(req, res) {
     const stream = anthropic.messages.stream({
       model: 'claude-sonnet-4-6', // keep Sonnet for answer quality; streaming makes it feel instant
       max_tokens: 450, // short answers — a couple of sentences plus the SOURCES/FOLLOWUPS lines
-      system: SYSTEM,
+      system: systemFull,
       messages
     });
     for await (const event of stream) {
