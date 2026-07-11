@@ -1,6 +1,6 @@
 // POST /api/chat  { question }  ->  { answer, sources }
 // RAG: embed question -> find relevant chunks -> Claude answers from them, with citations.
-import { supabaseAdmin, anthropic, embed, readJson, cors } from './_lib.js';
+import { supabaseAdmin, anthropic, embed, readJson, cors, isAdmin, sendNotifyEmail } from './_lib.js';
 
 const SYSTEM = `You are AskAnnuityAI, a warm, calm, expert educational guide for retirement and annuity questions, representing Pacific Ridgeway and grounded in the work of Gregory Stevenson, author of "Indexed Annuity Secrets."
 
@@ -152,5 +152,24 @@ export default async function handler(req, res) {
     if (logId) await supabaseAdmin.from('chat_logs').update({ answer: cleanAnswer || null }).eq('id', logId);
     else await supabaseAdmin.from('chat_logs').insert({ question, ip, email: askerEmail || null, answer: cleanAnswer || null });
   } catch (_) {}
+
+  // Email a notification when a SIGNED-IN visitor asks (so you know who's engaging + what they asked).
+  // Skips anonymous visitors and your own admin accounts to keep the inbox useful. Best-effort, non-blocking.
+  if (askerEmail && !isAdmin(askerEmail)) {
+    const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const when = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+    const ans = cleanAnswer || '(the assistant did not return an answer)';
+    const html = `
+      <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:600px">
+        <h2 style="color:#082B63;margin:0 0 4px">New question on AskAnnuityAI</h2>
+        <p style="color:#64748b;margin:0 0 16px">${esc(askerEmail)} &middot; ${esc(when)} PT</p>
+        <p style="font-size:16px;color:#0f172a;margin:0 0 10px"><b>Q:</b> ${esc(question)}</p>
+        <div style="background:#f4f7fb;border-left:3px solid #D4A12B;padding:12px 14px;border-radius:6px;color:#28323f;font-size:14.5px;line-height:1.6;white-space:pre-wrap">${esc(ans)}</div>
+        <p style="margin:20px 0 0"><a href="https://askannuityai.com/dashboard" style="background:#082B63;color:#fff;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:8px;display:inline-block">Open the live dashboard</a></p>
+        <p style="color:#94a3b8;font-size:12px;margin:18px 0 0">You're getting this because a signed-in visitor asked a question. Reply to this email to reach them at ${esc(askerEmail)}.</p>
+      </div>`;
+    const text = `New question on AskAnnuityAI\n${askerEmail} · ${when} PT\n\nQ: ${question}\n\nA: ${ans}\n\nDashboard: https://askannuityai.com/dashboard`;
+    try { await sendNotifyEmail({ subject: `AskAnnuityAI — new question from ${askerEmail}`, html, text, replyTo: askerEmail }); } catch (_) {}
+  }
   res.end();
 }

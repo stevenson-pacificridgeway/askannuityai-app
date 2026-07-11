@@ -33,7 +33,7 @@ async function notifyNewLead(lead) {
   const text = `New lead from AskAnnuityAI\n${who} — ${lead.source || 'website'} · ${when} PT\n\n`
     + ['name', 'email', 'phone', 'amount', 'source', 'message']
         .filter(k => lead[k]).map(k => `${k}: ${lead[k]}`).join('\n');
-  const subject = `New lead: ${who}${lead.source ? ' (' + lead.source + ')' : ''}`;
+  const subject = `AskAnnuityAI — new lead: ${who}${lead.source ? ' (' + lead.source + ')' : ''}`;
 
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 6000);

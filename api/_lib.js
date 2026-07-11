@@ -62,3 +62,27 @@ export function cors(res) {
   res.setHeader('Access-Control-Allow-Headers', 'authorization, content-type');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 }
+
+// Send a notification email via Resend. Best-effort: no-ops without a key, never throws.
+// Recipient defaults to the Resend account email (free tier only delivers there until a domain is verified).
+export async function sendNotifyEmail({ subject, html, text, replyTo }) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return false;
+  const to = process.env.LEAD_NOTIFY_EMAIL || 'stevenson@pacificridgewayinsurance.com';
+  const from = process.env.LEAD_NOTIFY_FROM || 'AskAnnuityAI <onboarding@resend.dev>';
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + key, 'content-type': 'application/json' },
+      body: JSON.stringify({ from, to, subject, html, text, reply_to: replyTo || undefined }),
+      signal: ctrl.signal
+    });
+    return r.ok;
+  } catch (_) {
+    return false;
+  } finally {
+    clearTimeout(t);
+  }
+}
