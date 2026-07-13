@@ -582,12 +582,12 @@
         <span class="core"></span><span class="sheen"></span><span class="spark"></span>
       </div>
       <div class="eyebrow">Unbiased · AI-powered · <b>Always free</b></div>
-      <h1>Ask anything about<br>retirement &amp; <em>annuities</em>.</h1>
-      <p class="lede">Clear, calm, jargon-free answers — instantly. The smartest way to understand your retirement income, with a licensed professional whenever you want one.</p>
+      <h1>Ask Oscar anything about<br>retirement &amp; <em>annuities</em>.</h1>
+      <p class="lede">Oscar, your retirement AI, gives clear, calm, jargon-free answers — instantly. The smartest way to understand your retirement income, with a licensed professional whenever you want one.</p>
 
       <div class="askbox">
         <div class="askwrap">
-          <textarea id="heroInput" rows="1" placeholder="Ask me anything about retirement…" aria-label="Ask a retirement or annuity question"></textarea>
+          <textarea id="heroInput" rows="1" placeholder="Ask Oscar anything about retirement…" aria-label="Ask Oscar a retirement or annuity question"></textarea>
           <button class="micbtn" id="heroMic" title="Speak your question" type="button" aria-label="Speak your question"><svg><use href="#mic"/></svg></button>
           <button class="sendbtn" id="heroSend" title="Ask" aria-label="Send question" disabled><svg><use href="#send"/></svg></button>
         </div>
@@ -696,11 +696,11 @@
   <!-- CHAT MODE -->
   <div class="chatpane">
     <div class="chatscroll" id="chatscroll">
-      <div class="chatscroll-inner" id="msgs" role="log" aria-live="polite" aria-atomic="false" aria-label="Conversation with AskAnnuityAI"></div>
+      <div class="chatscroll-inner" id="msgs" role="log" aria-live="polite" aria-atomic="false" aria-label="Conversation with Oscar"></div>
     </div>
     <div class="composerbar">
       <div class="composer">
-        <textarea id="chatInput" rows="1" placeholder="Ask a follow-up…" aria-label="Ask a follow-up question"></textarea>
+        <textarea id="chatInput" rows="1" placeholder="Ask Oscar a follow-up…" aria-label="Ask Oscar a follow-up question"></textarea>
         <button class="micbtn" id="chatMic" title="Speak your question" type="button" aria-label="Speak your question"><svg><use href="#mic"/></svg></button>
         <button class="sendbtn" id="chatSend" title="Send" aria-label="Send message"><svg><use href="#send"/></svg></button>
       </div>
@@ -938,7 +938,7 @@ const FOUNDATION_DOCS=[
  {title:"Annuity Glossary",key:"glossary, terms, definitions"}
 ];
 
-function botAvatar(){return '<div class="avatar"><svg><use href="#mtn"/></svg></div>';}
+function botAvatar(){return '<div class="avatar" title="Oscar" aria-label="Oscar"><svg><use href="#mtn"/></svg></div>';}
 function scrollBottom(){chatscroll.scrollTop=chatscroll.scrollHeight;}
 
 function fmtFull(text){let t=text.replace(/&/g,'&amp;').replace(/</g,'&lt;');t=t.replace(/\b([A-Z]{3,})\b/g,'<strong>$1</strong>');
