@@ -1478,7 +1478,7 @@ async function openLeadConvo(email,name){
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   $('toolTitle').textContent=(name||email||'Lead')+' — conversation';
   $('toolBody').innerHTML='<div class="empty">Loading…</div>';
-  $('toolModal').classList.add('open');
+  const _tm=$('toolModal');_tm.style.zIndex='200';_tm.classList.add('open');
   if(!email){$('toolBody').innerHTML='<div class="empty" style="padding:24px 8px">No email on this lead, so there is no conversation to show.</div>';return;}
   let s;try{s=await AAI.getStats();}catch(e){$('toolBody').innerHTML='<div class="empty" style="padding:24px 8px">Couldn’t load the conversation — make sure you’re signed in with your admin Google account.</div>';return;}
   const rows=(s.recent||[]).filter(r=>(r.email||'').toLowerCase()===email.toLowerCase()).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
