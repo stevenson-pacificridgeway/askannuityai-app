@@ -1406,7 +1406,7 @@ document.querySelectorAll('.rcard.tool').forEach(c=>c.onclick=e=>{e.preventDefau
 /* ===================== ADMIN ===================== */
 /* Admin UI is gated by the signed-in Google account. This is a UI gate only —
    the real security is server-side (isAdmin(email) + Bearer token) in /api/*. */
-const ADMIN_EMAILS=['stevenson@pacificridgewayinsurance.com','gregorystevenson@indexedannuitysecrets.com'];
+const ADMIN_EMAILS=['stevenson@pacificridgewayinsurance.com','gregorystevenson@indexedannuitysecrets.com','stevenson.gregory95@gmail.com'];
 function clientIsAdmin(){const u=getUser();return !!(u&&u.email&&ADMIN_EMAILS.includes(u.email.toLowerCase()));}
 function openAdmin(){
   $('adminModal').classList.add('open');
