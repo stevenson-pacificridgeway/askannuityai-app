@@ -1129,6 +1129,8 @@ function dueForPro(){
 
 function send(q){
   q=(q||'').trim();if(!q||streaming)return;
+  // Require a free Google sign-in before asking Oscar (also captures who's asking).
+  if(!getUser()){try{localStorage.setItem('aai_pending_q',q);}catch(_){}const wm=$('welcomeModal');if(wm)wm.classList.remove('open');openAuth('Sign in to ask Oscar');return;}
   asked.add(q.toLowerCase());logStat(q);exchanges++;
   if(!msgsEl.children.length){const g=el('div','msg ai');g.innerHTML=`${botAvatar()}<div class="content"><div class="text">Hi — I'm Oscar, your retirement guide. I keep things simple and in plain English. Ask me anything about retirement, income, or annuities.</div></div>`;msgsEl.appendChild(g);}
   addUser(q);
@@ -1301,7 +1303,7 @@ function applyCfg(){const c=getCfg();$('phoneLabel').textContent=c.phone;$('okPh
   $('bookLink').href=c.booking;$('cardBook').href=c.bookLink;$('cardUni').href=c.uniLink;$('yr').textContent=new Date().getFullYear();
   $('bookNav').onclick=()=>{document.body.classList.remove('chatting');location.hash='#talk';};}
 applyCfg();refreshAuthUI();if(getUser()&&innerWidth>=1024)openSidebar();
-window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});mergeRemoteHistory(u);if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}}});});
+window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});mergeRemoteHistory(u);const _pq=localStorage.getItem('aai_pending_q');if(_pq){localStorage.removeItem('aai_pending_q');const am=$('authModal');if(am)am.classList.remove('open');setTimeout(()=>send(_pq),350);}if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}}});});
 
 /* ---- mobile "use desktop" banner ---- */
 (function(){var b=$('mdb');if(!b)return;
