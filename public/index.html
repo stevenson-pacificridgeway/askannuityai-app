@@ -1226,7 +1226,7 @@ function toggleSidebar(){document.body.classList.contains('sidebar-open')?closeS
 $('sbToggle').onclick=toggleSidebar;$('sbClose').onclick=closeSidebar;$('sbBackdrop').onclick=closeSidebar;
 $('sbNew').onclick=()=>{newChat();if(innerWidth<1024)closeSidebar();};
 $('sbSearch').addEventListener('input',e=>renderSidebar(e.target.value));
-$('sbSignout').onclick=()=>{localStorage.removeItem(LS.user);refreshAuthUI();toast('Signed out');};
+$('sbSignout').onclick=async()=>{try{await AAI.signOut();}catch(_){}localStorage.removeItem(LS.user);localStorage.removeItem('aai_pending_q');refreshAuthUI();toast('Signed out');};
 $('sbFavBtn').onclick=()=>{openAcct();const t=document.querySelector('[data-atab="favs"]');if(t)t.click();};
 function renderSidebar(f){const u=getUser();if(!u)return;
   const list=(J(LS.convos,{})[u.email]||[]);const ff=(f||'').toLowerCase();const box=$('sbHistory');box.innerHTML='';
@@ -1266,7 +1266,7 @@ function loadConvo(c){msgsEl.innerHTML='';currentConvo=[];convoId=c.id;document.
 function saveFav(text,source){const u=getUser();if(!u){openAuth('Sign in to save');return;}const favs=J(LS.favs,{});const list=favs[u.email]||[];list.unshift({text,source,ts:new Date().toISOString()});favs[u.email]=list;S(LS.favs,favs);toast('Saved to favorites');}
 function renderFavs(){const u=getUser();const favs=(J(LS.favs,{})[u.email]||[]);const box=$('favList');box.innerHTML='';if(!favs.length){box.innerHTML='<div class="empty"><div class="e">⭐</div>Tap “Save” on any answer to keep it here.</div>';return;}favs.forEach(f=>{const d=el('div','row');d.innerHTML=`${f.text.slice(0,260).replace(/</g,'&lt;')}${f.text.length>260?'…':''}${f.source?`<div class="meta">📎 ${_escHTML(f.source)}</div>`:''}`;box.appendChild(d);});}
 document.querySelectorAll('[data-atab]').forEach(t=>t.onclick=()=>{document.querySelectorAll('[data-atab]').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelectorAll('.apane').forEach(p=>p.style.display='none');document.querySelector(`[data-apane="${t.dataset.atab}"]`).style.display='block';});
-$('logoutBtn').onclick=()=>{localStorage.removeItem(LS.user);refreshAuthUI();$('acctModal').classList.remove('open');toast('Signed out');};
+$('logoutBtn').onclick=async()=>{try{await AAI.signOut();}catch(_){}localStorage.removeItem(LS.user);localStorage.removeItem('aai_pending_q');refreshAuthUI();$('acctModal').classList.remove('open');toast('Signed out');};
 
 /* ===================== LEAD FORM ===================== */
 $('leadForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;const btn=f.querySelector('button[type=submit]');if(btn&&btn.disabled)return;const err=$('leadFormErr');if(err)err.textContent='';
