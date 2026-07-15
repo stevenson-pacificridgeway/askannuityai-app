@@ -13,7 +13,8 @@ HOW TO ANSWER — FIRST, JUDGE THE QUESTION TYPE:
 - If a provided source is not clearly relevant to THIS question, ignore it entirely and do not list it under SOURCES. Only cite sources you actually used.
 - For a short follow-up (e.g. "what about her?", "and if I wait?"), interpret it using the earlier conversation turns rather than treating it as a brand-new topic.
 - "Should I…" questions are NOT off-limits — answer them educationally and usefully, then add ONE brief closing line that their exact numbers should be confirmed with a licensed professional. The disclaimer is a closing note, never the opener and never the whole answer.
-- MONEY/INCOME questions (e.g. "I'm 62 with $300k, how do I turn it into guaranteed income?"): Keep it short and confident. Tell them the play in plain words — roll the old 401(k) or IRA over into a fixed indexed annuity with a guaranteed lifetime income rider, which turns their savings into a paycheck they can't outlive — and note that the longer they wait before switching the income on, the bigger that paycheck. If an "INCOME ESTIMATE" block appears below, USE those two dollar figures (income now vs. deferred) exactly as given, clearly framed as a rough single-life estimate, and close by offering to have a licensed agent run their exact numbers. If there is NO income-estimate block, do NOT invent any dollar amounts or rates — just describe the play and offer the exact numbers on a call. Two to four short sentences.
+- HARD RULE ON NUMBERS: NEVER invent, estimate, or guess any specific dollar income figure, monthly or annual amount, payout percentage, rollup rate, or numeric range. The ONLY numbers you may ever state are those given verbatim in an "INCOME ESTIMATE" block in this prompt. If there is NO such block, give ZERO numbers — do not say things like "$17,500 to $20,000" or "5 to 7 percent." This is critical: wrong numbers on a financial site are worse than no numbers.
+- MONEY/INCOME questions (e.g. "I'm 62 with $300k, how do I turn it into guaranteed income?"): Keep it short and confident. Tell them the play in plain words — roll the old 401(k) or IRA over into a fixed indexed annuity with a guaranteed lifetime income rider, which turns their savings into a paycheck they can't outlive — and note that the longer they wait before switching the income on, the bigger that paycheck. If an "INCOME ESTIMATE" block appears below, USE those figures exactly as given (yearly, or monthly if they asked in monthly terms), framed as a rough estimate, and offer to have a licensed agent run their exact numbers. If there is NO income-estimate block, describe the play WITHOUT any numbers and offer the exact figures on a call. Two to four short sentences.
 
 WRITING STYLE — VERY IMPORTANT (BE BRIEF):
 - Keep answers SHORT — aim for 2 to 4 short sentences. Most people just want a quick, clear answer, not an essay. Never pad or over-explain.
@@ -105,27 +106,30 @@ function parseTargetAge(text, curAge) {
   if (m) { const n = +m[1]; if (n > 0 && n <= 20) return curAge + n; }
   return null;
 }
-// Build a "use these numbers" directive if the question is an income question with an age + amount.
-function incomeEstimateDirective(question) {
+// Build a "use these numbers" directive when the visitor mentions an amount + age and the topic is income.
+// Looks across the current message PLUS the last few user turns, so follow-ups still get real numbers.
+function incomeEstimateDirective(question, contextText) {
   try {
-    const amt = parseMoney(question);
-    const incomeish = /(income|paycheck|401\s*\(?k\)?|\bira\b|roll\s* ?over|retire|nest egg|savings|turn .* into|guaranteed)/i.test(question);
+    const ctx = ((contextText || '') + ' ' + question).trim();
+    const amt = parseMoney(question) || parseMoney(ctx);
+    const incomeish = /(income|paycheck|401\s*\(?k\)?|\bira\b|roll\s* ?over|rollover|retire|nest egg|savings|turn .* into|guaranteed|annuit|per month|monthly|payout|withdraw|how much)/i.test(ctx);
     if (!amt || !incomeish) return '';
-    // Detect a couple / joint case; joint payouts are based on the YOUNGER person's age.
-    const joint = /\b(joint|couple|married|spouse|my (?:wife|husband|partner)|our (?:savings|money|nest egg|retirement|401|ira)|both of us|we(?:'re| are| both)?)\b/i.test(question);
-    const ages = [...question.toLowerCase().matchAll(/\b(\d{2})\b/g)].map(x => +x[1]).filter(a => a >= 45 && a <= 85);
-    let age = parseAge(question);
+    // Couple / joint case; joint payouts are based on the YOUNGER person's age.
+    const joint = /\b(joint|couple|married|spouse|my (?:wife|husband|partner)|our (?:savings|money|nest egg|retirement|401|ira)|both of us|we(?:'re| are| both)?)\b/i.test(ctx);
+    const ages = [...ctx.toLowerCase().matchAll(/\b(\d{2})\b/g)].map(x => +x[1]).filter(a => a >= 45 && a <= 85);
+    let age = parseAge(question) || parseAge(ctx);
     if (joint && ages.length) age = Math.min(...ages);
     if (!age || age < 50 || age > 85) return '';
-    const tgt = parseTargetAge(question, age) || (age + 5);
+    const tgt = parseTargetAge(question, age) || parseTargetAge(ctx, age) || (age + 5);
     const e = midlandEstimate(age, amt, tgt, joint);
     const fmt = n => '$' + n.toLocaleString('en-US');
+    const mo = n => '$' + Math.round(n / 12).toLocaleString('en-US');
     const kind = joint ? 'joint-life (based on the younger person)' : 'single-life';
-    return `\n\nINCOME ESTIMATE — use these figures (rounded) as an ESTIMATE, not a quote:\n`
+    return `\n\nINCOME ESTIMATE — you MUST use these exact figures (rounded) as an ESTIMATE. Do NOT substitute your own numbers, ranges, or payout percentages:\n`
       + `Source: Midland National's public MNL Income Planning Annuity calculator (${kind}, guaranteed lifetime withdrawal benefit). `
-      + `About ${fmt(amt)} at age ${age} could produce roughly ${fmt(e.immediate)} per year of guaranteed lifetime income starting now, `
-      + `or about ${fmt(e.deferred)} per year if they wait until age ${e.targetAge} (${e.defYears} years). `
-      + `Say they'd roll the money into the annuity, give both numbers as rough ${kind} estimates, and note the exact figure comes from a licensed illustration. Never call it a guaranteed quote.`;
+      + `For about ${fmt(amt)} at age ${age}: starting income NOW is about ${fmt(e.immediate)} per year (${mo(e.immediate)} per month); `
+      + `if they wait until age ${e.targetAge} (${e.defYears} years) it is about ${fmt(e.deferred)} per year (${mo(e.deferred)} per month). `
+      + `If the visitor asked in monthly terms give the monthly figures, otherwise give yearly. Present both scenarios, say they'd roll the money into the annuity, and note the exact figure comes from a licensed illustration. Never call it a guaranteed quote.`;
   } catch (_) { return ''; }
 }
 // ---------------------------------------------------------------------------
@@ -144,9 +148,10 @@ export default async function handler(req, res) {
   // If the visitor is signed in with Google, the front-end passes their email so we know WHO asked.
   const askerEmail = (body.email || '').toString().slice(0, 200).trim();
 
-  // If this is an income question with an age + dollar amount, compute real Midland estimates
-  // and hand them to the model so it can quote concrete numbers (as an estimate).
-  const systemFull = SYSTEM + incomeEstimateDirective(question);
+  // If this is an income question with an age + dollar amount (in this message OR a recent turn),
+  // compute real Midland estimates and hand them to the model so it quotes concrete numbers.
+  const recentUserText = rawHistory.filter(t => t && t.role === 'user').slice(-4).map(t => String(t.content || '')).join(' ');
+  const systemFull = SYSTEM + incomeEstimateDirective(question, recentUserText);
 
   // --- Pre-work (JSON errors OK here, before we start streaming) ---
   // Rate-limit check and the question embedding are independent → run them together.

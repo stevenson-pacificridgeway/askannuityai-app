@@ -3,10 +3,25 @@
 // can review and improve the answer. Best-effort — never blocks the user.
 import { sendNotifyEmail, readJson, cors } from './_lib.js';
 
+// Coarse per-IP throttle (per warm instance) so nobody can flood the owner's inbox with thumbs-downs.
+const _fbHits = new Map();
+function overFbLimit(ip) {
+  const now = Date.now();
+  const recent = (_fbHits.get(ip) || []).filter(t => now - t < 60000);
+  recent.push(now);
+  _fbHits.set(ip, recent);
+  if (_fbHits.size > 5000) _fbHits.clear();
+  return recent.length > 8;
+}
+function clientIp(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || req.socket?.remoteAddress || 'unknown';
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (overFbLimit(clientIp(req))) return res.status(200).json({ ok: true }); // silently drop floods
 
   const b = await readJson(req);
   const rating = b.rating === 'down' ? 'down' : 'up';
