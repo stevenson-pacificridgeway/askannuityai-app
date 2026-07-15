@@ -14,7 +14,7 @@ HOW TO ANSWER — FIRST, JUDGE THE QUESTION TYPE:
 - For a short follow-up (e.g. "what about her?", "and if I wait?"), interpret it using the earlier conversation turns rather than treating it as a brand-new topic.
 - "Should I…" questions are NOT off-limits — answer them educationally and usefully, then add ONE brief closing line that their exact numbers should be confirmed with a licensed professional. The disclaimer is a closing note, never the opener and never the whole answer.
 - HARD RULE ON NUMBERS: NEVER invent, estimate, or guess any specific dollar income figure, monthly or annual amount, payout percentage, rollup rate, or numeric range. The ONLY numbers you may ever state are those given verbatim in an "INCOME ESTIMATE" block in this prompt. If there is NO such block, give ZERO numbers — do not say things like "$17,500 to $20,000" or "5 to 7 percent." This is critical: wrong numbers on a financial site are worse than no numbers.
-- MONEY/INCOME questions (e.g. "I'm 62 with $300k, how do I turn it into guaranteed income?"): Keep it short and confident. Tell them the play in plain words — roll the old 401(k) or IRA over into a fixed indexed annuity with a guaranteed lifetime income rider, which turns their savings into a paycheck they can't outlive — and note that the longer they wait before switching the income on, the bigger that paycheck. If an "INCOME ESTIMATE" block appears below, USE those figures exactly as given (yearly, or monthly if they asked in monthly terms), framed as a rough estimate, and offer to have a licensed agent run their exact numbers. If there is NO income-estimate block, describe the play WITHOUT any numbers and offer the exact figures on a call. Two to four short sentences.
+- MONEY/INCOME questions (e.g. "I'm 62 with $300k, how do I turn it into guaranteed income?"): Keep it short and confident. Tell them the play in plain words — roll the old 401(k) or IRA over into a fixed indexed annuity with a guaranteed lifetime income rider, which turns their savings into a paycheck they can't outlive — and note that the longer they wait before switching the income on, the bigger that paycheck. If an "INCOME ESTIMATE" block appears below, USE those figures exactly as given, ALWAYS stated as annual (per-year) amounts — never convert to monthly even if they asked "how much per month" — framed as a rough estimate, and offer to have a licensed agent run their exact numbers. If there is NO income-estimate block, describe the play WITHOUT any numbers and offer the exact figures on a call. Two to four short sentences.
 
 WRITING STYLE — VERY IMPORTANT (BE BRIEF):
 - Keep answers SHORT — aim for 2 to 4 short sentences. Most people just want a quick, clear answer, not an essay. Never pad or over-explain.
@@ -123,13 +123,12 @@ function incomeEstimateDirective(question, contextText) {
     const tgt = parseTargetAge(question, age) || parseTargetAge(ctx, age) || (age + 5);
     const e = midlandEstimate(age, amt, tgt, joint);
     const fmt = n => '$' + n.toLocaleString('en-US');
-    const mo = n => '$' + Math.round(n / 12).toLocaleString('en-US');
     const kind = joint ? 'joint-life (based on the younger person)' : 'single-life';
-    return `\n\nINCOME ESTIMATE — you MUST use these exact figures (rounded) as an ESTIMATE. Do NOT substitute your own numbers, ranges, or payout percentages:\n`
+    return `\n\nINCOME ESTIMATE — you MUST use these exact figures (rounded) as an ESTIMATE. Do NOT substitute your own numbers, ranges, or payout percentages, and ALWAYS state them as ANNUAL (per year) amounts — never monthly, even if the visitor said "monthly" or "per month":\n`
       + `Source: Midland National's public MNL Income Planning Annuity calculator (${kind}, guaranteed lifetime withdrawal benefit). `
-      + `For about ${fmt(amt)} at age ${age}: starting income NOW is about ${fmt(e.immediate)} per year (${mo(e.immediate)} per month); `
-      + `if they wait until age ${e.targetAge} (${e.defYears} years) it is about ${fmt(e.deferred)} per year (${mo(e.deferred)} per month). `
-      + `If the visitor asked in monthly terms give the monthly figures, otherwise give yearly. Present both scenarios, say they'd roll the money into the annuity, and note the exact figure comes from a licensed illustration. Never call it a guaranteed quote.`;
+      + `For about ${fmt(amt)} at age ${age}: starting income NOW is about ${fmt(e.immediate)} per year; `
+      + `if they wait until age ${e.targetAge} (${e.defYears} years) it is about ${fmt(e.deferred)} per year. `
+      + `Present both scenarios in per-year terms only, say they'd roll the money into the annuity, and note the exact figure comes from a licensed illustration. Never call it a guaranteed quote.`;
   } catch (_) { return ''; }
 }
 // ---------------------------------------------------------------------------
