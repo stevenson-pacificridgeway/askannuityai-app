@@ -47,6 +47,32 @@ async function notifyNewLead(lead) {
   } catch (_) { /* best-effort */ } finally { clearTimeout(t); }
 }
 
+// Forward every captured lead to the Follow Up Boss CRM via your RidgeCRM webhook. Best-effort — never
+// throws and never blocks the save, so a CRM outage can never lose a lead. No API key here: your
+// Railway server holds the Follow Up Boss key and does the authenticated call.
+async function forwardToCrm(lead) {
+  const url = process.env.CRM_WEBHOOK_URL || 'https://ridgecrm-production.up.railway.app/api/website-lead';
+  if (!url) return;
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: lead.name || '',
+        email: lead.email || '',
+        phone: lead.phone || '',
+        source: lead.source || 'AskAnnuity AI',   // tag by where the lead came from
+        message: lead.message || ''
+      }),
+      signal: ctrl.signal
+    });
+  } catch (_) { /* swallow — the lead is already saved */ } finally {
+    clearTimeout(t);
+  }
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -112,8 +138,8 @@ export default async function handler(req, res) {
     const lead = { name, email, phone, amount: b.amount || '', message, source };
     const { error } = await supabaseAdmin.from('leads').insert(lead);
     if (error) throw error;
-    // Notify on every new lead (best-effort; never blocks the save).
-    await notifyNewLead(lead);
+    // Notify you by email AND forward to your CRM — both best-effort, in parallel, never blocking the save.
+    await Promise.allSettled([notifyNewLead(lead), forwardToCrm(lead)]);
     res.status(200).json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: String(e?.message || e) });
