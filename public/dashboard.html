@@ -211,6 +211,15 @@ function relTime(iso){
 function absTime(iso){ return iso ? new Date(iso).toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT' : ''; }
 
 let STATE = { recent:[], leads:[], total:0 };
+// Hide the setup/QA test rows (example.com emails, "TEST"/"probe"/"dedupe" markers)
+// so the dashboard reflects only real visitor activity.
+function isTestRow(r){
+  if(!r) return false;
+  const email=(r.email||'').toLowerCase();
+  if(/@example\.(com|org|net)$/.test(email) || /(^|[._-])(test|probe|dedupe|qa)@/.test(email)) return true;
+  const blob=[r.name,r.question,r.answer,r.message,r.source].map(x=>String(x||'')).join(' ').toLowerCase();
+  return /\btest\b|\bprobe\b|\bdedupe\b|resend[- ]?(check|verification)|crm connection|direct probe/.test(blob);
+}
 let AUTO = null;        // auto-refresh timer
 let LASTSIG = '';       // signature of last data, so we only redraw the feed when it actually changes
 let feedMode = 'all';   // 'all' | 'answered' | 'signedin' — set by clicking a stat card
@@ -312,9 +321,14 @@ async function load(){
       AAI.getStats().catch(e=>({total:0,top:[],recent:[],_err:String(e)})),
       AAI.getLeads().catch(e=>[])
     ]);
-    STATE.total = stats.total||0;
-    STATE.recent = Array.isArray(stats.recent)?stats.recent:[];
-    STATE.leads = Array.isArray(leads)?leads:[];
+    const rawRecent = Array.isArray(stats.recent)?stats.recent:[];
+    const rawLeads  = Array.isArray(leads)?leads:[];
+    STATE.recent = rawRecent.filter(r=>!isTestRow(r));
+    STATE.leads  = rawLeads.filter(r=>!isTestRow(r));
+    // Server total counts every row ever, including our setup tests. Discount the
+    // test rows we can see in this batch so the headline number reads honestly.
+    const hiddenHere = rawRecent.length - STATE.recent.length;
+    STATE.total = Math.max(STATE.recent.length, (stats.total||0) - hiddenHere);
     // Always refresh the cheap, time-sensitive bits (stats + live strip).
     renderStats(); renderActivity();
     // Only redraw the feed/leads when the data actually changed, so a poll doesn't

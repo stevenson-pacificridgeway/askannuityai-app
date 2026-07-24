@@ -88,8 +88,8 @@
   body{
     font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;
     background-color:var(--bg);
-    background-image:linear-gradient(to bottom, var(--bg) 0%, color-mix(in srgb,var(--bg) 94%,transparent) 22%, color-mix(in srgb,var(--bg) 76%,transparent) 52%, color-mix(in srgb,var(--bg) 42%,transparent) 80%, transparent 100%), url("https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=2400&q=80");
-    background-repeat:no-repeat,no-repeat;background-position:center,bottom center;background-size:cover,cover;background-attachment:fixed,fixed;
+    background-image:linear-gradient(to bottom, var(--bg) 0%, color-mix(in srgb,var(--bg) 94%,transparent) 22%, color-mix(in srgb,var(--bg) 76%,transparent) 52%, color-mix(in srgb,var(--bg) 42%,transparent) 80%, transparent 100%), radial-gradient(120% 90% at 78% 12%, color-mix(in srgb,var(--gold) 26%,transparent) 0%, transparent 46%), radial-gradient(130% 100% at 12% 8%, color-mix(in srgb,#1b4a8f 55%,transparent) 0%, transparent 52%), linear-gradient(160deg, #0a1e42 0%, #0b2f63 42%, #08498f 100%);
+    background-repeat:no-repeat;background-position:center;background-size:cover;background-attachment:fixed;
     color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;letter-spacing:-.011em;transition:background-color .35s var(--ease),color .35s var(--ease)
   }
@@ -692,7 +692,7 @@
           <h2 style="margin-top:12px">Real numbers, from a real person.</h2>
           <p class="s">Get a free, no-obligation retirement income review with current rates from a licensed professional who works for you.</p>
           <div class="contact">
-            <a id="callLink" href="tel:+15555550123"><span class="ic"><svg><use href="#i-phone"/></svg></span><span><b>Call directly</b><small id="phoneLabel">(555) 555-0123</small></span></a>
+            <a id="callLink" href="tel:+16193748100"><span class="ic"><svg><use href="#i-phone"/></svg></span><span><b>Call directly</b><small id="phoneLabel">(619) 374-8100</small></span></a>
             <a id="bookLink" href="#" target="_blank" rel="noopener"><span class="ic"><svg><use href="#i-cal"/></svg></span><span><b>Book a retirement review</b><small>Pick a time that works for you</small></span></a>
           </div>
         </div>
@@ -711,7 +711,7 @@
             <button type="submit" class="btn btn-accent btn-lg" style="width:100%;justify-content:center">Request my free review →</button>
             <div class="err" id="leadFormErr" role="alert" style="margin-top:10px"></div>
           </form>
-          <div class="leadok" id="leadOk"><div class="big">✓</div><h3>Thank you.</h3><p class="s">Your request is in. A licensed professional will reach out shortly. Prefer to talk now? Call <b id="okPhone">(555) 555-0123</b>.</p></div>
+          <div class="leadok" id="leadOk"><div class="big">✓</div><h3>Thank you.</h3><p class="s">Your request is in. A licensed professional will reach out shortly. Prefer to talk now? Call <b id="okPhone">(619) 374-8100</b>.</p></div>
         </div>
       </div>
     </section>
@@ -891,7 +891,7 @@
           <div id="topQ"></div>
         </div>
         <div class="dpane" data-dpane="leads" style="display:none">
-          <div class="hint">Leads from the contact form. In the live version these also email instantly to <b id="leadEmailLabel"></b> and sync to your CRM.</div>
+          <div class="hint">Leads from the contact form. Each new lead emails you instantly at <b id="leadEmailLabel"></b> and syncs to your Follow Up Boss CRM.</div>
           <div id="leadsList"></div>
           <button class="btn btn-soft" id="exportLeadsBtn" style="margin-top:8px">Export CSV</button>
         </div>
@@ -1130,7 +1130,7 @@ function dueForPro(){
 function send(q){
   q=(q||'').trim();if(!q||streaming)return;
   // Require a free Google sign-in before asking Oscar (also captures who's asking).
-  if(!getUser()){try{localStorage.setItem('aai_pending_q',q);}catch(_){}const wm=$('welcomeModal');if(wm)wm.classList.remove('open');openAuth('Sign in to ask Oscar');return;}
+  if(!getUser()){try{localStorage.setItem('aai_pending_q',q);}catch(_){}S(LS.welcomed,1);const wm=$('welcomeModal');if(wm){const wt=$('welcomeTitle');if(wt)wt.textContent='Sign in to ask Oscar';wm.classList.add('open');}else{openAuth('Sign in to ask Oscar');}return;}
   asked.add(q.toLowerCase());logStat(q);exchanges++;
   if(!msgsEl.children.length){const g=el('div','msg ai');g.innerHTML=`${botAvatar()}<div class="content"><div class="text">Hi — I'm Oscar, your retirement guide. I keep things simple and in plain English. Ask me anything about retirement, income, or annuities.</div></div>`;msgsEl.appendChild(g);}
   addUser(q);
@@ -1400,7 +1400,7 @@ function _calcSSA(b){
   $('ts_fra').addEventListener('input',calc);calc();}
 function openTool(kind){$('toolTitle').textContent=TOOLINFO[kind]||'Tool';const b=$('toolBody');
   if(kind==='income')_calcIncome(b);else if(kind==='lasts')_calcLasts(b);else _calcSSA(b);
-  $('toolModal').classList.add('open');}
+  const _t=$('toolModal');_t.style.zIndex='';_t.classList.add('open');}
 document.querySelectorAll('.rcard.tool').forEach(c=>c.onclick=e=>{e.preventDefault();openTool(c.dataset.tool);});
 
 /* ===================== ADMIN ===================== */

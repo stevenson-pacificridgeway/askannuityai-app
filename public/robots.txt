@@ -4,5 +4,6 @@ Allow: /
 # Keep the AI backend and internal ingest notes out of search
 Disallow: /api/
 Disallow: /cases/_ingest
+Disallow: /dashboard
 
 Sitemap: https://askannuityai.com/sitemap.xml
