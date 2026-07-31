@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<!-- Follow Up Boss Pixel (website activity tracking) -->
+<script>
+(function(w,i,d,g,e,t){w["WidgetTrackerObject"]=g;(w[g]=w[g]||function(){(w[g].q=w[g].q||[]).push(arguments);}),(w[g].ds=1*new Date());(e="script"),(t=d.createElement(e)),(e=d.getElementsByTagName(e)[0]);t.async=1;t.src=i;e.parentNode.insertBefore(t,e);})(window,"https://widgetbe.com/agent","widgetTracker");
+window.widgetTracker("create","WT-YZMXMKIV");
+window.widgetTracker("send","pageview");
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 <title>AskAnnuityAI — Ask anything about retirement & annuities</title>
 <meta name="description" content="The premium AI for retirement & annuity questions. Ask anything and get clear, unbiased, educational answers — instantly. Talk to a licensed professional when you're ready." />
@@ -738,6 +744,7 @@
         <form id="magnetForm" novalidate>
           <div class="caprow">
             <input id="magnetEmail" type="email" required placeholder="you@email.com" aria-label="Your email">
+            <input id="magnetPhone" type="tel" inputmode="tel" placeholder="Phone (optional)" aria-label="Phone (optional)">
             <button type="submit" class="btn btn-accent">Send me the guide →</button>
           </div>
           <div class="capdone" id="magnetDone" style="display:none">Thanks! <a href="/retirement-income-starter-guide.pdf" target="_blank" rel="noopener" download style="color:var(--gold);text-decoration:underline;font-weight:700">Download your guide →</a></div>
@@ -922,6 +929,10 @@
         <div class="step"><div class="num">2</div><div><h4>Ask anything</h4><p>Type any retirement or annuity question and get a clear, instant answer — share as much or as little as you like.</p></div></div>
         <div class="step"><div class="num">3</div><div><h4>Create a free account</h4><p>Sign in with Google so your conversations, answers, and favorites are saved across every visit.</p></div></div>
         <div class="step"><div class="num">4</div><div><h4>Keep learning</h4><p>Unlock curated resources and pick up right where you left off, anytime.</p></div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <input id="welcomePhone" type="tel" inputmode="tel" placeholder="Your phone (optional)" aria-label="Phone (optional)" style="width:100%;padding:12px 14px;border:1px solid var(--line,#d9dee7);border-radius:10px;font-size:15px;box-sizing:border-box">
+        <p style="font-size:11.5px;color:var(--faint);margin:6px 2px 0;text-align:center">Optional — lets a licensed advisor reach you faster.</p>
       </div>
       <div class="auth-btns">
         <button id="welcomeGoogle" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:0 0 18px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continue with Google</button>
@@ -1131,7 +1142,7 @@ function send(q){
   q=(q||'').trim();if(!q||streaming)return;
   // Require a free Google sign-in before asking Oscar (also captures who's asking).
   if(!getUser()){try{localStorage.setItem('aai_pending_q',q);}catch(_){}S(LS.welcomed,1);const wm=$('welcomeModal');if(wm){const wt=$('welcomeTitle');if(wt)wt.textContent='Sign in to ask Oscar';wm.classList.add('open');}else{openAuth('Sign in to ask Oscar');}return;}
-  asked.add(q.toLowerCase());logStat(q);exchanges++;
+  asked.add(q.toLowerCase());logStat(q);exchanges++;try{fubTrack('/oscar/asked-a-question','Asked Oscar a question');}catch(_){}
   if(!msgsEl.children.length){const g=el('div','msg ai');g.innerHTML=`${botAvatar()}<div class="content"><div class="text">Hi — I'm Oscar, your retirement guide. I keep things simple and in plain English. Ask me anything about retirement, income, or annuities.</div></div>`;msgsEl.appendChild(g);}
   addUser(q);
   const m=addAI();const textEl=m.querySelector('.text');const contentEl=m.querySelector('.content');
@@ -1274,6 +1285,7 @@ $('leadForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.t
   if(btn){btn.dataset._t=btn.dataset._t||btn.textContent;btn.disabled=true;btn.textContent='Sending…';}
   try{
     await AAI.saveLead({name:d.name,email:d.email,phone:d.phone,amount:d.amount,message:d.message,source:'Contact form'});
+    try{fubTrack('/contact/requested-review','Requested a free review');}catch(_){}
     f.style.display='none';$('leadOk').style.display='block';
   }catch(_){
     if(btn){btn.disabled=false;btn.textContent=btn.dataset._t||'Request my free review →';}
@@ -1287,10 +1299,12 @@ $('leadForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.t
     const emEl=$(k+'Email'); const em=(emEl.value||'').trim();
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){emEl.focus();return;}
     const btn=f.querySelector('button'); if(btn)btn.disabled=true;
+    const phEl=$(k+'Phone'); const ph=phEl?(phEl.value||'').trim():'';
     try{
-      await AAI.saveLead({email:em,name:'',source:src,message:msg});
+      await AAI.saveLead({email:em,name:'',phone:ph,source:src,message:msg});
       const row=f.querySelector('.caprow'); if(row)row.style.display='none';
       $(k+'Done').style.display='block';
+      try{fubTrack('/guide/'+k,'Lead magnet: '+src);}catch(_){}
     }catch(_){
       if(btn)btn.disabled=false;
       const done=$(k+'Done'); done.textContent='Something went wrong — please try again.'; done.style.color='#b42318'; done.style.display='block';
@@ -1298,12 +1312,15 @@ $('leadForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.t
   });
 });
 
+/* Follow Up Boss pixel: log a lightweight intent event (generic label, no personal data). */
+function fubTrack(page,title){try{if(window.widgetTracker){var d={page:page,title:title};try{var u=getUser&&getUser();if(u&&u.email)d.email=u.email;}catch(_){}window.widgetTracker('send','pageview',d);}}catch(_){}}
+
 /* ===================== CONFIG -> UI ===================== */
 function applyCfg(){const c=getCfg();$('phoneLabel').textContent=c.phone;$('okPhone').textContent=c.phone;$('callLink').href='tel:'+c.phoneRaw;
   $('bookLink').href=c.booking;$('cardBook').href=c.bookLink;$('cardUni').href=c.uniLink;$('yr').textContent=new Date().getFullYear();
   $('bookNav').onclick=()=>{document.body.classList.remove('chatting');location.hash='#talk';};}
 applyCfg();refreshAuthUI();if(getUser()&&innerWidth>=1024)openSidebar();
-window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});mergeRemoteHistory(u);const _pq=localStorage.getItem('aai_pending_q');if(_pq){localStorage.removeItem('aai_pending_q');const am=$('authModal');if(am)am.classList.remove('open');setTimeout(()=>send(_pq),350);}if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}}});});
+window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});mergeRemoteHistory(u);const _pq=localStorage.getItem('aai_pending_q');if(_pq){localStorage.removeItem('aai_pending_q');const am=$('authModal');if(am)am.classList.remove('open');setTimeout(()=>send(_pq),350);}if(localStorage.getItem('aai_pending_lead')){var _pph=localStorage.getItem('aai_pending_phone')||'';AAI.saveLead({name:u.name,email:u.email,phone:_pph,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');localStorage.removeItem('aai_pending_phone');}try{fubTrack('/','Signed in');}catch(_){}}});});
 
 /* ---- mobile "use desktop" banner ---- */
 (function(){var b=$('mdb');if(!b)return;
@@ -1316,7 +1333,7 @@ function registerLearnerLead(u){const leads=J(LS.leads,[]);
     leads.unshift({name:u.name||'',email:u.email||'',phone:'',amount:'',message:'Wants to continuously learn (signed up via welcome pop-up)',source:'Welcome popup',ts:new Date().toISOString()});
     S(LS.leads,leads);}
 }
-$('welcomeGoogle').onclick=()=>{localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
+$('welcomeGoogle').onclick=()=>{try{var _wp=($('welcomePhone')&&$('welcomePhone').value||'').trim();if(_wp)localStorage.setItem('aai_pending_phone',_wp);}catch(_){}localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
 $('welcomeSkip').onclick=()=>{$('welcomeModal').classList.remove('open');S(LS.welcomed,1);};
 $('welcomeModal').addEventListener('click',e=>{if(e.target===$('welcomeModal'))S(LS.welcomed,1);});
 /* Show the 4-step welcome popup once for signed-OUT visitors; never after it's been dismissed or once signed in. */
@@ -1398,7 +1415,7 @@ function _calcSSA(b){
     const b1=be(a62,a67,62,67),b2=be(a67,a70,67,70);
     $('ts_be').innerHTML=`Rough break-even: waiting to 67 pays off by about age ${b1?Math.round(b1):'—'}; waiting to 70 pays off by about age ${b2?Math.round(b2):'—'}. Excludes cost-of-living raises and taxes; full retirement age is 67 for anyone born in 1960 or later.`;};
   $('ts_fra').addEventListener('input',calc);calc();}
-function openTool(kind){$('toolTitle').textContent=TOOLINFO[kind]||'Tool';const b=$('toolBody');
+function openTool(kind){try{fubTrack('/tools/'+kind,'Used the '+kind+' tool');}catch(_){}$('toolTitle').textContent=TOOLINFO[kind]||'Tool';const b=$('toolBody');
   if(kind==='income')_calcIncome(b);else if(kind==='lasts')_calcLasts(b);else _calcSSA(b);
   const _t=$('toolModal');_t.style.zIndex='';_t.classList.add('open');}
 document.querySelectorAll('.rcard.tool').forEach(c=>c.onclick=e=>{e.preventDefault();openTool(c.dataset.tool);});
