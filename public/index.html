@@ -781,7 +781,8 @@ window.widgetTracker("send","pageview");
           <span class="s">No spam. Unsubscribe anytime.</span>
           <form id="nlForm" novalidate>
             <div class="caprow" style="margin-top:10px;justify-content:flex-start">
-              <input id="nlEmail" type="email" required placeholder="you@email.com" aria-label="Your email" style="max-width:280px">
+              <input id="nlEmail" type="email" required placeholder="you@email.com" aria-label="Your email" style="max-width:240px">
+              <input id="nlPhone" type="tel" inputmode="tel" placeholder="Phone (optional)" aria-label="Phone (optional)" style="max-width:180px">
               <button type="submit" class="btn btn-soft">Subscribe</button>
             </div>
             <div class="capdone" id="nlDone" style="display:none">You're on the list — thanks!</div>
@@ -915,6 +916,45 @@ window.widgetTracker("send","pageview");
   </div>
 </div>
 
+<!-- FLOATING CALL BUTTON (mobile only) -->
+<a href="tel:+16193748100" class="fab-call" aria-label="Call (619) 374-8100"><svg><use href="#i-phone"/></svg><span>Call a licensed pro</span></a>
+<style>
+.fab-call{display:none}
+@media(max-width:720px){.fab-call{display:flex;position:fixed;left:14px;right:14px;bottom:14px;z-index:150;align-items:center;justify-content:center;gap:8px;background:var(--gold,#D4A12B);color:#0a1730;font-weight:700;font-size:15px;padding:14px;border-radius:14px;box-shadow:0 6px 20px rgba(8,23,48,.28);text-decoration:none}.fab-call svg{width:18px;height:18px;fill:currentColor}}
+</style>
+
+<!-- ENTRY CAPTURE POPUP (name / email / phone + text-code verify) -->
+<div class="ov" id="captureModal">
+  <div class="sheet sm" role="dialog" aria-modal="true" aria-labelledby="capTitle">
+    <div class="sh-body" style="padding:30px 28px 26px">
+      <div class="welcome-head">
+        <div class="w-orb"></div>
+        <h3 id="capTitle">Connect with a financial professional</h3>
+        <p id="capHi">You're signed in as <b id="capEmail"></b>. Add your mobile and a licensed financial professional will personally review your situation — we'll text a quick code to confirm your number.</p>
+      </div>
+      <div id="capStep1">
+        <div class="fld"><input id="capPhone" type="tel" inputmode="tel" placeholder="Your mobile number" autocomplete="tel"></div>
+        <button id="capSend" class="btn btn-accent btn-lg" style="width:100%;justify-content:center;margin-top:4px">Text me a code →</button>
+        <div class="err" id="capErr1" role="alert" style="margin-top:8px"></div>
+      </div>
+      <div id="capStep2" style="display:none">
+        <p class="s" style="margin-bottom:12px">We texted a 6-digit code to <b id="capPhoneEcho"></b>.</p>
+        <div class="fld"><input id="capCode" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit code" style="letter-spacing:4px;text-align:center;font-size:18px"></div>
+        <button id="capVerify" class="btn btn-accent btn-lg" style="width:100%;justify-content:center">Verify &amp; continue →</button>
+        <div class="err" id="capErr2" role="alert" style="margin-top:8px"></div>
+        <button class="skip" id="capResend" style="margin-top:6px">Resend code</button>
+      </div>
+      <div id="capDone" style="display:none;text-align:center;padding:6px 0">
+        <div class="big" style="font-size:38px;color:var(--gold)">✓</div>
+        <h3 style="margin-top:4px">You're all set!</h3>
+        <p class="s">Ask Oscar anything.</p>
+      </div>
+      <button class="skip" id="capSkip" style="margin-top:10px">Maybe later</button>
+      <p style="text-align:center;font-size:11px;color:var(--faint);margin-top:10px;line-height:1.5">By submitting, you agree to receive calls, texts &amp; emails from Pacific Ridgeway at the number provided — including by autodialer. Consent isn't a condition of purchase. Msg &amp; data rates may apply. Reply STOP to opt out. See our <a href="/privacy" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:underline">Privacy Policy</a>.</p>
+    </div>
+  </div>
+</div>
+
 <!-- WELCOME / HOW IT WORKS POPUP -->
 <div class="ov" id="welcomeModal">
   <div class="sheet sm" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
@@ -929,10 +969,6 @@ window.widgetTracker("send","pageview");
         <div class="step"><div class="num">2</div><div><h4>Ask anything</h4><p>Type any retirement or annuity question and get a clear, instant answer — share as much or as little as you like.</p></div></div>
         <div class="step"><div class="num">3</div><div><h4>Create a free account</h4><p>Sign in with Google so your conversations, answers, and favorites are saved across every visit.</p></div></div>
         <div class="step"><div class="num">4</div><div><h4>Keep learning</h4><p>Unlock curated resources and pick up right where you left off, anytime.</p></div></div>
-      </div>
-      <div style="margin-bottom:12px">
-        <input id="welcomePhone" type="tel" inputmode="tel" placeholder="Your phone (optional)" aria-label="Phone (optional)" style="width:100%;padding:12px 14px;border:1px solid var(--line,#d9dee7);border-radius:10px;font-size:15px;box-sizing:border-box">
-        <p style="font-size:11.5px;color:var(--faint);margin:6px 2px 0;text-align:center">Optional — lets a licensed advisor reach you faster.</p>
       </div>
       <div class="auth-btns">
         <button id="welcomeGoogle" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48" style="flex:0 0 18px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continue with Google</button>
@@ -1320,7 +1356,7 @@ function applyCfg(){const c=getCfg();$('phoneLabel').textContent=c.phone;$('okPh
   $('bookLink').href=c.booking;$('cardBook').href=c.bookLink;$('cardUni').href=c.uniLink;$('yr').textContent=new Date().getFullYear();
   $('bookNav').onclick=()=>{document.body.classList.remove('chatting');location.hash='#talk';};}
 applyCfg();refreshAuthUI();if(getUser()&&innerWidth>=1024)openSidebar();
-window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});mergeRemoteHistory(u);const _pq=localStorage.getItem('aai_pending_q');if(_pq){localStorage.removeItem('aai_pending_q');const am=$('authModal');if(am)am.classList.remove('open');setTimeout(()=>send(_pq),350);}if(localStorage.getItem('aai_pending_lead')){var _pph=localStorage.getItem('aai_pending_phone')||'';AAI.saveLead({name:u.name,email:u.email,phone:_pph,message:'Wants to continuously learn (welcome popup)',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');localStorage.removeItem('aai_pending_phone');}try{fubTrack('/','Signed in');}catch(_){}}});});
+window.addEventListener('aai-ready',()=>{AAI.onAuth(u=>{if(u){setUser({name:u.name,email:u.email,provider:'google'});mergeRemoteHistory(u);const _pq=localStorage.getItem('aai_pending_q');if(_pq){localStorage.removeItem('aai_pending_q');const am=$('authModal');if(am)am.classList.remove('open');setTimeout(()=>send(_pq),350);}if(localStorage.getItem('aai_pending_lead')){AAI.saveLead({name:u.name,email:u.email,message:'Signed in via welcome popup',source:'Welcome popup'});localStorage.removeItem('aai_pending_lead');}try{fubTrack('/','Signed in');}catch(_){}try{if(window.startPhoneVerify)setTimeout(window.startPhoneVerify,800);}catch(_){}}});});
 
 /* ---- mobile "use desktop" banner ---- */
 (function(){var b=$('mdb');if(!b)return;
@@ -1333,11 +1369,63 @@ function registerLearnerLead(u){const leads=J(LS.leads,[]);
     leads.unshift({name:u.name||'',email:u.email||'',phone:'',amount:'',message:'Wants to continuously learn (signed up via welcome pop-up)',source:'Welcome popup',ts:new Date().toISOString()});
     S(LS.leads,leads);}
 }
-$('welcomeGoogle').onclick=()=>{try{var _wp=($('welcomePhone')&&$('welcomePhone').value||'').trim();if(_wp)localStorage.setItem('aai_pending_phone',_wp);}catch(_){}localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
+$('welcomeGoogle').onclick=()=>{localStorage.setItem('aai_pending_lead','1');S(LS.welcomed,1);$('welcomeModal').classList.remove('open');AAI.signInWithGoogle();};
 $('welcomeSkip').onclick=()=>{$('welcomeModal').classList.remove('open');S(LS.welcomed,1);};
 $('welcomeModal').addEventListener('click',e=>{if(e.target===$('welcomeModal'))S(LS.welcomed,1);});
-/* Show the 4-step welcome popup once for signed-OUT visitors; never after it's been dismissed or once signed in. */
-if(!getUser()&&!J(LS.welcomed,0))setTimeout(()=>{if(!getUser()&&!J(LS.welcomed,0)&&!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);
+/* Welcome popup auto-opens EVERY visit for signed-OUT visitors (the simple Google entry, no phone). */
+if(!getUser())setTimeout(()=>{if(!getUser()&&!document.body.classList.contains('chatting'))$('welcomeModal').classList.add('open');},1300);
+
+/* ===== AFTER Google sign-in: verify the mobile. Name + email already come from Google. ===== */
+(function(){
+  const cm=$('captureModal'); if(!cm) return;
+  const dg=s=>String(s||'').replace(/[^0-9+]/g,'');
+  let capPhone='';
+  const closeCap=()=>cm.classList.remove('open');
+  window.startPhoneVerify=function(){
+    if(localStorage.getItem('aai_phone_verified'))return;   // already verified
+    if(localStorage.getItem('aai_phone_skip'))return;        // chose to skip earlier
+    $('capStep1').style.display='block';$('capStep2').style.display='none';$('capDone').style.display='none';
+    try{var _u=(getUser&&getUser())||{};if($('capEmail'))$('capEmail').textContent=_u.email||'your account';}catch(_){}
+    var pp=localStorage.getItem('aai_pending_phone');if(pp&&$('capPhone')&&!$('capPhone').value)$('capPhone').value=pp;
+    cm.classList.add('open');const pi=$('capPhone');if(pi)setTimeout(()=>pi.focus(),120);
+  };
+  $('capSend').onclick=async()=>{
+    const phone=$('capPhone').value.trim();const e1=$('capErr1');e1.textContent='';
+    const nat=dg(phone).replace(/^\+?1?/,'');
+    if(nat.length<10){e1.textContent='Please enter a valid 10-digit mobile number.';return;}
+    if(/^(\d)\1{9}$/.test(nat)||nat==='1234567890'||nat.slice(0,3)==='555'){e1.textContent='Please enter your real mobile number.';return;}
+    const btn=$('capSend');btn.disabled=true;btn.textContent='Sending…';
+    try{
+      const r=await fetch('/api/otp-send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok){e1.textContent=d.error||'Could not send the code.';btn.disabled=false;btn.textContent='Text me a code →';return;}
+      capPhone=d.to||phone;$('capPhoneEcho').textContent=phone;
+      $('capStep1').style.display='none';$('capStep2').style.display='block';
+      const cc=$('capCode');if(cc)cc.focus();
+    }catch(_){e1.textContent='Something went wrong. Please try again.';}
+    btn.disabled=false;btn.textContent='Text me a code →';
+  };
+  $('capResend').onclick=async()=>{try{await fetch('/api/otp-send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:capPhone})});if(window.toast)toast('Code re-sent');}catch(_){}};
+  $('capVerify').onclick=async()=>{
+    const code=$('capCode').value.trim();const e2=$('capErr2');e2.textContent='';
+    if(code.replace(/[^0-9]/g,'').length<4){e2.textContent='Enter the code we texted you.';return;}
+    const btn=$('capVerify');btn.disabled=true;btn.textContent='Checking…';
+    try{
+      const r=await fetch('/api/otp-verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:capPhone,code})});
+      const d=await r.json().catch(()=>({}));
+      if(!d.verified){e2.textContent='That code did not match. Try again.';btn.disabled=false;btn.textContent='Verify & continue →';return;}
+      const u=(getUser&&getUser())||{};
+      try{await AAI.saveLead({name:u.name||'',email:u.email||'',phone:capPhone,source:'Welcome popup (verified)',message:'Verified mobile via text code'});}catch(_){}
+      try{fubTrack('/','Verified phone');}catch(_){}
+      localStorage.setItem('aai_phone_verified','1');localStorage.removeItem('aai_pending_phone');
+      $('capStep2').style.display='none';$('capDone').style.display='block';
+      setTimeout(closeCap,1700);
+    }catch(_){e2.textContent='Something went wrong. Please try again.';}
+    btn.disabled=false;btn.textContent='Verify & continue →';
+  };
+  $('capSkip').onclick=()=>{localStorage.setItem('aai_phone_skip','1');closeCap();};
+  cm.addEventListener('click',e=>{if(e.target===cm){localStorage.setItem('aai_phone_skip','1');closeCap();}});
+})();
 
 /* ===================== THEME ===================== */
 const themeBtn=$('themeBtn');
