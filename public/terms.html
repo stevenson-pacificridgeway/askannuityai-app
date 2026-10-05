@@ -117,6 +117,18 @@
     .site-footer a:hover { color: var(--navy); }
     .dot { color: var(--line); }
   </style>
+<!-- PR tracking: GA4 + Meta Pixel + lead events -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-H8N4L0ZKGY"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-H8N4L0ZKGY');
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','614281688337041');fbq('track','PageView');
+window.prTrack=function(ev,p){try{gtag('event',ev,p||{});}catch(e){}};
+window.prTrackLead=function(src){var s=src||location.hostname;window.prTrack('generate_lead',{lead_source:s,site:location.hostname});try{fbq('track','Lead',{content_name:s});}catch(e){}};
+document.addEventListener('submit',function(e){var f=e.target;if(f&&f.tagName==='FORM')window.prTrackLead(f.id||f.getAttribute('name')||f.getAttribute('data-source')||location.pathname);},true);
+document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a[href]'):null;if(!a)return;var h=a.getAttribute('href')||'';if(h.indexOf('tel:')===0){window.prTrack('click_to_call',{site:location.hostname});try{fbq('track','Contact');}catch(x){}}else if(h.indexOf('calendly.com')>-1){window.prTrack('click_book_call',{site:location.hostname});}else if(/\.pdf(\?|$)/i.test(h)||/\/download|escape-kit|kit-download/.test(h)){window.prTrack('file_download',{site:location.hostname,link_url:h});}},true);
+window.addEventListener('message',function(e){if(e.data&&e.data.event==='calendly.event_scheduled'){window.prTrack('book_appointment',{site:location.hostname});try{fbq('track','Schedule');}catch(x){}}});
+</script>
 </head>
 <body>
   <header class="site-header">
