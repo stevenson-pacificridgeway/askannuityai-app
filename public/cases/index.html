@@ -98,7 +98,19 @@ footer{background:var(--navy);color:#fff;margin-top:50px;border-top:3px solid va
 .row p{margin:0;color:var(--ink2);font-size:15.5px}
 .row .tg{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
 .row .tg span{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(8,43,99,.06);color:var(--navy)}
-</style></head><body>
+</style><!-- PR tracking: GA4 + Meta Pixel + lead events -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-H8N4L0ZKGY"></script>
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-H8N4L0ZKGY');
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','614281688337041');fbq('track','PageView');
+window.prTrack=function(ev,p){try{gtag('event',ev,p||{});}catch(e){}};
+window.prTrackLead=function(src){var s=src||location.hostname;window.prTrack('generate_lead',{lead_source:s,site:location.hostname});try{fbq('track','Lead',{content_name:s});}catch(e){}};
+document.addEventListener('submit',function(e){var f=e.target;if(f&&f.tagName==='FORM')window.prTrackLead(f.id||f.getAttribute('name')||f.getAttribute('data-source')||location.pathname);},true);
+document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a[href]'):null;if(!a)return;var h=a.getAttribute('href')||'';if(h.indexOf('tel:')===0){window.prTrack('click_to_call',{site:location.hostname});try{fbq('track','Contact');}catch(x){}}else if(h.indexOf('calendly.com')>-1){window.prTrack('click_book_call',{site:location.hostname});}else if(/\.pdf(\?|$)/i.test(h)||/\/download|escape-kit|kit-download/.test(h)){window.prTrack('file_download',{site:location.hostname,link_url:h});}},true);
+window.addEventListener('message',function(e){if(e.data&&e.data.event==='calendly.event_scheduled'){window.prTrack('book_appointment',{site:location.hostname});try{fbq('track','Schedule');}catch(x){}}});
+</script>
+</head><body>
 <header class="topbar"><div class="in">
 <a class="brand" href="/"><span class="mark"><svg viewBox="0 0 30 22" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M2 19 L10.5 5 L15 12 L18.5 6 L28 19"/><path d="M7.4 13 L10.5 8.6 L12.7 12" stroke-opacity=".75"/></svg></span><span>
 <span class="wm">Pacific <b>Ridgeway</b></span><span class="sub">Insurance Solutions</span></span></a>
