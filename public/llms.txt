@@ -1,0 +1,26 @@
+# AskAnnuityAI
+
+> Plain-English AI (named Oscar) plus licensed professionals at Pacific Ridgeway that help people age 55+ turn retirement savings into guaranteed lifetime income. Free to ask, educational, and never pushy — you only ever buy if it's right for you.
+
+AskAnnuityAI answers retirement and annuity questions in clear, plain English, grounded in real client case studies, and connects people to a licensed professional when they want exact numbers for their situation. The focus is retirement income: turning a 401(k), IRA, or savings into a paycheck that lasts for life, primarily using fixed indexed annuities with guaranteed lifetime income riders. All answers are for general education only and are not financial, tax, or legal advice.
+
+## Answer guides (plain-English, source-grounded)
+- [How much monthly income could $500k give me at 62?](https://askannuityai.com/answers/how-much-income-500k-at-62): Illustrative lifetime monthly income from $500,000 starting at age 62, and what drives it.
+- [How much does a $1 million annuity pay per month?](https://askannuityai.com/answers/how-much-does-a-million-dollar-annuity-pay): Realistic illustrative monthly income range from $1,000,000.
+- [Will I run out of money in retirement?](https://askannuityai.com/answers/will-i-run-out-of-money-in-retirement): The two risks that cause it and how a guaranteed income floor prevents it.
+- [How do I turn my 401(k) into guaranteed income?](https://askannuityai.com/answers/turn-401k-into-guaranteed-income): The rollover path from a market-based 401(k) to a lifetime paycheck.
+- [What is a fixed indexed annuity (and how does it work)?](https://askannuityai.com/answers/what-is-a-fixed-indexed-annuity): Principal protection, index-linked growth, and optional lifetime income.
+- [Are annuities a good idea? Honest pros and cons](https://askannuityai.com/answers/are-annuities-a-good-idea): The real pros, cons, and who annuities fit.
+- [All answers](https://askannuityai.com/answers/): The full retirement & annuity answers library.
+
+## Key pages
+- [Home](https://askannuityai.com/): Ask Oscar anything about retirement and annuities.
+- [Free guide: The Retirement Income Starter Guide (PDF)](https://askannuityai.com/retirement-income-starter-guide.pdf)
+
+## About
+- Operated by Pacific Ridgeway. Author: Gregory Stevenson, author of "Indexed Annuity Secrets."
+- Insurance products are offered through licensed professionals; guarantees rely on the claims-paying ability of the issuing insurer and vary by state.
+
+## Contact
+- Book a free, no-obligation call: https://calendly.com/gregorystevenson/annuity-call
+- Phone: (619) 374-8100
